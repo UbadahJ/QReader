@@ -1,0 +1,23 @@
+<resources>
+    <string name="app_name">Qidian Underground</string>
+
+    <string name="library">Library</string>
+    <string name="name">Name</string>
+    <string name="book">Book</string>
+    <string name="last_read">Last Read</string>
+    <string name="last_updated">Last Updated</string>
+    <string name="chapter">Chapter</string>
+    <string name="chapters">Chapters</string>
+    <string name="download">Download</string>
+    <string name="refresh">Refresh</string>
+    <string name="error_refreshing">Failed to refresh new content</string>
+    <string name="add_library">Add to Library</string>
+    <string name="remove_from_library">Remove from Library</string>
+    <string name="completed">Completed</string>
+    <string name="more">More</string>
+    <string name="sort_by">Sort by</string>
+    <string name="filter">Filter</string>
+    <string name="browse">Browse</string>
+    <!-- TODO: Remove or change this placeholder text -->
+    <string name="hello_blank_fragment">Hello blank fragment</string>
+</resources>

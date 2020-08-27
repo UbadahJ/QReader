@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8"?>
+<set xmlns:android="http://schemas.android.com/apk/res/android"
+    android:duration="@integer/config_navAnimTime">
+
+    <alpha
+        android:fromAlpha="0"
+        android:toAlpha="1" />
+
+    <translate
+        android:fromYDelta="-300"
+        android:toYDelta="0" />
+
+</set>

@@ -1,0 +1,43 @@
+package com.ubadahj.qidianundergroud.ui
+
+import android.os.Bundle
+import android.view.LayoutInflater
+import android.view.View
+import android.view.ViewGroup
+import androidx.fragment.app.Fragment
+import androidx.fragment.app.activityViewModels
+import androidx.navigation.fragment.findNavController
+import com.ubadahj.qidianundergroud.R
+import com.ubadahj.qidianundergroud.databinding.BookListFragmentBinding
+
+class LibraryFragment : Fragment() {
+
+    private val viewModel: MainViewModel by activityViewModels()
+    private var binding: BookListFragmentBinding? = null
+
+    override fun onCreateView(
+        inflater: LayoutInflater, container: ViewGroup?,
+        savedInstanceState: Bundle?
+    ): View {
+        binding = BookListFragmentBinding.inflate(inflater, container, false)
+        return binding!!.root
+    }
+
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        super.onViewCreated(view, savedInstanceState)
+        binding?.apply {
+            header.text = resources.getText(R.string.library)
+            floatingButton.setOnClickListener {
+                findNavController().navigate(
+                    LibraryFragmentDirections.actionLibraryFragmentToBrowseFragment()
+                )
+            }
+        }
+    }
+
+    override fun onDestroyView() {
+        super.onDestroyView()
+        binding = null
+    }
+
+}

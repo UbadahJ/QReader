@@ -1,0 +1,20 @@
+<resources>
+
+    <style name="AppTheme" parent="Theme.MaterialComponents.DayNight.NoActionBar">
+        <item name="colorPrimary">@color/colorPrimaryDark</item>
+        <item name="colorAccent">@color/colorAccentDark</item>
+        <item name="android:colorBackground">@color/colorDarkBackground</item>
+
+        <item name="statusBarForeground">@color/textDarkPrimary</item>
+        <item name="statusBarBackground">@color/colorDarkBackground</item>
+        <item name="statusBarScrim">@color/colorDarkBackground</item>
+
+        <item name="android:statusBarColor">@color/colorDarkBackground</item>
+        <item name="android:navigationBarColor">@color/colorDarkBackground</item>
+    </style>
+
+    <style name="AppTheme.Icon">
+        <item name="tint">@color/textDarkSecondary</item>
+    </style>
+
+</resources>
