@@ -9,18 +9,18 @@ import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import androidx.navigation.fragment.findNavController
 import com.ubadahj.qidianundergroud.R
-import com.ubadahj.qidianundergroud.databinding.BookListFragmentBinding
+import com.ubadahj.qidianundergroud.databinding.LibraryFragmentBinding
 
 class LibraryFragment : Fragment() {
 
     private val viewModel: MainViewModel by activityViewModels()
-    private var binding: BookListFragmentBinding? = null
+    private var binding: LibraryFragmentBinding? = null
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View {
-        binding = BookListFragmentBinding.inflate(inflater, container, false)
+        binding = LibraryFragmentBinding.inflate(inflater, container, false)
         return binding!!.root
     }
 

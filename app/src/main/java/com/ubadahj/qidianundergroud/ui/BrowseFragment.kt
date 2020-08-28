@@ -12,7 +12,7 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import com.google.android.material.snackbar.Snackbar
 import com.ubadahj.qidianundergroud.R
 import com.ubadahj.qidianundergroud.api.Api
-import com.ubadahj.qidianundergroud.databinding.BookListFragmentBinding
+import com.ubadahj.qidianundergroud.databinding.BrowseFragmentBinding
 import com.ubadahj.qidianundergroud.models.Book
 import com.ubadahj.qidianundergroud.ui.adapters.BookListingAdapter
 import kotlinx.coroutines.Dispatchers
@@ -24,13 +24,13 @@ import java.net.SocketException
 class BrowseFragment : Fragment() {
 
     private val viewModel: MainViewModel by activityViewModels()
-    private var binding: BookListFragmentBinding? = null
+    private var binding: BrowseFragmentBinding? = null
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View {
-        binding = BookListFragmentBinding.inflate(inflater, container, false)
+        binding = BrowseFragmentBinding.inflate(inflater, container, false)
         return binding!!.root
     }
 
@@ -38,7 +38,6 @@ class BrowseFragment : Fragment() {
         super.onViewCreated(view, savedInstanceState)
         binding?.apply {
             (requireActivity() as AppCompatActivity).setSupportActionBar(toolbar.appbar)
-            floatingButton.visibility = View.GONE
             toolbar.appbar.title = resources.getText(R.string.browse)
             bookListingView.layoutManager = LinearLayoutManager(requireContext())
             progressBar.visibility = View.VISIBLE
@@ -52,8 +51,6 @@ class BrowseFragment : Fragment() {
                     Snackbar.make(view, R.string.error_refreshing, Snackbar.LENGTH_SHORT).show()
                 } catch (e: IOException) {
                     Snackbar.make(view, R.string.error_refreshing, Snackbar.LENGTH_SHORT).show()
-                } finally {
-                    binding?.progressBar?.visibility = View.GONE
                 }
             }
         } else updateListing(viewModel.bookList!!)
@@ -61,6 +58,7 @@ class BrowseFragment : Fragment() {
     }
 
     private fun updateListing(books: List<Book>) {
+        binding?.progressBar?.visibility = View.GONE
         binding?.bookListingView?.adapter = BookListingAdapter(books) {
             viewModel.updateSelectedBook(books[it])
             findNavController().navigate(
