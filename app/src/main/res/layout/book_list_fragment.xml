@@ -7,32 +7,10 @@
     android:layout_height="match_parent"
     tools:context=".ui.LibraryFragment">
 
-    <TextView
-        android:id="@+id/header"
-        style="@style/AppTheme.Title"
-        android:layout_width="0dp"
-        android:layout_height="wrap_content"
-        android:layout_marginStart="24dp"
-        android:layout_marginTop="24dp"
-        android:layout_marginEnd="24dp"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        tools:text="Library" />
+    <include
+        android:id="@+id/toolbar"
+        layout="@layout/material_toolbar" />
 
-    <ImageView
-        android:id="@+id/background_overlay"
-        android:layout_width="0dp"
-        android:layout_height="0dp"
-        android:layout_marginStart="16dp"
-        android:layout_marginTop="24dp"
-        android:layout_marginEnd="16dp"
-        android:layout_marginBottom="16dp"
-        android:src="@drawable/browse_background"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/header" />
 
     <com.google.android.material.floatingactionbutton.ExtendedFloatingActionButton
         android:id="@+id/floating_button"
@@ -52,10 +30,10 @@
         android:id="@+id/book_listing_view"
         android:layout_width="0dp"
         android:layout_height="0dp"
-        app:layout_constraintBottom_toBottomOf="@+id/background_overlay"
-        app:layout_constraintEnd_toEndOf="@+id/background_overlay"
-        app:layout_constraintStart_toStartOf="@+id/background_overlay"
-        app:layout_constraintTop_toTopOf="@+id/background_overlay" />
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/toolbar" />
 
     <ProgressBar
         android:id="@+id/progress_bar"

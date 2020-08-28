@@ -6,7 +6,7 @@
     <color name="colorAccent">#4291FA</color>
     <color name="colorAccentDark">#2A83F8</color>
 
-    <color name="colorBackground">#F2F2F2</color>
+    <color name="colorBackground">#FFFFFF</color>
     <color name="colorSurface">#FFFFFF</color>
     <color name="colorBase">#FFFFFF</color>
     <color name="colorBaseAlt">#FAFAFA</color>
