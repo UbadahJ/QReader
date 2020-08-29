@@ -17,4 +17,8 @@
         <item name="tint">@color/textDarkSecondary</item>
     </style>
 
+    <style name="Toolbar.AppTheme" parent="ThemeOverlay.MaterialComponents.ActionBar">
+        <item name="android:background">@color/colorDarkBackground</item>
+    </style>
+
 </resources>
