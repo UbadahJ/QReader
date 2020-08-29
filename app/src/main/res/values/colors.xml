@@ -7,12 +7,12 @@
     <color name="colorAccentDark">#2A83F8</color>
 
     <color name="colorBackground">#FFFFFF</color>
-    <color name="colorSurface">#FFFFFF</color>
+    <color name="colorSurface">#F5F5F5</color>
     <color name="colorBase">#FFFFFF</color>
     <color name="colorBaseAlt">#FAFAFA</color>
 
     <color name="colorDarkBackground">#212121</color>
-    <color name="colorDarkSurface">#3C3C3C</color>
+    <color name="colorDarkSurface">#343434</color>
     <color name="colorDarkBase">#2C2C2C</color>
     <color name="colorDarkBaseAlt">#242424</color>
 

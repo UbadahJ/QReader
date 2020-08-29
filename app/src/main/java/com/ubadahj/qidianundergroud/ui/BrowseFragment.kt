@@ -23,6 +23,7 @@ class BrowseFragment : Fragment() {
 
     private val viewModel: MainViewModel by activityViewModels()
     private var binding: BrowseFragmentBinding? = null
+    private var searchBarVisible: Boolean = false
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -68,7 +69,16 @@ class BrowseFragment : Fragment() {
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
         return when (item.itemId) {
-            R.id.search -> true
+            R.id.search -> {
+                binding?.apply {
+                    bookListingView.animate()
+                        .alpha(1f)
+                        .translationY(if (!searchBarVisible) searchBar.root.height + 32f else 0f)
+                        .start()
+                    searchBarVisible = !searchBarVisible
+                }
+                true
+            }
             R.id.menu -> true
             else -> false
         }

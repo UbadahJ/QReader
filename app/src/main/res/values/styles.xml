@@ -27,14 +27,17 @@
     <style name="Toolbar.AppTheme" parent="ThemeOverlay.MaterialComponents.ActionBar">
         <item name="theme">?theme</item>
         <item name="android:background">@color/colorBackground</item>
-        <item name="titleTextAppearance">@style/TextAppearance.AppTheme.Toolbar</item>
+        <item name="titleTextAppearance">@style/TextAppearance.MaterialComponents.Button</item>
     </style>
 
-    <style name="TextAppearance.AppTheme.Toolbar" parent="TextAppearance.MaterialComponents.Button">
-        <item name="android:textSize">18sp</item>
+    <style name="TextInputLayout.AppTheme" parent="Widget.MaterialComponents.TextInputLayout.OutlinedBox">
+        <item name="boxStrokeColor">?attr/colorAccent</item>
+        <item name="boxStrokeWidth">0dp</item>
+        <item name="boxStrokeWidthFocused">1dp</item>
+        <item name="boxBackgroundColor">@color/colorSurface</item>
     </style>
 
-    <style name="AppTheme.FloatingActionButton" parent="Widget.MaterialComponents.ExtendedFloatingActionButton">
+    <style name="FloatingActionButton.AppTheme" parent="Widget.MaterialComponents.ExtendedFloatingActionButton">
         <item name="android:backgroundTint">@color/colorPrimary</item>
         <item name="android:textColor">@color/textDarkPrimary</item>
         <item name="iconTint">@color/textDarkPrimary</item>
