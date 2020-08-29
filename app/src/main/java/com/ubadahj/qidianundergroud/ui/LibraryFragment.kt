@@ -13,7 +13,6 @@ class LibraryFragment : Fragment() {
 
     private val viewModel: MainViewModel by activityViewModels()
     private var binding: LibraryFragmentBinding? = null
-    private var searchBarVisible: Boolean = false
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -46,11 +45,11 @@ class LibraryFragment : Fragment() {
         return when (item.itemId) {
             R.id.search -> {
                 binding?.apply {
+                    val searchBarVisible = bookListingView.y != searchBar.root.y
                     bookListingView.animate()
                         .alpha(1f)
                         .translationY(if (!searchBarVisible) searchBar.root.height + 32f else 0f)
                         .start()
-                    searchBarVisible = !searchBarVisible
                 }
                 true
             }

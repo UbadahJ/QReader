@@ -1,8 +1,10 @@
 package com.ubadahj.qidianundergroud.ui
 
 import android.os.Bundle
+import android.text.Editable
 import android.view.*
 import androidx.appcompat.app.AppCompatActivity
+import androidx.core.widget.addTextChangedListener
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import androidx.navigation.fragment.findNavController
@@ -23,7 +25,6 @@ class BrowseFragment : Fragment() {
 
     private val viewModel: MainViewModel by activityViewModels()
     private var binding: BrowseFragmentBinding? = null
-    private var searchBarVisible: Boolean = false
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -41,6 +42,18 @@ class BrowseFragment : Fragment() {
             toolbar.appbar.title = resources.getText(R.string.browse)
             bookListingView.layoutManager = LinearLayoutManager(requireContext())
             progressBar.visibility = View.VISIBLE
+            searchBar.searchEditText.addTextChangedListener { text: Editable? ->
+                text?.apply {
+                    val books = viewModel.bookList?.filter { book ->
+                        book.name.contains(
+                            text,
+                            ignoreCase = true
+                        )
+                    }
+                    if (books != null)
+                        updateListing(books)
+                }
+            }
         }
         if (viewModel.bookList == null) {
             GlobalScope.launch(Dispatchers.Main) {
@@ -60,7 +73,7 @@ class BrowseFragment : Fragment() {
     private fun updateListing(books: List<Book>) {
         binding?.progressBar?.visibility = View.GONE
         binding?.bookListingView?.adapter = BookListingAdapter(books) {
-            viewModel.updateSelectedBook(books[it])
+            viewModel.updateSelectedBook(it)
             findNavController().navigate(
                 BrowseFragmentDirections.actionBrowseFragmentToBookFragment()
             )
@@ -71,11 +84,11 @@ class BrowseFragment : Fragment() {
         return when (item.itemId) {
             R.id.search -> {
                 binding?.apply {
+                    val searchBarVisible = bookListingView.y != searchBar.root.y
                     bookListingView.animate()
                         .alpha(1f)
                         .translationY(if (!searchBarVisible) searchBar.root.height + 32f else 0f)
                         .start()
-                    searchBarVisible = !searchBarVisible
                 }
                 true
             }
