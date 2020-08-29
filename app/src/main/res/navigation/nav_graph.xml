@@ -9,7 +9,7 @@
         android:id="@+id/libraryFragment"
         android:name="com.ubadahj.qidianundergroud.ui.LibraryFragment"
         android:label="book_list_fragment"
-        tools:layout="@layout/book_list_fragment">
+        tools:layout="@layout/library_fragment">
         <action
             android:id="@+id/action_libraryFragment_to_browseFragment"
             app:destination="@id/browseFragment"

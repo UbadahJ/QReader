@@ -8,7 +8,7 @@ import androidx.browser.customtabs.CustomTabsIntent
 import androidx.core.net.toUri
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
-import androidx.recyclerview.widget.LinearLayoutManager
+import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.google.android.material.snackbar.Snackbar
 import com.ubadahj.qidianundergroud.R
@@ -56,7 +56,7 @@ class BookFragment : Fragment() {
                 "${resources.getString(R.string.chapter)}: Completed"
             else
                 "${resources.getString(R.string.last_updated)}: ${book.formattedLastUpdated}"
-            chapterListView.layoutManager = LinearLayoutManager(requireContext())
+            chapterListView.layoutManager = GridLayoutManager(requireContext(), 2)
         }
         GlobalScope.launch(Dispatchers.Main) {
             try {
@@ -64,7 +64,7 @@ class BookFragment : Fragment() {
                 binding?.chapterListView?.adapter = ChapterListingAdapter(groups) {
                     CustomTabsIntent.Builder()
                         .build()
-                        .launchUrl(requireContext(), groups[it].link.toUri())
+                        .launchUrl(requireContext(), it.link.toUri())
                 }
             } catch (e: SocketException) {
                 snackbar?.show()
@@ -81,25 +81,29 @@ class BookFragment : Fragment() {
 
     class ChapterListingAdapter(
         private val groups: List<ChapterGroup>,
-        private val onClick: (Int) -> Unit
+        private val onClick: (ChapterGroup) -> Unit
     ) : RecyclerView.Adapter<ChapterListingAdapter.ViewHolder>() {
 
         override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
             val binding =
                 ChapterItemBinding.inflate(LayoutInflater.from(parent.context), parent, false)
-            return ViewHolder(binding, onClick)
+            return ViewHolder(binding, groups, onClick)
         }
 
         override fun onBindViewHolder(holder: ViewHolder, position: Int) {
-            holder.binding.chapterText.text = groups[position].text
+            holder.binding.root.text = groups[position].text
         }
 
         override fun getItemCount(): Int = groups.size
 
-        class ViewHolder(val binding: ChapterItemBinding, onClick: (Int) -> Unit) :
+        class ViewHolder(
+            val binding: ChapterItemBinding,
+            groups: List<ChapterGroup>,
+            onClick: (ChapterGroup) -> Unit
+        ) :
             RecyclerView.ViewHolder(binding.root) {
             init {
-                binding.root.setOnClickListener { onClick(adapterPosition) }
+                binding.root.setOnClickListener { onClick(groups[adapterPosition]) }
             }
         }
     }

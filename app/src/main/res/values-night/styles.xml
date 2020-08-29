@@ -8,13 +8,27 @@
         <item name="statusBarForeground">@color/textDarkPrimary</item>
         <item name="statusBarBackground">@color/colorDarkBackground</item>
         <item name="statusBarScrim">@color/colorDarkBackground</item>
+        <item name="backgroundVariant">@color/colorDarkSurface</item>
 
         <item name="android:statusBarColor">@color/colorDarkBackground</item>
         <item name="android:navigationBarColor">@color/colorDarkBackground</item>
     </style>
 
+    <style name="TextInputLayout.AppTheme" parent="Widget.MaterialComponents.TextInputLayout.OutlinedBox">
+        <item name="boxStrokeColor">?attr/colorAccent</item>
+        <item name="boxStrokeWidth">0dp</item>
+        <item name="boxStrokeWidthFocused">1dp</item>
+        <item name="boxBackgroundColor">@color/colorDarkSurface</item>
+    </style>
+
     <style name="AppTheme.Icon">
         <item name="tint">@color/textDarkSecondary</item>
+    </style>
+
+    <style name="Toolbar.AppTheme" parent="ThemeOverlay.MaterialComponents.ActionBar">
+        <item name="theme">?theme</item>
+        <item name="android:background">@color/colorDarkBackground</item>
+        <item name="titleTextAppearance">@style/TextAppearance.MaterialComponents.Button</item>
     </style>
 
 </resources>
