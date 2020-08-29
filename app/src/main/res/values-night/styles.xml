@@ -8,6 +8,7 @@
         <item name="statusBarForeground">@color/textDarkPrimary</item>
         <item name="statusBarBackground">@color/colorDarkBackground</item>
         <item name="statusBarScrim">@color/colorDarkBackground</item>
+        <item name="backgroundVariant">@color/colorDarkSurface</item>
 
         <item name="android:statusBarColor">@color/colorDarkBackground</item>
         <item name="android:navigationBarColor">@color/colorDarkBackground</item>
