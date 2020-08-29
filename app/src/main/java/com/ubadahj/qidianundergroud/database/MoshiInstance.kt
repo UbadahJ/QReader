@@ -1,4 +1,4 @@
-package com.ubadahj.qidianundergroud.models
+package com.ubadahj.qidianundergroud.database
 
 import com.squareup.moshi.Moshi
 import com.squareup.moshi.kotlin.reflect.KotlinJsonAdapterFactory

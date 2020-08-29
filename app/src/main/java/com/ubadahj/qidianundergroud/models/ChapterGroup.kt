@@ -1,7 +1,9 @@
 package com.ubadahj.qidianundergroud.models
 
 import com.squareup.moshi.Json
+import com.squareup.moshi.JsonClass
 
+@JsonClass(generateAdapter = true)
 data class ChapterGroup(
     @Json(name = "Text") val text: String,
     @Json(name = "Href") val link: String

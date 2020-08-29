@@ -1,7 +1,6 @@
 package com.ubadahj.qidianundergroud.database
 
 import android.content.Context
-import androidx.room.Room
 
 class DatabaseInstance private constructor(context: Context) {
 
@@ -15,8 +14,7 @@ class DatabaseInstance private constructor(context: Context) {
         }
     }
 
-    val db: Database = Room.databaseBuilder(
-        context, Database::class.java, "appDb"
-    ).build()
-
+    val db: Database = Database(
+        context.getSharedPreferences("db", Context.MODE_PRIVATE)
+    )
 }

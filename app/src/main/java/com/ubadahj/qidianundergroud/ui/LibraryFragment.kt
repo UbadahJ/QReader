@@ -6,8 +6,11 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import androidx.navigation.fragment.findNavController
+import androidx.recyclerview.widget.LinearLayoutManager
 import com.ubadahj.qidianundergroud.R
+import com.ubadahj.qidianundergroud.database.DatabaseInstance
 import com.ubadahj.qidianundergroud.databinding.LibraryFragmentBinding
+import com.ubadahj.qidianundergroud.ui.adapters.BookListingAdapter
 
 class LibraryFragment : Fragment() {
 
@@ -32,6 +35,13 @@ class LibraryFragment : Fragment() {
                 findNavController().navigate(
                     LibraryFragmentDirections.actionLibraryFragmentToBrowseFragment()
                 )
+            }
+            bookListingView.layoutManager = LinearLayoutManager(requireContext())
+            bookListingView.adapter = BookListingAdapter(
+                DatabaseInstance.getInstance(requireContext()).get()
+            ) {
+                viewModel.updateSelectedBook(it)
+                LibraryFragmentDirections.actionLibraryFragmentToBookFragment()
             }
         }
     }

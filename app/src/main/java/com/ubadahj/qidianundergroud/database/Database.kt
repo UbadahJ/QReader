@@ -1,14 +1,32 @@
 package com.ubadahj.qidianundergroud.database
 
-import androidx.room.Database
-import androidx.room.RoomDatabase
-import androidx.room.TypeConverters
+import android.content.SharedPreferences
+import com.squareup.moshi.Types
 import com.ubadahj.qidianundergroud.models.Book
 
-@Database(entities = [Book::class], version = 1)
-@TypeConverters(ChapterGroupConverter::class)
-abstract class Database : RoomDatabase() {
+class Database(private val preferences: SharedPreferences) {
 
-    abstract fun bookDao(): BookDao
+    private val adapter = moshi.adapter<MutableList<Book>>(
+        Types.newParameterizedType(MutableList::class.java, Book::class.java)
+    )
+    private val books: MutableList<Book> = adapter.fromJson(
+        preferences.getString("books", "[]")!!
+    )!!
+
+    fun get(): List<Book> = books
+
+    fun add(vararg books: Book) {
+        this.books.addAll(books)
+        save()
+    }
+
+    fun delete(book: Book) {
+        books.remove(book)
+        save()
+    }
+
+    private fun save() {
+        preferences.edit().putString("books", adapter.toJson(books)).apply()
+    }
 
 }
