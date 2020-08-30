@@ -4,6 +4,7 @@ import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
 import androidx.navigation.ActivityNavigator
 import androidx.navigation.findNavController
+import androidx.work.ExistingPeriodicWorkPolicy
 import androidx.work.PeriodicWorkRequestBuilder
 import androidx.work.WorkManager
 import com.ubadahj.qidianundergroud.databinding.MainActivityBinding
@@ -20,10 +21,9 @@ class MainActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         binding = MainActivityBinding.inflate(layoutInflater)
         setContentView(binding.root)
-        WorkManager.getInstance(applicationContext).enqueue(notificationRequest)
-//        WorkManager.getInstance(applicationContext).enqueueUniquePeriodicWork(
-//            "NotificationService", ExistingPeriodicWorkPolicy.KEEP, notificationRequest
-//        )
+        WorkManager.getInstance(applicationContext).enqueueUniquePeriodicWork(
+            "NotificationService", ExistingPeriodicWorkPolicy.KEEP, notificationRequest
+        )
     }
 
     override fun onSupportNavigateUp() = findNavController(R.id.nav_host_fragment).navigateUp()
