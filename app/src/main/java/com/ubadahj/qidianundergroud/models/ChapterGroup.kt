@@ -16,4 +16,6 @@ data class ChapterGroup(
 
     val total: Int
         get() = lastChapter - firstChapter + 1
+
+    operator fun contains(chapter: Int): Boolean = chapter in firstChapter..lastChapter
 }

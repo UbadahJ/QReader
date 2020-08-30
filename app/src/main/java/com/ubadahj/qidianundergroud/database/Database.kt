@@ -25,7 +25,7 @@ class Database(private val preferences: SharedPreferences) {
         save()
     }
 
-    private fun save() {
+    fun save() {
         preferences.edit().putString("books", adapter.toJson(books)).apply()
     }
 
