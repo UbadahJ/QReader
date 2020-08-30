@@ -11,7 +11,7 @@ import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.google.android.material.snackbar.Snackbar
 import com.ubadahj.qidianundergroud.R
-import com.ubadahj.qidianundergroud.api.Api
+import com.ubadahj.qidianundergroud.api.UndergroundApi
 import com.ubadahj.qidianundergroud.databinding.BrowseFragmentBinding
 import com.ubadahj.qidianundergroud.models.Book
 import com.ubadahj.qidianundergroud.ui.adapters.BookListingAdapter
@@ -58,7 +58,7 @@ class BrowseFragment : Fragment() {
         if (viewModel.bookList == null) {
             GlobalScope.launch(Dispatchers.Main) {
                 try {
-                    viewModel.bookList = Api.getBooks(true)
+                    viewModel.bookList = UndergroundApi.getBooks(true)
                     updateListing(viewModel.bookList!!)
                 } catch (e: SocketException) {
                     Snackbar.make(view, R.string.error_refreshing, Snackbar.LENGTH_SHORT).show()

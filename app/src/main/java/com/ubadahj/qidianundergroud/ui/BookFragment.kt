@@ -14,7 +14,7 @@ import androidx.recyclerview.widget.RecyclerView
 import com.google.android.material.snackbar.Snackbar
 import com.squareup.moshi.JsonDataException
 import com.ubadahj.qidianundergroud.R
-import com.ubadahj.qidianundergroud.api.Api
+import com.ubadahj.qidianundergroud.api.UndergroundApi
 import com.ubadahj.qidianundergroud.database.Database
 import com.ubadahj.qidianundergroud.database.DatabaseInstance
 import com.ubadahj.qidianundergroud.databinding.BookFragmentBinding
@@ -72,7 +72,7 @@ class BookFragment : Fragment() {
         }
         GlobalScope.launch(Dispatchers.Main) {
             try {
-                book.chapterGroups = Api.getChapters(book, true)
+                book.chapterGroups = UndergroundApi.getChapters(book, true)
                 binding?.chapterListView?.adapter = ChapterListingAdapter(book) {
                     book.lastRead = it.lastChapter
                     database.save()

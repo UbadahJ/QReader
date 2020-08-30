@@ -9,7 +9,7 @@ import retrofit2.Retrofit
 import retrofit2.converter.moshi.MoshiConverterFactory
 import retrofit2.http.*
 
-interface Api {
+interface UndergroundApi {
 
     companion object {
 
@@ -20,40 +20,40 @@ interface Api {
             cookieJar(MemoryCookieJar())
         }.build()
 
-        private val api: Api by lazy {
+        private val undergroundApi: UndergroundApi by lazy {
             Retrofit.Builder()
                 .baseUrl("https://toc.qidianunderground.org/api/v1/pages/")
                 .client(client)
                 .addConverterFactory(MoshiConverterFactory.create(moshi).asLenient())
                 .build()
-                .create(Api::class.java)
+                .create(UndergroundApi::class.java)
         }
 
-        private val proxyApi: Api by lazy {
+        private val proxyUndergroundApi: UndergroundApi by lazy {
             Retrofit.Builder()
                 .baseUrl("http://us7.unblock-websites.com/")
                 .client(client)
                 .addConverterFactory(MoshiConverterFactory.create(moshi).asLenient())
                 .build()
-                .create(Api::class.java)
+                .create(UndergroundApi::class.java)
         }
 
         suspend fun getBooks(proxy: Boolean = false): List<Book> {
             if (proxy)
-                return proxyApi._proxyGetBooks(
+                return proxyUndergroundApi._proxyGetBooks(
                     "https://toc.qidianunderground.org/api/v1/pages/public/",
                     "rnd"
                 )
-            return api._getBooks()
+            return undergroundApi._getBooks()
         }
 
         suspend fun getChapters(book: Book, proxy: Boolean = false): List<ChapterGroup> {
             if (proxy)
-                return proxyApi._proxyGetChapters(
+                return proxyUndergroundApi._proxyGetChapters(
                     "https://toc.qidianunderground.org/api/v1/pages/public/${book.id}/chapters",
                     "rnd"
                 )
-            return api._getChapters(book.id)
+            return undergroundApi._getChapters(book.id)
         }
 
     }
