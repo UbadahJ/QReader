@@ -13,6 +13,8 @@ import androidx.recyclerview.widget.RecyclerView
 import com.google.android.material.snackbar.Snackbar
 import com.ubadahj.qidianundergroud.R
 import com.ubadahj.qidianundergroud.api.Api
+import com.ubadahj.qidianundergroud.database.Database
+import com.ubadahj.qidianundergroud.database.DatabaseInstance
 import com.ubadahj.qidianundergroud.databinding.BookFragmentBinding
 import com.ubadahj.qidianundergroud.databinding.ChapterItemBinding
 import com.ubadahj.qidianundergroud.models.Book
@@ -28,6 +30,7 @@ class BookFragment : Fragment() {
     private val viewModel: MainViewModel by activityViewModels()
     private var binding: BookFragmentBinding? = null
     private lateinit var groups: List<ChapterGroup>
+    private lateinit var database: Database
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -42,6 +45,7 @@ class BookFragment : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+        database = DatabaseInstance.getInstance(requireContext())
         viewModel.getSelectedBook().value?.apply {
             init(this)
         }
@@ -57,6 +61,9 @@ class BookFragment : Fragment() {
             else
                 "${resources.getString(R.string.last_updated)}: ${book.formattedLastUpdated}"
             chapterListView.layoutManager = GridLayoutManager(requireContext(), 2)
+            libraryButton.setOnClickListener { database.add(book) }
+            if (database.get().contains(book))
+                libraryButton.visibility = View.GONE
         }
         GlobalScope.launch(Dispatchers.Main) {
             try {

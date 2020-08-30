@@ -41,7 +41,9 @@ class LibraryFragment : Fragment() {
                 DatabaseInstance.getInstance(requireContext()).get()
             ) {
                 viewModel.updateSelectedBook(it)
-                LibraryFragmentDirections.actionLibraryFragmentToBookFragment()
+                findNavController().navigate(
+                    LibraryFragmentDirections.actionLibraryFragmentToBookFragment()
+                )
             }
         }
     }
