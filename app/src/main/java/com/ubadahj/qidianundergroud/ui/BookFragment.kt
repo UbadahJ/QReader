@@ -30,6 +30,8 @@ import java.net.SocketException
 class BookFragment : Fragment() {
 
     private val viewModel: MainViewModel by activityViewModels()
+    private val api = Api(true)
+
     private var binding: BookFragmentBinding? = null
     private lateinit var database: Database
 
@@ -72,7 +74,7 @@ class BookFragment : Fragment() {
         }
         GlobalScope.launch(Dispatchers.Main) {
             try {
-                book.chapterGroups = Api.getChapters(book, true)
+                book.chapterGroups = api.getChapters(book)
                 binding?.chapterListView?.adapter = ChapterListingAdapter(book) {
                     book.lastRead = it.lastChapter
                     database.save()
