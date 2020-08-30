@@ -5,14 +5,18 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.browser.customtabs.CustomTabsIntent
+import androidx.core.content.ContextCompat
 import androidx.core.net.toUri
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.google.android.material.snackbar.Snackbar
+import com.squareup.moshi.JsonDataException
 import com.ubadahj.qidianundergroud.R
 import com.ubadahj.qidianundergroud.api.Api
+import com.ubadahj.qidianundergroud.database.Database
+import com.ubadahj.qidianundergroud.database.DatabaseInstance
 import com.ubadahj.qidianundergroud.databinding.BookFragmentBinding
 import com.ubadahj.qidianundergroud.databinding.ChapterItemBinding
 import com.ubadahj.qidianundergroud.models.Book
@@ -27,7 +31,7 @@ class BookFragment : Fragment() {
 
     private val viewModel: MainViewModel by activityViewModels()
     private var binding: BookFragmentBinding? = null
-    private lateinit var groups: List<ChapterGroup>
+    private lateinit var database: Database
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -42,6 +46,7 @@ class BookFragment : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+        database = DatabaseInstance.getInstance(requireContext())
         viewModel.getSelectedBook().value?.apply {
             init(this)
         }
@@ -57,16 +62,28 @@ class BookFragment : Fragment() {
             else
                 "${resources.getString(R.string.last_updated)}: ${book.formattedLastUpdated}"
             chapterListView.layoutManager = GridLayoutManager(requireContext(), 2)
+            libraryButton.setOnClickListener {
+                database.add(book)
+                Snackbar.make(root, "Added book to the library", Snackbar.LENGTH_SHORT).show()
+                libraryButton.visibility = View.GONE
+            }
+            if (database.get().contains(book))
+                libraryButton.visibility = View.GONE
         }
         GlobalScope.launch(Dispatchers.Main) {
             try {
-                groups = Api.getChapters(book, true)
-                binding?.chapterListView?.adapter = ChapterListingAdapter(groups) {
+                book.chapterGroups = Api.getChapters(book, true)
+                binding?.chapterListView?.adapter = ChapterListingAdapter(book) {
+                    book.lastRead = it.lastChapter
+                    database.save()
                     CustomTabsIntent.Builder()
                         .build()
                         .launchUrl(requireContext(), it.link.toUri())
+                    binding?.chapterListView?.adapter?.notifyDataSetChanged()
                 }
             } catch (e: SocketException) {
+                snackbar?.show()
+            } catch (e: JsonDataException) {
                 snackbar?.show()
             } catch (e: IOException) {
                 snackbar?.show()
@@ -80,9 +97,11 @@ class BookFragment : Fragment() {
     }
 
     class ChapterListingAdapter(
-        private val groups: List<ChapterGroup>,
+        private val book: Book,
         private val onClick: (ChapterGroup) -> Unit
     ) : RecyclerView.Adapter<ChapterListingAdapter.ViewHolder>() {
+
+        private val groups: List<ChapterGroup> = book.chapterGroups
 
         override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
             val binding =
@@ -91,7 +110,15 @@ class BookFragment : Fragment() {
         }
 
         override fun onBindViewHolder(holder: ViewHolder, position: Int) {
+            val context = holder.binding.root.context
             holder.binding.root.text = groups[position].text
+            if (book.lastRead in groups[position])
+                holder.binding.root.setTextColor(
+                    ContextCompat.getColor(
+                        context,
+                        R.color.colorAccent
+                    )
+                )
         }
 
         override fun getItemCount(): Int = groups.size

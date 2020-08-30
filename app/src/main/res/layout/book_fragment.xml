@@ -6,6 +6,17 @@
     android:layout_height="match_parent"
     tools:context=".ui.BookFragment">
 
+    <ImageView
+        android:id="@+id/book_image"
+        android:layout_width="96dp"
+        android:layout_height="96dp"
+        android:layout_marginTop="64dp"
+        android:src="@drawable/book"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:tint="?android:attr/textColorPrimary" />
+
     <TextView
         android:id="@+id/header"
         android:layout_width="0dp"
@@ -29,7 +40,7 @@
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/last_updated" />
+        app:layout_constraintTop_toBottomOf="@+id/simple_barrier" />
 
     <TextView
         android:id="@+id/last_updated"
@@ -46,20 +57,20 @@
         android:id="@+id/chapter_text"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:text="Table of Contents"
         android:layout_marginTop="32dp"
+        android:text="Table of Contents"
         android:textAlignment="center"
         android:textAppearance="@style/TextAppearance.MaterialComponents.Subtitle1"
         app:layout_constraintEnd_toEndOf="@+id/last_updated"
         app:layout_constraintStart_toStartOf="@+id/last_updated"
-        app:layout_constraintTop_toBottomOf="@+id/last_updated" />
+        app:layout_constraintTop_toBottomOf="@+id/simple_barrier" />
 
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/chapter_list_view"
         android:layout_width="0dp"
         android:layout_height="0dp"
-        android:layout_marginTop="16dp"
         android:layout_marginStart="16dp"
+        android:layout_marginTop="16dp"
         android:layout_marginEnd="16dp"
         android:layout_marginBottom="16dp"
         app:layout_constraintBottom_toBottomOf="parent"
@@ -67,15 +78,24 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/chapter_text" />
 
-    <ImageView
-        android:id="@+id/book_image"
-        android:layout_width="96dp"
-        android:layout_height="96dp"
-        android:layout_marginTop="64dp"
-        android:src="@drawable/book"
+    <androidx.constraintlayout.widget.Barrier
+        android:id="@+id/simple_barrier"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        app:barrierDirection="bottom"
+        app:constraint_referenced_ids="header,last_updated,book_image,library_button"
+        tools:layout_editor_absoluteY="228dp" />
+
+    <com.google.android.material.button.MaterialButton
+        android:id="@+id/library_button"
+        style="@style/Widget.MaterialComponents.Button.TextButton"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="8dp"
+        android:text="Add to library"
+        app:icon="@drawable/add"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:tint="?android:attr/textColorPrimary" />
+        app:layout_constraintTop_toBottomOf="@+id/last_updated" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

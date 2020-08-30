@@ -1,8 +1,8 @@
 package com.ubadahj.qidianundergroud.api
 
+import com.ubadahj.qidianundergroud.database.moshi
 import com.ubadahj.qidianundergroud.models.Book
 import com.ubadahj.qidianundergroud.models.ChapterGroup
-import com.ubadahj.qidianundergroud.models.moshi
 import okhttp3.OkHttpClient
 import okhttp3.logging.HttpLoggingInterceptor
 import retrofit2.Retrofit
