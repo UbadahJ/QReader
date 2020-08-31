@@ -104,10 +104,13 @@ class BookFragment : Fragment() {
     ) : RecyclerView.Adapter<ChapterListingAdapter.ViewHolder>() {
 
         private val groups: List<ChapterGroup> = book.chapterGroups
+        private var defaultColor: Int = 0
 
         override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
             val binding =
                 ChapterItemBinding.inflate(LayoutInflater.from(parent.context), parent, false)
+            if (defaultColor == 0)
+                defaultColor = binding.root.currentTextColor
             return ViewHolder(binding, groups, onClick)
         }
 
@@ -116,11 +119,10 @@ class BookFragment : Fragment() {
             holder.binding.root.text = groups[position].text
             if (book.lastRead in groups[position])
                 holder.binding.root.setTextColor(
-                    ContextCompat.getColor(
-                        context,
-                        R.color.colorAccent
-                    )
+                    ContextCompat.getColor(context, R.color.colorAccent)
                 )
+            else
+                holder.binding.root.setTextColor(defaultColor)
         }
 
         override fun getItemCount(): Int = groups.size
