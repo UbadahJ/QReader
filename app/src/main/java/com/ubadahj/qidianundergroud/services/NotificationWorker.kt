@@ -43,7 +43,7 @@ class NotificationWorker(context: Context, params: WorkerParameters) :
             val notification = NotificationCompat.Builder(applicationContext, CHANNEL_ID)
                 .setSmallIcon(R.drawable.book)
                 .setContentTitle(pair.second.name)
-                .setContentText("${pair.first} new chapter${if (pair.first > 1) "s" else ""} avaliable")
+                .setContentText("${pair.first} new chapter${if (pair.first > 1) "s" else ""} available")
                 .setPriority(NotificationCompat.PRIORITY_DEFAULT)
                 .build()
             with(NotificationManagerCompat.from(applicationContext)) {
