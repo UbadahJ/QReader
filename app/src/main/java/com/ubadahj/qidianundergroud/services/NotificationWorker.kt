@@ -29,7 +29,7 @@ class NotificationWorker(context: Context, params: WorkerParameters) :
                 val lastChapter = chapters.lastChapter()
                 val bookLastChapter = book.chapterGroups.lastChapter()
                 if (lastChapter > bookLastChapter) {
-                    updates.add(Pair(bookLastChapter - lastChapter, book))
+                    updates.add(Pair(lastChapter - bookLastChapter, book))
                     book.chapterGroups = chapters
                     database.save()
                 }
@@ -42,8 +42,8 @@ class NotificationWorker(context: Context, params: WorkerParameters) :
         for (pair in updates) {
             val notification = NotificationCompat.Builder(applicationContext, CHANNEL_ID)
                 .setSmallIcon(R.drawable.book)
-                .setContentTitle("${pair.second.name} updated")
-                .setContentText("${pair.first} new chapter${if (pair.first > 1) "s" else ""}")
+                .setContentTitle(pair.second.name)
+                .setContentText("${pair.first} new chapter${if (pair.first > 1) "s" else ""} available")
                 .setPriority(NotificationCompat.PRIORITY_DEFAULT)
                 .build()
             with(NotificationManagerCompat.from(applicationContext)) {
