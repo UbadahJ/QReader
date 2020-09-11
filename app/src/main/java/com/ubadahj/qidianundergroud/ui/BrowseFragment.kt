@@ -15,6 +15,8 @@ import com.ubadahj.qidianundergroud.api.Api
 import com.ubadahj.qidianundergroud.databinding.BrowseFragmentBinding
 import com.ubadahj.qidianundergroud.models.Book
 import com.ubadahj.qidianundergroud.ui.adapters.BookListingAdapter
+import com.ubadahj.qidianundergroud.ui.adapters.MenuAdapter
+import com.ubadahj.qidianundergroud.utils.setListener
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
@@ -22,6 +24,8 @@ import java.io.IOException
 import java.net.SocketException
 
 class BrowseFragment : Fragment() {
+
+    // TODO: Improve refresh UI
 
     private val viewModel: MainViewModel by activityViewModels()
     private var binding: BrowseFragmentBinding? = null
@@ -55,20 +59,31 @@ class BrowseFragment : Fragment() {
                         updateListing(books)
                 }
             }
-        }
-        if (viewModel.bookList == null) {
-            GlobalScope.launch(Dispatchers.Main) {
-                try {
-                    viewModel.bookList = api.getBooks()
-                    updateListing(viewModel.bookList!!)
-                } catch (e: SocketException) {
-                    Snackbar.make(view, R.string.error_refreshing, Snackbar.LENGTH_SHORT).show()
-                } catch (e: IOException) {
-                    Snackbar.make(view, R.string.error_refreshing, Snackbar.LENGTH_SHORT).show()
+            dropdownMenu.menu.layoutManager = LinearLayoutManager(requireContext())
+            dropdownMenu.menu.adapter = MenuAdapter(listOf("Refresh")) {
+                when (it) {
+                    1 -> fetchBooks(root)
                 }
             }
-        } else updateListing(viewModel.bookList!!)
+        }
+        if (viewModel.bookList == null)
+            fetchBooks(view)
+        else
+            updateListing(viewModel.bookList!!)
 
+    }
+
+    private fun fetchBooks(view: View) {
+        GlobalScope.launch(Dispatchers.Main) {
+            try {
+                viewModel.bookList = api.getBooks()
+                updateListing(viewModel.bookList!!)
+            } catch (e: SocketException) {
+                Snackbar.make(view, R.string.error_refreshing, Snackbar.LENGTH_SHORT).show()
+            } catch (e: IOException) {
+                Snackbar.make(view, R.string.error_refreshing, Snackbar.LENGTH_SHORT).show()
+            }
+        }
     }
 
     private fun updateListing(books: List<Book>) {
@@ -93,7 +108,20 @@ class BrowseFragment : Fragment() {
                 }
                 true
             }
-            R.id.menu -> true
+            R.id.menu -> {
+                binding?.apply {
+                    if (dropdownMenu.root.visibility == View.GONE) {
+                        dropdownMenu.root.visibility = View.VISIBLE
+                        dropdownMenu.root.animate().alpha(1f).setListener {
+                        }.start()
+                    } else {
+                        dropdownMenu.root.animate().alpha(0f).setListener {
+                            dropdownMenu.root.visibility = View.GONE
+                        }.start()
+                    }
+                }
+                true
+            }
             else -> false
         }
     }

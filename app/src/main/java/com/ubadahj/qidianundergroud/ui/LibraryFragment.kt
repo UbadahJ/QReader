@@ -11,6 +11,8 @@ import com.ubadahj.qidianundergroud.R
 import com.ubadahj.qidianundergroud.database.DatabaseInstance
 import com.ubadahj.qidianundergroud.databinding.LibraryFragmentBinding
 import com.ubadahj.qidianundergroud.ui.adapters.BookListingAdapter
+import com.ubadahj.qidianundergroud.ui.adapters.MenuAdapter
+import com.ubadahj.qidianundergroud.utils.setListener
 
 class LibraryFragment : Fragment() {
 
@@ -45,6 +47,8 @@ class LibraryFragment : Fragment() {
                     LibraryFragmentDirections.actionLibraryFragmentToBookFragment()
                 )
             }
+            dropdownMenu.menu.layoutManager = LinearLayoutManager(requireContext())
+            dropdownMenu.menu.adapter = MenuAdapter(listOf("History", "Settings", "About")) {}
         }
     }
 
@@ -65,7 +69,20 @@ class LibraryFragment : Fragment() {
                 }
                 true
             }
-            R.id.menu -> true
+            R.id.menu -> {
+                binding?.apply {
+                    if (dropdownMenu.root.visibility == View.GONE) {
+                        dropdownMenu.root.visibility = View.VISIBLE
+                        dropdownMenu.root.animate().alpha(1f).setListener {
+                        }.start()
+                    } else {
+                        dropdownMenu.root.animate().alpha(0f).setListener {
+                            dropdownMenu.root.visibility = View.GONE
+                        }.start()
+                    }
+                }
+                true
+            }
             else -> false
         }
     }
