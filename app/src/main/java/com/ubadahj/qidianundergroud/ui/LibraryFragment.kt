@@ -42,7 +42,7 @@ class LibraryFragment : Fragment() {
             bookListingView.adapter = BookListingAdapter(
                 DatabaseInstance.getInstance(requireContext()).get()
             ) {
-                viewModel.updateSelectedBook(it)
+                viewModel.selectedBook.value = it
                 findNavController().navigate(
                     LibraryFragmentDirections.actionLibraryFragmentToBookFragment()
                 )

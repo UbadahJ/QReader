@@ -40,7 +40,7 @@ class BookFragment : Fragment() {
         savedInstanceState: Bundle?
     ): View {
         binding = BookFragmentBinding.inflate(inflater, container, false)
-        viewModel.getSelectedBook().observe(viewLifecycleOwner) {
+        viewModel.selectedBook.observe(viewLifecycleOwner) {
             if (it != null) init(it)
         }
         return binding!!.root
@@ -49,7 +49,7 @@ class BookFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         database = DatabaseInstance.getInstance(requireContext())
-        viewModel.getSelectedBook().value?.apply {
+        viewModel.selectedBook.value?.apply {
             init(this)
         }
     }

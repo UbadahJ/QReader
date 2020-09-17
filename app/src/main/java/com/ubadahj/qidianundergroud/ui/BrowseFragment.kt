@@ -89,7 +89,7 @@ class BrowseFragment : Fragment() {
     private fun updateListing(books: List<Book>) {
         binding?.progressBar?.visibility = View.GONE
         binding?.bookListingView?.adapter = BookListingAdapter(books) {
-            viewModel.updateSelectedBook(it)
+            viewModel.selectedBook.value = it
             findNavController().navigate(
                 BrowseFragmentDirections.actionBrowseFragmentToBookFragment()
             )
