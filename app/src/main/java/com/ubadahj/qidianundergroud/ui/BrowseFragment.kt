@@ -11,25 +11,17 @@ import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.google.android.material.snackbar.Snackbar
 import com.ubadahj.qidianundergroud.R
-import com.ubadahj.qidianundergroud.api.Api
 import com.ubadahj.qidianundergroud.databinding.BrowseFragmentBinding
 import com.ubadahj.qidianundergroud.models.Book
+import com.ubadahj.qidianundergroud.models.Resource
 import com.ubadahj.qidianundergroud.ui.adapters.BookListingAdapter
 import com.ubadahj.qidianundergroud.ui.adapters.MenuAdapter
 import com.ubadahj.qidianundergroud.utils.setListener
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.GlobalScope
-import kotlinx.coroutines.launch
-import java.io.IOException
-import java.net.SocketException
 
 class BrowseFragment : Fragment() {
 
-    // TODO: Improve refresh UI
-
     private val viewModel: MainViewModel by activityViewModels()
     private var binding: BrowseFragmentBinding? = null
-    private val api: Api = Api(proxy = true)
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -42,6 +34,20 @@ class BrowseFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         setHasOptionsMenu(true)
+
+        viewModel.getBooks().observe(viewLifecycleOwner) { resource ->
+            when (resource) {
+                is Resource.Success -> updateListing(resource.data!!)
+                is Resource.Loading -> binding?.progressBar?.visibility = View.VISIBLE
+                is Resource.Error -> {
+                    binding?.apply {
+                        progressBar.visibility = View.GONE
+                        Snackbar.make(root, R.string.error_refreshing, Snackbar.LENGTH_SHORT).show()
+                    }
+                }
+            }
+        }
+
         binding?.apply {
             (requireActivity() as AppCompatActivity).setSupportActionBar(toolbar.appbar)
             toolbar.appbar.title = resources.getText(R.string.browse)
@@ -49,50 +55,33 @@ class BrowseFragment : Fragment() {
             progressBar.visibility = View.VISIBLE
             searchBar.searchEditText.addTextChangedListener { text: Editable? ->
                 text?.apply {
-                    val books = viewModel.bookList?.filter { book ->
-                        book.name.contains(
-                            text,
-                            ignoreCase = true
-                        )
+                    viewModel.getBooks().value?.apply {
+                        if (this is Resource.Success)
+                            updateListing(data!!.filter { book ->
+                                book.name.contains(text, ignoreCase = true)
+                            })
                     }
-                    if (books != null)
-                        updateListing(books)
                 }
             }
             dropdownMenu.menu.layoutManager = LinearLayoutManager(requireContext())
             dropdownMenu.menu.adapter = MenuAdapter(listOf("Refresh")) {
                 when (it) {
-                    1 -> fetchBooks(root)
+                    1 -> viewModel.getBooks(true)
                 }
             }
         }
-        if (viewModel.bookList == null)
-            fetchBooks(view)
-        else
-            updateListing(viewModel.bookList!!)
 
-    }
-
-    private fun fetchBooks(view: View) {
-        GlobalScope.launch(Dispatchers.Main) {
-            try {
-                viewModel.bookList = api.getBooks()
-                updateListing(viewModel.bookList!!)
-            } catch (e: SocketException) {
-                Snackbar.make(view, R.string.error_refreshing, Snackbar.LENGTH_SHORT).show()
-            } catch (e: IOException) {
-                Snackbar.make(view, R.string.error_refreshing, Snackbar.LENGTH_SHORT).show()
-            }
-        }
     }
 
     private fun updateListing(books: List<Book>) {
-        binding?.progressBar?.visibility = View.GONE
-        binding?.bookListingView?.adapter = BookListingAdapter(books) {
-            viewModel.selectedBook.value = it
-            findNavController().navigate(
-                BrowseFragmentDirections.actionBrowseFragmentToBookFragment()
-            )
+        binding?.apply {
+            progressBar.visibility = View.GONE
+            bookListingView.adapter = BookListingAdapter(books) {
+                viewModel.selectedBook.value = it
+                findNavController().navigate(
+                    BrowseFragmentDirections.actionBrowseFragmentToBookFragment()
+                )
+            }
         }
     }
 
