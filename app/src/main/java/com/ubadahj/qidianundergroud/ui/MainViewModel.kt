@@ -13,4 +13,7 @@ class MainViewModel : ViewModel() {
 
     fun getBooks(refresh: Boolean = false) = BookRepository().getBooks(refresh)
 
+    fun getChapters(book: Book, refresh: Boolean = false) =
+        BookRepository().getChapters(book, refresh)
+
 }
