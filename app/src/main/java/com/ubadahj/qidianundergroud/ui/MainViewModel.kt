@@ -7,10 +7,10 @@ import com.ubadahj.qidianundergroud.repositories.BookRepository
 
 class MainViewModel : ViewModel() {
 
-    fun getBooks(refresh: Boolean = false) = BookRepository().getBooks(refresh)
-
     val selectedBook: MutableLiveData<Book?> by lazy {
         MutableLiveData()
     }
+
+    fun getBooks(refresh: Boolean = false) = BookRepository().getBooks(refresh)
 
 }
