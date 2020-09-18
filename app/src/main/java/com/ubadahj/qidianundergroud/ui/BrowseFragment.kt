@@ -9,6 +9,7 @@ import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
+import com.github.ajalt.timberkt.d
 import com.google.android.material.snackbar.Snackbar
 import com.ubadahj.qidianundergroud.R
 import com.ubadahj.qidianundergroud.databinding.BrowseFragmentBinding
@@ -35,24 +36,12 @@ class BrowseFragment : Fragment() {
         super.onViewCreated(view, savedInstanceState)
         setHasOptionsMenu(true)
 
-        viewModel.getBooks().observe(viewLifecycleOwner) { resource ->
-            when (resource) {
-                is Resource.Success -> updateListing(resource.data!!)
-                is Resource.Loading -> binding?.progressBar?.visibility = View.VISIBLE
-                is Resource.Error -> {
-                    binding?.apply {
-                        progressBar.visibility = View.GONE
-                        Snackbar.make(root, R.string.error_refreshing, Snackbar.LENGTH_SHORT).show()
-                    }
-                }
-            }
-        }
+        viewModel.getBooks().observe(viewLifecycleOwner, this::getBooks)
 
         binding?.apply {
             (requireActivity() as AppCompatActivity).setSupportActionBar(toolbar.appbar)
             toolbar.appbar.title = resources.getText(R.string.browse)
             bookListingView.layoutManager = LinearLayoutManager(requireContext())
-            progressBar.visibility = View.VISIBLE
             searchBar.searchEditText.addTextChangedListener { text: Editable? ->
                 text?.apply {
                     viewModel.getBooks().value?.apply {
@@ -66,11 +55,27 @@ class BrowseFragment : Fragment() {
             dropdownMenu.menu.layoutManager = LinearLayoutManager(requireContext())
             dropdownMenu.menu.adapter = MenuAdapter(listOf("Refresh")) {
                 when (it) {
-                    1 -> viewModel.getBooks(true)
+                    0 -> viewModel
+                        .getBooks(refresh = true)
+                        .observe(viewLifecycleOwner, this@BrowseFragment::getBooks)
                 }
             }
         }
 
+    }
+
+    private fun getBooks(resource: Resource<List<Book>>) {
+        d { "getBooks(): resource = $resource" }
+        when (resource) {
+            is Resource.Success -> updateListing(resource.data!!)
+            is Resource.Loading -> binding?.progressBar?.visibility = View.VISIBLE
+            is Resource.Error -> {
+                binding?.apply {
+                    progressBar.visibility = View.GONE
+                    Snackbar.make(root, R.string.error_refreshing, Snackbar.LENGTH_SHORT).show()
+                }
+            }
+        }
     }
 
     private fun updateListing(books: List<Book>) {
