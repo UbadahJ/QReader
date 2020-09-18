@@ -11,18 +11,22 @@ import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.github.ajalt.timberkt.d
 import com.google.android.material.snackbar.Snackbar
+import com.mikepenz.fastadapter.FastAdapter
+import com.mikepenz.fastadapter.adapters.ItemAdapter
 import com.ubadahj.qidianundergroud.R
 import com.ubadahj.qidianundergroud.databinding.BrowseFragmentBinding
 import com.ubadahj.qidianundergroud.models.Book
 import com.ubadahj.qidianundergroud.models.Resource
-import com.ubadahj.qidianundergroud.ui.adapters.BookListingAdapter
+import com.ubadahj.qidianundergroud.ui.adapters.BookAdapter
 import com.ubadahj.qidianundergroud.ui.adapters.MenuAdapter
+import com.ubadahj.qidianundergroud.ui.adapters.items.BookItem
 import com.ubadahj.qidianundergroud.utils.setListener
 
 class BrowseFragment : Fragment() {
 
     private val viewModel: MainViewModel by activityViewModels()
     private var binding: BrowseFragmentBinding? = null
+    private var adapter: ItemAdapter<BookItem>? = null
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -43,14 +47,7 @@ class BrowseFragment : Fragment() {
             toolbar.appbar.title = resources.getText(R.string.browse)
             bookListingView.layoutManager = LinearLayoutManager(requireContext())
             searchBar.searchEditText.addTextChangedListener { text: Editable? ->
-                text?.apply {
-                    viewModel.getBooks().value?.apply {
-                        if (this is Resource.Success)
-                            updateListing(data!!.filter { book ->
-                                book.name.contains(text, ignoreCase = true)
-                            })
-                    }
-                }
+                adapter?.filter(text)
             }
             dropdownMenu.menu.layoutManager = LinearLayoutManager(requireContext())
             dropdownMenu.menu.adapter = MenuAdapter(listOf("Refresh")) {
@@ -81,11 +78,15 @@ class BrowseFragment : Fragment() {
     private fun updateListing(books: List<Book>) {
         binding?.apply {
             progressBar.visibility = View.GONE
-            bookListingView.adapter = BookListingAdapter(books) {
-                viewModel.selectedBook.value = it
-                findNavController().navigate(
-                    BrowseFragmentDirections.actionBrowseFragmentToBookFragment()
-                )
+            adapter = BookAdapter(books)
+            bookListingView.adapter = FastAdapter.with(adapter!!).apply {
+                onClickListener = { _, _, item, _ ->
+                    viewModel.selectedBook.value = item.book
+                    findNavController().navigate(
+                        BrowseFragmentDirections.actionBrowseFragmentToBookFragment()
+                    )
+                    false
+                }
             }
         }
     }
