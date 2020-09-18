@@ -49,12 +49,19 @@ class BrowseFragment : Fragment() {
             searchBar.searchEditText.addTextChangedListener { text: Editable? ->
                 adapter?.filter(text)
             }
+
             dropdownMenu.menu.layoutManager = LinearLayoutManager(requireContext())
-            dropdownMenu.menu.adapter = MenuAdapter(listOf("Refresh")) {
-                when (it) {
-                    0 -> viewModel
-                        .getBooks(refresh = true)
-                        .observe(viewLifecycleOwner, this@BrowseFragment::getBooks)
+            dropdownMenu.menu.adapter = FastAdapter.with(MenuAdapter(listOf("Refresh"))).apply {
+                onClickListener = { _, _, _, i ->
+                    when (i) {
+                        0 -> {
+                            viewModel
+                                .getBooks(refresh = true)
+                                .observe(viewLifecycleOwner, this@BrowseFragment::getBooks)
+                            true
+                        }
+                        else -> false
+                    }
                 }
             }
         }

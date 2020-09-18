@@ -57,7 +57,11 @@ class LibraryFragment : Fragment() {
             ).apply { onClickListener = onBookSelected }
 
             dropdownMenu.menu.layoutManager = LinearLayoutManager(requireContext())
-            dropdownMenu.menu.adapter = MenuAdapter(listOf("History", "Settings", "About")) {}
+            dropdownMenu.menu.adapter = FastAdapter.with(
+                MenuAdapter(
+                    listOf("History", "Settings", "About")
+                )
+            )
         }
     }
 
