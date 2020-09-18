@@ -7,6 +7,7 @@ import androidx.navigation.findNavController
 import androidx.work.ExistingPeriodicWorkPolicy
 import androidx.work.PeriodicWorkRequestBuilder
 import androidx.work.WorkManager
+import com.github.ajalt.timberkt.Timber
 import com.ubadahj.qidianundergroud.databinding.MainActivityBinding
 import com.ubadahj.qidianundergroud.services.NotificationWorker
 import java.util.concurrent.TimeUnit
@@ -21,6 +22,10 @@ class MainActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         binding = MainActivityBinding.inflate(layoutInflater)
         setContentView(binding.root)
+
+        if (BuildConfig.DEBUG)
+            Timber.plant(Timber.DebugTree())
+
         WorkManager.getInstance(applicationContext).enqueueUniquePeriodicWork(
             "NotificationService", ExistingPeriodicWorkPolicy.KEEP, notificationRequest
         )
