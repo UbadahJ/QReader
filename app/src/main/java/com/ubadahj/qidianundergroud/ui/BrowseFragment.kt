@@ -9,27 +9,24 @@ import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
+import com.github.ajalt.timberkt.d
 import com.google.android.material.snackbar.Snackbar
+import com.mikepenz.fastadapter.FastAdapter
+import com.mikepenz.fastadapter.adapters.ItemAdapter
 import com.ubadahj.qidianundergroud.R
-import com.ubadahj.qidianundergroud.api.Api
 import com.ubadahj.qidianundergroud.databinding.BrowseFragmentBinding
 import com.ubadahj.qidianundergroud.models.Book
-import com.ubadahj.qidianundergroud.ui.adapters.BookListingAdapter
+import com.ubadahj.qidianundergroud.models.Resource
+import com.ubadahj.qidianundergroud.ui.adapters.BookAdapter
 import com.ubadahj.qidianundergroud.ui.adapters.MenuAdapter
+import com.ubadahj.qidianundergroud.ui.adapters.items.BookItem
 import com.ubadahj.qidianundergroud.utils.setListener
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.GlobalScope
-import kotlinx.coroutines.launch
-import java.io.IOException
-import java.net.SocketException
 
 class BrowseFragment : Fragment() {
 
-    // TODO: Improve refresh UI
-
     private val viewModel: MainViewModel by activityViewModels()
     private var binding: BrowseFragmentBinding? = null
-    private val api: Api = Api(proxy = true)
+    private var adapter: ItemAdapter<BookItem>? = null
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -42,57 +39,62 @@ class BrowseFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         setHasOptionsMenu(true)
+
+        viewModel.getBooks().observe(viewLifecycleOwner, this::getBooks)
+
         binding?.apply {
             (requireActivity() as AppCompatActivity).setSupportActionBar(toolbar.appbar)
             toolbar.appbar.title = resources.getText(R.string.browse)
             bookListingView.layoutManager = LinearLayoutManager(requireContext())
-            progressBar.visibility = View.VISIBLE
             searchBar.searchEditText.addTextChangedListener { text: Editable? ->
-                text?.apply {
-                    val books = viewModel.bookList?.filter { book ->
-                        book.name.contains(
-                            text,
-                            ignoreCase = true
-                        )
-                    }
-                    if (books != null)
-                        updateListing(books)
-                }
+                adapter?.filter(text)
             }
+
             dropdownMenu.menu.layoutManager = LinearLayoutManager(requireContext())
-            dropdownMenu.menu.adapter = MenuAdapter(listOf("Refresh")) {
-                when (it) {
-                    1 -> fetchBooks(root)
+            dropdownMenu.menu.adapter = FastAdapter.with(MenuAdapter(listOf("Refresh"))).apply {
+                onClickListener = { _, _, _, i ->
+                    when (i) {
+                        0 -> {
+                            viewModel
+                                .getBooks(refresh = true)
+                                .observe(viewLifecycleOwner, this@BrowseFragment::getBooks)
+                            true
+                        }
+                        else -> false
+                    }
                 }
             }
         }
-        if (viewModel.bookList == null)
-            fetchBooks(view)
-        else
-            updateListing(viewModel.bookList!!)
 
     }
 
-    private fun fetchBooks(view: View) {
-        GlobalScope.launch(Dispatchers.Main) {
-            try {
-                viewModel.bookList = api.getBooks()
-                updateListing(viewModel.bookList!!)
-            } catch (e: SocketException) {
-                Snackbar.make(view, R.string.error_refreshing, Snackbar.LENGTH_SHORT).show()
-            } catch (e: IOException) {
-                Snackbar.make(view, R.string.error_refreshing, Snackbar.LENGTH_SHORT).show()
+    private fun getBooks(resource: Resource<List<Book>>) {
+        d { "getBooks(): resource = $resource" }
+        when (resource) {
+            is Resource.Success -> updateListing(resource.data!!)
+            is Resource.Loading -> binding?.progressBar?.visibility = View.VISIBLE
+            is Resource.Error -> {
+                binding?.apply {
+                    progressBar.visibility = View.GONE
+                    Snackbar.make(root, R.string.error_refreshing, Snackbar.LENGTH_SHORT).show()
+                }
             }
         }
     }
 
     private fun updateListing(books: List<Book>) {
-        binding?.progressBar?.visibility = View.GONE
-        binding?.bookListingView?.adapter = BookListingAdapter(books) {
-            viewModel.updateSelectedBook(it)
-            findNavController().navigate(
-                BrowseFragmentDirections.actionBrowseFragmentToBookFragment()
-            )
+        binding?.apply {
+            progressBar.visibility = View.GONE
+            adapter = BookAdapter(books)
+            bookListingView.adapter = FastAdapter.with(adapter!!).apply {
+                onClickListener = { _, _, item, _ ->
+                    viewModel.selectedBook.value = item.book
+                    findNavController().navigate(
+                        BrowseFragmentDirections.actionBrowseFragmentToBookFragment()
+                    )
+                    false
+                }
+            }
         }
     }
 

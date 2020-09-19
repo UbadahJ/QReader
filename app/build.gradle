@@ -95,5 +95,14 @@ dependencies {
     def work_version = "2.4.0"
     implementation "androidx.work:work-runtime-ktx:$work_version"
 
+    // For logging
+    implementation 'com.github.ajalt:timberkt:1.5.1'
+
+    // Better recyclerview
+    def fast_adapter_version = "5.2.3"
+    implementation "com.mikepenz:fastadapter:$fast_adapter_version"
+    implementation "com.mikepenz:fastadapter-extensions-binding:$fast_adapter_version"
+    implementation "com.mikepenz:fastadapter-extensions-diff:$fast_adapter_version"
+
 
 }

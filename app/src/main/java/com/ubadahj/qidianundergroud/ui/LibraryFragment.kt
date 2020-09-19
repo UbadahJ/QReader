@@ -7,16 +7,28 @@ import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
+import com.mikepenz.fastadapter.FastAdapter
+import com.mikepenz.fastadapter.IAdapter
 import com.ubadahj.qidianundergroud.R
 import com.ubadahj.qidianundergroud.database.DatabaseInstance
 import com.ubadahj.qidianundergroud.databinding.LibraryFragmentBinding
-import com.ubadahj.qidianundergroud.ui.adapters.BookListingAdapter
+import com.ubadahj.qidianundergroud.ui.adapters.BookAdapter
 import com.ubadahj.qidianundergroud.ui.adapters.MenuAdapter
+import com.ubadahj.qidianundergroud.ui.adapters.items.BookItem
 import com.ubadahj.qidianundergroud.utils.setListener
 
 class LibraryFragment : Fragment() {
 
     private val viewModel: MainViewModel by activityViewModels()
+    private val onBookSelected: (View?, IAdapter<BookItem>, BookItem, Int) -> Boolean =
+        { _, _, item, _ ->
+            viewModel.selectedBook.value = item.book
+            findNavController().navigate(
+                LibraryFragmentDirections.actionLibraryFragmentToBookFragment()
+            )
+            true
+        }
+
     private var binding: LibraryFragmentBinding? = null
 
     override fun onCreateView(
@@ -38,17 +50,18 @@ class LibraryFragment : Fragment() {
                     LibraryFragmentDirections.actionLibraryFragmentToBrowseFragment()
                 )
             }
+
             bookListingView.layoutManager = LinearLayoutManager(requireContext())
-            bookListingView.adapter = BookListingAdapter(
-                DatabaseInstance.getInstance(requireContext()).get()
-            ) {
-                viewModel.updateSelectedBook(it)
-                findNavController().navigate(
-                    LibraryFragmentDirections.actionLibraryFragmentToBookFragment()
-                )
-            }
+            bookListingView.adapter = FastAdapter.with(
+                BookAdapter(DatabaseInstance.getInstance(requireContext()).get())
+            ).apply { onClickListener = onBookSelected }
+
             dropdownMenu.menu.layoutManager = LinearLayoutManager(requireContext())
-            dropdownMenu.menu.adapter = MenuAdapter(listOf("History", "Settings", "About")) {}
+            dropdownMenu.menu.adapter = FastAdapter.with(
+                MenuAdapter(
+                    listOf("History", "Settings", "About")
+                )
+            )
         }
     }
 

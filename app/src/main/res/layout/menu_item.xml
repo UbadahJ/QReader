@@ -2,6 +2,7 @@
 <com.google.android.material.button.MaterialButton xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     style="@style/Widget.MaterialComponents.Button.TextButton"
+    android:id="@+id/menu_item"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:padding="16dp"

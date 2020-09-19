@@ -10,29 +10,31 @@ import retrofit2.converter.moshi.MoshiConverterFactory
 
 class Api(private val proxy: Boolean = false) {
 
-    private val client: OkHttpClient = OkHttpClient.Builder().apply {
-        networkInterceptors().add(HttpLoggingInterceptor().apply {
-            setLevel(HttpLoggingInterceptor.Level.BASIC)
-        })
-        cookieJar(MemoryCookieJar())
-    }.build()
+    companion object {
+        private val client: OkHttpClient = OkHttpClient.Builder().apply {
+            networkInterceptors().add(HttpLoggingInterceptor().apply {
+                setLevel(HttpLoggingInterceptor.Level.BASIC)
+            })
+            cookieJar(MemoryCookieJar())
+        }.build()
 
-    private val api: UndergroundApi by lazy {
-        Retrofit.Builder()
-            .baseUrl("https://toc.qidianunderground.org/api/v1/pages/")
-            .client(client)
-            .addConverterFactory(MoshiConverterFactory.create(moshi).asLenient())
-            .build()
-            .create(UndergroundApi::class.java)
-    }
+        private val api: UndergroundApi by lazy {
+            Retrofit.Builder()
+                .baseUrl("https://toc.qidianunderground.org/api/v1/pages/")
+                .client(client)
+                .addConverterFactory(MoshiConverterFactory.create(moshi).asLenient())
+                .build()
+                .create(UndergroundApi::class.java)
+        }
 
-    private val proxyApi: ProxyApi by lazy {
-        Retrofit.Builder()
-            .baseUrl("http://us7.unblock-websites.com/")
-            .client(client)
-            .addConverterFactory(MoshiConverterFactory.create(moshi).asLenient())
-            .build()
-            .create(ProxyApi::class.java)
+        private val proxyApi: ProxyApi by lazy {
+            Retrofit.Builder()
+                .baseUrl("http://us7.unblock-websites.com/")
+                .client(client)
+                .addConverterFactory(MoshiConverterFactory.create(moshi).asLenient())
+                .build()
+                .create(ProxyApi::class.java)
+        }
     }
 
     suspend fun getBooks(): List<Book> {
