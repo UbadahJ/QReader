@@ -8,6 +8,7 @@ import androidx.browser.customtabs.CustomTabsIntent
 import androidx.core.net.toUri
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
+import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.GridLayoutManager
 import com.google.android.material.snackbar.Snackbar
 import com.mikepenz.fastadapter.FastAdapter
@@ -43,6 +44,12 @@ class BookFragment : Fragment() {
         viewModel.selectedBook.observe(viewLifecycleOwner) {
             it?.apply { init(this) }
         }
+    }
+
+    override fun onResume() {
+        super.onResume()
+        if (viewModel.selectedBook.value == null)
+            findNavController().popBackStack()
     }
 
     private fun init(book: Book) {
