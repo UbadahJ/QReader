@@ -24,7 +24,7 @@ data class Book(
     val formattedLastUpdated: String
         get() = Instant.ofEpochSecond(lastUpdated.toLong())
             .atZone(ZoneId.systemDefault())
-            .format(DateTimeFormatter.ofPattern("EEEE, MMMM dd yyyy"))
+            .format(DateTimeFormatter.ofPattern("EEEE, MMMM dd, yyyy"))
             .toString()
 
     val status: Boolean

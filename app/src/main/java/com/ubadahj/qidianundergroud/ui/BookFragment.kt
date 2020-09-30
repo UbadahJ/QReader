@@ -55,10 +55,7 @@ class BookFragment : Fragment() {
     private fun init(book: Book) {
         binding?.apply {
             header.text = book.name
-            lastUpdated.text = if (book.status)
-                "${resources.getString(R.string.chapter)}: Completed"
-            else
-                "${resources.getString(R.string.last_updated)}: ${book.formattedLastUpdated}"
+            lastUpdated.text = if (book.status) "Completed" else book.formattedLastUpdated
             chapterListView.layoutManager = GridLayoutManager(requireContext(), 2)
             libraryButton.setOnClickListener {
                 database.add(book)
