@@ -48,7 +48,6 @@
         android:layout_marginTop="16dp"
         android:layout_marginEnd="8dp"
         android:layout_marginBottom="8dp"
-        app:cardBackgroundColor="?attr/backgroundVariant"
         app:cardCornerRadius="16dp"
         app:cardElevation="4dp"
         app:layout_constraintBottom_toBottomOf="parent"
