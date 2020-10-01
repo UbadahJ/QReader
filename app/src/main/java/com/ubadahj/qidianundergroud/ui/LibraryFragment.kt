@@ -15,7 +15,7 @@ import com.ubadahj.qidianundergroud.databinding.LibraryFragmentBinding
 import com.ubadahj.qidianundergroud.ui.adapters.BookAdapter
 import com.ubadahj.qidianundergroud.ui.adapters.MenuAdapter
 import com.ubadahj.qidianundergroud.ui.adapters.items.BookItem
-import com.ubadahj.qidianundergroud.utils.setListener
+import com.ubadahj.qidianundergroud.ui.dialog.MenuDialog
 
 class LibraryFragment : Fragment() {
 
@@ -28,11 +28,13 @@ class LibraryFragment : Fragment() {
             )
             true
         }
+    private val menu = MenuDialog(MenuAdapter(listOf("History", "Settings", "About")))
 
     private var binding: LibraryFragmentBinding? = null
 
     override fun onCreateView(
-        inflater: LayoutInflater, container: ViewGroup?,
+        inflater: LayoutInflater,
+        container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View {
         binding = LibraryFragmentBinding.inflate(inflater, container, false)
@@ -55,13 +57,6 @@ class LibraryFragment : Fragment() {
             bookListingView.adapter = FastAdapter.with(
                 BookAdapter(DatabaseInstance.getInstance(requireContext()).get())
             ).apply { onClickListener = onBookSelected }
-
-            dropdownMenu.menu.layoutManager = LinearLayoutManager(requireContext())
-            dropdownMenu.menu.adapter = FastAdapter.with(
-                MenuAdapter(
-                    listOf("History", "Settings", "About")
-                )
-            )
         }
     }
 
@@ -83,17 +78,7 @@ class LibraryFragment : Fragment() {
                 true
             }
             R.id.menu -> {
-                binding?.apply {
-                    if (dropdownMenu.root.visibility == View.GONE) {
-                        dropdownMenu.root.visibility = View.VISIBLE
-                        dropdownMenu.root.animate().alpha(1f).setListener {
-                        }.start()
-                    } else {
-                        dropdownMenu.root.animate().alpha(0f).setListener {
-                            dropdownMenu.root.visibility = View.GONE
-                        }.start()
-                    }
-                }
+                menu.show(requireActivity().supportFragmentManager, null)
                 true
             }
             else -> false
@@ -103,5 +88,4 @@ class LibraryFragment : Fragment() {
     override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater) {
         inflater.inflate(R.menu.library_menu, menu)
     }
-
 }
