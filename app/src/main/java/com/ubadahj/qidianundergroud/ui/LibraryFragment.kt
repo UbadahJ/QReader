@@ -15,6 +15,7 @@ import com.ubadahj.qidianundergroud.databinding.LibraryFragmentBinding
 import com.ubadahj.qidianundergroud.ui.adapters.BookAdapter
 import com.ubadahj.qidianundergroud.ui.adapters.MenuAdapter
 import com.ubadahj.qidianundergroud.ui.adapters.items.BookItem
+import com.ubadahj.qidianundergroud.ui.adapters.items.MenuAdapterItem
 import com.ubadahj.qidianundergroud.ui.dialog.MenuDialog
 
 class LibraryFragment : Fragment() {
@@ -28,7 +29,15 @@ class LibraryFragment : Fragment() {
             )
             true
         }
-    private val menu = MenuDialog(MenuAdapter(listOf("History", "Settings", "About")))
+    private val menu = MenuDialog(
+        MenuAdapter(
+            listOf(
+                MenuAdapterItem("History", R.drawable.archive),
+                MenuAdapterItem("Settings", R.drawable.settings),
+                MenuAdapterItem("About", R.drawable.info)
+            )
+        )
+    )
 
     private var binding: LibraryFragmentBinding? = null
 

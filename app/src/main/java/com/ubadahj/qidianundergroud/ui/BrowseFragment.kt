@@ -20,12 +20,17 @@ import com.ubadahj.qidianundergroud.models.Resource
 import com.ubadahj.qidianundergroud.ui.adapters.BookAdapter
 import com.ubadahj.qidianundergroud.ui.adapters.MenuAdapter
 import com.ubadahj.qidianundergroud.ui.adapters.items.BookItem
+import com.ubadahj.qidianundergroud.ui.adapters.items.MenuAdapterItem
 import com.ubadahj.qidianundergroud.ui.dialog.MenuDialog
 
 class BrowseFragment : Fragment() {
 
     private val viewModel: MainViewModel by activityViewModels()
-    private val menu = MenuDialog(MenuAdapter(listOf("Refresh"))).apply {
+    private val menu = MenuDialog(
+        MenuAdapter(
+            listOf(MenuAdapterItem("Refresh", R.drawable.refresh))
+        )
+    ).apply {
         adapter.onClickListener = { _, _, _, i ->
             when (i) {
                 0 -> {
