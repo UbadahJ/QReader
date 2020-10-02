@@ -123,7 +123,7 @@ class BrowseFragment : Fragment() {
     }
 
     override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater) {
-        inflater.inflate(R.menu.library_menu, menu)
+        inflater.inflate(R.menu.search_menu, menu)
     }
 
     override fun onDestroyView() {

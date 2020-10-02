@@ -2,9 +2,7 @@ package com.ubadahj.qidianundergroud.ui
 
 import android.annotation.SuppressLint
 import android.os.Bundle
-import android.view.LayoutInflater
-import android.view.View
-import android.view.ViewGroup
+import android.view.*
 import android.webkit.WebView
 import androidx.appcompat.app.AppCompatActivity
 import androidx.fragment.app.Fragment
@@ -17,12 +15,22 @@ import com.ubadahj.qidianundergroud.databinding.ChapterFragmentBinding
 import com.ubadahj.qidianundergroud.models.ChapterGroup
 import com.ubadahj.qidianundergroud.models.Resource
 import com.ubadahj.qidianundergroud.ui.adapters.ChapterContentAdapter
+import com.ubadahj.qidianundergroud.ui.adapters.MenuAdapter
 import com.ubadahj.qidianundergroud.ui.adapters.items.ChapterContentItem
+import com.ubadahj.qidianundergroud.ui.adapters.items.MenuAdapterItem
+import com.ubadahj.qidianundergroud.ui.dialog.MenuDialog
 
 class ChapterFragment : Fragment() {
 
     private val viewModel: MainViewModel by activityViewModels()
     private var binding: ChapterFragmentBinding? = null
+    private var menu: MenuDialog = MenuDialog(
+        MenuAdapter(
+            listOf(
+                MenuAdapterItem("Loading", R.drawable.pulse)
+            )
+        )
+    )
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -35,6 +43,20 @@ class ChapterFragment : Fragment() {
         return binding?.root
     }
 
+    override fun onOptionsItemSelected(item: MenuItem): Boolean {
+        return when (item.itemId) {
+            R.id.menu -> {
+                menu.show(requireActivity().supportFragmentManager, null)
+                true
+            }
+            else -> false
+        }
+    }
+
+    override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater) {
+        inflater.inflate(R.menu.simple_menu, menu)
+    }
+
     override fun onDestroyView() {
         super.onDestroyView()
         binding = null
@@ -42,6 +64,7 @@ class ChapterFragment : Fragment() {
 
     @SuppressLint("SetJavaScriptEnabled")
     private fun init(chapters: ChapterGroup) {
+        setHasOptionsMenu(true)
         binding?.apply {
             (requireActivity() as AppCompatActivity).setSupportActionBar(toolbar.appbar)
             toolbar.appbar.title = "Loading"
@@ -52,6 +75,7 @@ class ChapterFragment : Fragment() {
                 when (it) {
                     is Resource.Success -> {
                         chapterRecyclerView.adapter = getAdapter(it.data!!)
+                        menu = getMenu(it.data)
                         toolbar.appbar.title = it.data[0].chapterName
                         progressBar.visibility = View.GONE
                     }
@@ -60,6 +84,13 @@ class ChapterFragment : Fragment() {
                     }
                     is Resource.Error -> {
                         toolbar.appbar.title = "Error"
+                        menu = MenuDialog(
+                            MenuAdapter(
+                                listOf(
+                                    MenuAdapterItem("Error", R.drawable.unlink)
+                                )
+                            )
+                        )
                         Snackbar.make(root, R.string.time_out, Snackbar.LENGTH_SHORT).show()
                         progressBar.visibility = View.GONE
                     }
@@ -67,6 +98,14 @@ class ChapterFragment : Fragment() {
             })
         }
     }
+
+    private fun WebView.getChapterContents(chapters: ChapterGroup, refresh: Boolean = false) =
+        viewModel.getChapterContents(
+            this,
+            viewModel.selectedBook.value!!,
+            chapters,
+            refresh
+        )
 
     private fun getAdapter(items: List<ChapterContentItem>) =
         FastAdapter.with(ChapterContentAdapter(items)).apply {
@@ -76,11 +115,17 @@ class ChapterFragment : Fragment() {
             }
         }
 
-    private fun WebView.getChapterContents(chapters: ChapterGroup, refresh: Boolean = false) =
-        viewModel.getChapterContents(
-            this,
-            viewModel.selectedBook.value!!,
-            chapters,
-            refresh
-        )
+    private fun getMenu(items: List<ChapterContentItem>) =
+        MenuDialog(MenuAdapter(items.map { MenuAdapterItem(it.chapterName.toString()) })).apply {
+            adapter.onClickListener = { _, _, item, pos ->
+                binding?.apply {
+                    chapterRecyclerView.layoutManager?.let {
+                        (it as LinearLayoutManager).scrollToPositionWithOffset(pos, 0)
+                    }
+                    toolbar.appbar.title = item.text
+                }
+                dismiss()
+                true
+            }
+        }
 }
