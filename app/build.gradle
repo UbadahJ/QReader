@@ -104,5 +104,7 @@ dependencies {
     implementation "com.mikepenz:fastadapter-extensions-binding:$fast_adapter_version"
     implementation "com.mikepenz:fastadapter-extensions-diff:$fast_adapter_version"
 
+    // For for working with JSoup
+    implementation "org.jsoup:jsoup:1.13.1"
 
 }

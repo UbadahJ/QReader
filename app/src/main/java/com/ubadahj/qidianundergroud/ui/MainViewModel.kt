@@ -3,11 +3,16 @@ package com.ubadahj.qidianundergroud.ui
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import com.ubadahj.qidianundergroud.models.Book
+import com.ubadahj.qidianundergroud.models.ChapterGroup
 import com.ubadahj.qidianundergroud.repositories.BookRepository
 
 class MainViewModel : ViewModel() {
 
     val selectedBook: MutableLiveData<Book?> by lazy {
+        MutableLiveData()
+    }
+
+    val selectedChapter: MutableLiveData<ChapterGroup?> by lazy {
         MutableLiveData()
     }
 
