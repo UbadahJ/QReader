@@ -1,7 +1,6 @@
 package com.ubadahj.qidianundergroud.utils
 
 import android.webkit.WebView
-import com.github.ajalt.timberkt.d
 import kotlinx.coroutines.delay
 
 suspend fun WebView.getHtml(): String {
@@ -19,10 +18,8 @@ suspend fun WebView.getHtml(): String {
                 "})();"
     ) { contents = it }
 
-    while (contents == null) {
-        d { "getHtml: delaying" }
+    while (contents == null)
         delay(200)
-    }
 
     return contents!!.replace("\\u003C", "<")
         .replace("\\n", "")
