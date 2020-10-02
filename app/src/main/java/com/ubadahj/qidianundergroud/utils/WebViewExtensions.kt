@@ -28,4 +28,5 @@ suspend fun WebView.getHtml(): String {
         .replace("\\n", "")
         .replace("\\t", "")
         .replace("\\\"", "\"")
+        .replace("<hr />", "")
 }
