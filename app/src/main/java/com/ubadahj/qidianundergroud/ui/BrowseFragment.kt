@@ -20,16 +20,36 @@ import com.ubadahj.qidianundergroud.models.Resource
 import com.ubadahj.qidianundergroud.ui.adapters.BookAdapter
 import com.ubadahj.qidianundergroud.ui.adapters.MenuAdapter
 import com.ubadahj.qidianundergroud.ui.adapters.items.BookItem
-import com.ubadahj.qidianundergroud.utils.setListener
+import com.ubadahj.qidianundergroud.ui.adapters.items.MenuAdapterItem
+import com.ubadahj.qidianundergroud.ui.dialog.MenuDialog
 
 class BrowseFragment : Fragment() {
 
     private val viewModel: MainViewModel by activityViewModels()
+    private val menu = MenuDialog(
+        MenuAdapter(
+            listOf(MenuAdapterItem("Refresh", R.drawable.refresh))
+        )
+    ).apply {
+        adapter.onClickListener = { _, _, _, i ->
+            when (i) {
+                0 -> {
+                    viewModel
+                        .getBooks(refresh = true)
+                        .observe(viewLifecycleOwner, this@BrowseFragment::getBooks)
+                    true
+                }
+                else -> false
+            }
+        }
+    }
+
     private var binding: BrowseFragmentBinding? = null
     private var adapter: ItemAdapter<BookItem>? = null
 
     override fun onCreateView(
-        inflater: LayoutInflater, container: ViewGroup?,
+        inflater: LayoutInflater,
+        container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View {
         binding = BrowseFragmentBinding.inflate(inflater, container, false)
@@ -49,23 +69,7 @@ class BrowseFragment : Fragment() {
             searchBar.searchEditText.addTextChangedListener { text: Editable? ->
                 adapter?.filter(text)
             }
-
-            dropdownMenu.menu.layoutManager = LinearLayoutManager(requireContext())
-            dropdownMenu.menu.adapter = FastAdapter.with(MenuAdapter(listOf("Refresh"))).apply {
-                onClickListener = { _, _, _, i ->
-                    when (i) {
-                        0 -> {
-                            viewModel
-                                .getBooks(refresh = true)
-                                .observe(viewLifecycleOwner, this@BrowseFragment::getBooks)
-                            true
-                        }
-                        else -> false
-                    }
-                }
-            }
         }
-
     }
 
     private fun getBooks(resource: Resource<List<Book>>) {
@@ -111,17 +115,7 @@ class BrowseFragment : Fragment() {
                 true
             }
             R.id.menu -> {
-                binding?.apply {
-                    if (dropdownMenu.root.visibility == View.GONE) {
-                        dropdownMenu.root.visibility = View.VISIBLE
-                        dropdownMenu.root.animate().alpha(1f).setListener {
-                        }.start()
-                    } else {
-                        dropdownMenu.root.animate().alpha(0f).setListener {
-                            dropdownMenu.root.visibility = View.GONE
-                        }.start()
-                    }
-                }
+                menu.show(requireActivity().supportFragmentManager, null)
                 true
             }
             else -> false
@@ -136,5 +130,4 @@ class BrowseFragment : Fragment() {
         super.onDestroyView()
         binding = null
     }
-
 }

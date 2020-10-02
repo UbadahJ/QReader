@@ -23,7 +23,7 @@ class ChapterItem(private val book: Book, val chapter: ChapterGroup) :
     override fun bindView(binding: ChapterItemBinding, payloads: List<Any>) {
         binding.chapterId.text = chapter.text
         binding.chapterId.setTextColor(
-            if (book.lastRead == chapter.lastChapter) highlightColor else defaultColor
+            if (book.lastRead in chapter) highlightColor else defaultColor
         )
     }
 
@@ -33,7 +33,7 @@ class ChapterItem(private val book: Book, val chapter: ChapterGroup) :
         if (defaultColor == 0)
             defaultColor = binding.root.currentTextColor
         if (highlightColor == 0)
-            highlightColor = ContextCompat.getColor(binding.root.context, R.color.colorAccent)
+            highlightColor = ContextCompat.getColor(binding.root.context, R.color.secondaryColor)
 
         return binding
     }

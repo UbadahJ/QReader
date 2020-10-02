@@ -3,19 +3,18 @@
     <!-- TODO: Add light and dark book list accent tint -->
 
     <style name="AppTheme" parent="Theme.MaterialComponents.DayNight.NoActionBar">
-        <item name="colorPrimary">@color/colorPrimary</item>
-        <item name="colorAccent">@color/colorAccent</item>
+        <item name="colorPrimary">@color/primaryColor</item>
+        <item name="colorAccent">@color/secondaryColor</item>
 
-        <item name="statusBarForeground">@color/textPrimary</item>
-        <item name="statusBarBackground">@color/colorBackground</item>
-        <item name="statusBarScrim">@color/colorBackground</item>
+        <item name="statusBarForeground">@color/primaryTextColor</item>
+        <item name="statusBarBackground">@color/primaryColor</item>
+        <item name="statusBarScrim">@color/primaryColor</item>
 
-        <item name="android:colorBackground">@color/colorBackground</item>
-        <item name="android:statusBarColor">@color/colorBackground</item>
-        <item name="android:navigationBarColor">@color/colorBackground</item>
+        <item name="android:colorBackground">@color/primaryColor</item>
+        <item name="android:statusBarColor">@color/primaryColor</item>
+        <item name="android:navigationBarColor">@color/primaryColor</item>
 
-        <item name="android:textColorPrimary">@color/textPrimary</item>
-        <item name="backgroundVariant">@color/colorSurface</item>
+        <item name="android:textColorPrimary">@color/primaryTextColor</item>
 
         <item name="android:windowLightStatusBar" tools:targetApi="m">true</item>
 
@@ -27,7 +26,7 @@
 
     <style name="Toolbar.AppTheme" parent="ThemeOverlay.MaterialComponents.ActionBar">
         <item name="theme">?theme</item>
-        <item name="android:background">@color/colorBackground</item>
+        <item name="android:background">@color/primaryColor</item>
         <item name="titleTextAppearance">@style/TextAppearance.MaterialComponents.Button</item>
     </style>
 
@@ -35,13 +34,13 @@
         <item name="boxStrokeColor">?attr/colorAccent</item>
         <item name="boxStrokeWidth">0dp</item>
         <item name="boxStrokeWidthFocused">1dp</item>
-        <item name="boxBackgroundColor">@color/colorSurface</item>
+        <item name="boxBackgroundColor">@color/secondaryDarkColor</item>
     </style>
 
     <style name="FloatingActionButton.AppTheme" parent="Widget.MaterialComponents.ExtendedFloatingActionButton">
-        <item name="android:backgroundTint">@color/colorPrimary</item>
-        <item name="android:textColor">@color/textDarkPrimary</item>
-        <item name="iconTint">@color/textDarkPrimary</item>
+        <item name="android:backgroundTint">@color/secondaryColor</item>
+        <item name="android:textColor">@color/secondaryTextColor</item>
+        <item name="iconTint">@color/secondaryTextColor</item>
     </style>
 
     <style name="AppTheme.Title">
@@ -50,7 +49,7 @@
     </style>
 
     <style name="AppTheme.Icon">
-        <item name="tint">@color/textSecondary</item>
+        <item name="tint">@color/primaryTextColor</item>
     </style>
 
 </resources>

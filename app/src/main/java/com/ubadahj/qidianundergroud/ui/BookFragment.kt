@@ -8,6 +8,7 @@ import androidx.browser.customtabs.CustomTabsIntent
 import androidx.core.net.toUri
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
+import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.GridLayoutManager
 import com.google.android.material.snackbar.Snackbar
 import com.mikepenz.fastadapter.FastAdapter
@@ -45,13 +46,16 @@ class BookFragment : Fragment() {
         }
     }
 
+    override fun onResume() {
+        super.onResume()
+        if (viewModel.selectedBook.value == null)
+            findNavController().popBackStack()
+    }
+
     private fun init(book: Book) {
         binding?.apply {
             header.text = book.name
-            lastUpdated.text = if (book.status)
-                "${resources.getString(R.string.chapter)}: Completed"
-            else
-                "${resources.getString(R.string.last_updated)}: ${book.formattedLastUpdated}"
+            lastUpdated.text = if (book.status) "Completed" else book.formattedLastUpdated
             chapterListView.layoutManager = GridLayoutManager(requireContext(), 2)
             libraryButton.setOnClickListener {
                 database.add(book)
