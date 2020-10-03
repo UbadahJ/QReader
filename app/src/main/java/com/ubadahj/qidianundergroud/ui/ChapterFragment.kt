@@ -114,7 +114,7 @@ class ChapterFragment : Fragment() {
     }
 
     private fun getAdapter(items: List<ChapterContentItem>) =
-        FastScrollAdapter<ChapterContentItem> { binding?.toolbar?.appbar?.title = it.chapterName }
+        FastScrollAdapter<ChapterContentItem>()
             .wrap(FastAdapter.with(ChapterContentAdapter(items)).apply {
                 onTouchListener = { _, _, _, item, _ ->
                     binding?.toolbar?.appbar?.title = item.chapterName
