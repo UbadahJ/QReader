@@ -104,6 +104,9 @@ dependencies {
     implementation "com.mikepenz:fastadapter-extensions-binding:$fast_adapter_version"
     implementation "com.mikepenz:fastadapter-extensions-diff:$fast_adapter_version"
 
+    // Fast Scroller for recyclerview
+    implementation 'com.l4digital.fastscroll:fastscroll:2.0.1'
+
     // For for working with JSoup
     implementation "org.jsoup:jsoup:1.13.1"
 

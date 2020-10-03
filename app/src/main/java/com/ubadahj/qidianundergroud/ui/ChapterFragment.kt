@@ -15,6 +15,7 @@ import com.ubadahj.qidianundergroud.databinding.ChapterFragmentBinding
 import com.ubadahj.qidianundergroud.models.ChapterGroup
 import com.ubadahj.qidianundergroud.models.Resource
 import com.ubadahj.qidianundergroud.ui.adapters.ChapterContentAdapter
+import com.ubadahj.qidianundergroud.ui.adapters.FastScrollAdapter
 import com.ubadahj.qidianundergroud.ui.adapters.MenuAdapter
 import com.ubadahj.qidianundergroud.ui.adapters.items.ChapterContentItem
 import com.ubadahj.qidianundergroud.ui.adapters.items.MenuAdapterItem
@@ -108,12 +109,13 @@ class ChapterFragment : Fragment() {
         )
 
     private fun getAdapter(items: List<ChapterContentItem>) =
-        FastAdapter.with(ChapterContentAdapter(items)).apply {
-            onTouchListener = { _, _, _, item, _ ->
-                binding?.toolbar?.appbar?.title = item.chapterName
-                true
-            }
-        }
+        FastScrollAdapter<ChapterContentItem> { binding?.toolbar?.appbar?.title = it.chapterName }
+            .wrap(FastAdapter.with(ChapterContentAdapter(items)).apply {
+                onTouchListener = { _, _, _, item, _ ->
+                    binding?.toolbar?.appbar?.title = item.chapterName
+                    true
+                }
+            })
 
     private fun getMenu(items: List<ChapterContentItem>) =
         MenuDialog(MenuAdapter(items.map { MenuAdapterItem(it.chapterName.toString()) })).apply {
