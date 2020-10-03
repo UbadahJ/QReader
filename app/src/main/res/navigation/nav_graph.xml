@@ -41,5 +41,18 @@
         android:id="@+id/bookFragment"
         android:name="com.ubadahj.qidianundergroud.ui.BookFragment"
         android:label="book_fragment"
-        tools:layout="@layout/book_fragment" />
+        tools:layout="@layout/book_fragment">
+        <action
+            android:id="@+id/action_bookFragment_to_chapterFragment"
+            app:destination="@id/chapterFragment"
+            app:enterAnim="@anim/slide_up"
+            app:exitAnim="@anim/slide_down"
+            app:popEnterAnim="@anim/slide_up"
+            app:popExitAnim="@anim/slide_down" />
+    </fragment>
+    <fragment
+        android:id="@+id/chapterFragment"
+        android:name="com.ubadahj.qidianundergroud.ui.ChapterFragment"
+        android:label="chapter_fragment"
+        tools:layout="@layout/chapter_fragment" />
 </navigation>

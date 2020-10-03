@@ -4,8 +4,6 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import androidx.browser.customtabs.CustomTabsIntent
-import androidx.core.net.toUri
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import androidx.navigation.fragment.findNavController
@@ -93,9 +91,10 @@ class BookFragment : Fragment() {
             onClickListener = { _, _, item, _ ->
                 book.lastRead = item.chapter.lastChapter
                 database.save()
-                CustomTabsIntent.Builder()
-                    .build()
-                    .launchUrl(requireContext(), item.chapter.link.toUri())
+                viewModel.selectedChapter.value = item.chapter
+                findNavController().navigate(
+                    BookFragmentDirections.actionBookFragmentToChapterFragment()
+                )
                 notifyAdapterDataSetChanged()
                 true
             }
