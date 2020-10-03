@@ -18,6 +18,7 @@ import com.ubadahj.qidianundergroud.databinding.BrowseFragmentBinding
 import com.ubadahj.qidianundergroud.models.Book
 import com.ubadahj.qidianundergroud.models.Resource
 import com.ubadahj.qidianundergroud.ui.adapters.BookAdapter
+import com.ubadahj.qidianundergroud.ui.adapters.FastScrollAdapter
 import com.ubadahj.qidianundergroud.ui.adapters.MenuAdapter
 import com.ubadahj.qidianundergroud.ui.adapters.items.BookItem
 import com.ubadahj.qidianundergroud.ui.adapters.items.MenuAdapterItem
@@ -90,15 +91,18 @@ class BrowseFragment : Fragment() {
         binding?.apply {
             progressBar.visibility = View.GONE
             adapter = BookAdapter(books)
-            bookListingView.adapter = FastAdapter.with(adapter!!).apply {
-                onClickListener = { _, _, item, _ ->
-                    viewModel.selectedBook.value = item.book
-                    findNavController().navigate(
-                        BrowseFragmentDirections.actionBrowseFragmentToBookFragment()
-                    )
-                    false
+            bookListingView.adapter = FastScrollAdapter<BookItem>().wrap(
+                FastAdapter.with(adapter!!).apply {
+                    onClickListener = { _, _, item, _ ->
+                        viewModel.selectedBook.value = item.book
+                        findNavController().navigate(
+                            BrowseFragmentDirections.actionBrowseFragmentToBookFragment()
+                        )
+                        false
+                    }
                 }
-            }
+
+            )
         }
     }
 
