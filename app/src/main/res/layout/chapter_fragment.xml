@@ -10,12 +10,6 @@
         android:id="@+id/toolbar"
         layout="@layout/material_toolbar" />
 
-    <WebView
-        android:id="@+id/web_view"
-        android:layout_width="0dp"
-        android:layout_height="0dp"
-        tools:ignore="MissingConstraints" />
-
     <com.l4digital.fastscroll.FastScrollRecyclerView
         android:id="@+id/chapter_recycler_view"
         android:layout_width="0dp"

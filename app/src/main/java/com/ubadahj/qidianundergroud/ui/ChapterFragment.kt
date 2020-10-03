@@ -7,6 +7,7 @@ import android.webkit.WebView
 import androidx.appcompat.app.AppCompatActivity
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
+import androidx.lifecycle.LiveData
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.google.android.material.snackbar.Snackbar
 import com.mikepenz.fastadapter.FastAdapter
@@ -70,9 +71,7 @@ class ChapterFragment : Fragment() {
             (requireActivity() as AppCompatActivity).setSupportActionBar(toolbar.appbar)
             toolbar.appbar.title = "Loading"
             chapterRecyclerView.layoutManager = LinearLayoutManager(requireContext())
-            webView.settings.javaScriptEnabled = true
-            webView.loadUrl(chapters.link)
-            webView.getChapterContents(chapters).observe(viewLifecycleOwner, {
+            getChapterContents(chapters).observe(viewLifecycleOwner, {
                 when (it) {
                     is Resource.Success -> {
                         chapterRecyclerView.adapter = getAdapter(it.data!!)
@@ -100,13 +99,19 @@ class ChapterFragment : Fragment() {
         }
     }
 
-    private fun WebView.getChapterContents(chapters: ChapterGroup, refresh: Boolean = false) =
-        viewModel.getChapterContents(
-            this,
+    @SuppressLint("SetJavaScriptEnabled")
+    private fun getChapterContents(chapters: ChapterGroup, refresh: Boolean = false):
+            LiveData<Resource<out List<ChapterContentItem>?>> {
+        val webView = WebView(requireContext())
+        webView.settings.javaScriptEnabled = true
+        webView.loadUrl(chapters.link)
+        return viewModel.getChapterContents(
+            webView,
             viewModel.selectedBook.value!!,
             chapters,
             refresh
         )
+    }
 
     private fun getAdapter(items: List<ChapterContentItem>) =
         FastScrollAdapter<ChapterContentItem> { binding?.toolbar?.appbar?.title = it.chapterName }
