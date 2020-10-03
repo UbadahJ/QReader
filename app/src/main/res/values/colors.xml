@@ -9,13 +9,13 @@
     <color name="darkPrimaryLightColor">#484848</color>
     <color name="darkPrimaryDarkColor">#000000</color>
 
-    <color name="secondaryColor">#455a64</color>
-    <color name="secondaryLightColor">#718792</color>
-    <color name="secondaryDarkColor">#1c313a</color>
+    <color name="secondaryColor">#7e57c2</color>
+    <color name="secondaryLightColor">#b085f5</color>
+    <color name="secondaryDarkColor">#4d2c91</color>
 
     <color name="primaryTextColor">#212121</color>
     <color name="darkPrimaryTextColor">#fafafa</color>
-    <color name="secondaryTextColor">#f5f5f5</color>
+    <color name="secondaryTextColor">#ffffff</color>
 
     <color name="colorTransparent">#00000000</color>
 
