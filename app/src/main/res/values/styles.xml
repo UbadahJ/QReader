@@ -34,7 +34,7 @@
         <item name="boxStrokeColor">?attr/colorAccent</item>
         <item name="boxStrokeWidth">0dp</item>
         <item name="boxStrokeWidthFocused">1dp</item>
-        <item name="boxBackgroundColor">@color/secondaryDarkColor</item>
+        <item name="boxBackgroundColor">?android:attr/colorBackground</item>
     </style>
 
     <style name="FloatingActionButton.AppTheme" parent="Widget.MaterialComponents.ExtendedFloatingActionButton">
