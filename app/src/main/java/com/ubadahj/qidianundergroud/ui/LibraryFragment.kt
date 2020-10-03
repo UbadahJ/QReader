@@ -7,6 +7,7 @@ import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
+import com.mikepenz.aboutlibraries.LibsBuilder
 import com.mikepenz.fastadapter.FastAdapter
 import com.mikepenz.fastadapter.IAdapter
 import com.ubadahj.qidianundergroud.R
@@ -37,7 +38,20 @@ class LibraryFragment : Fragment() {
                 MenuAdapterItem("About", R.drawable.info)
             )
         )
-    )
+    ).apply {
+        adapter.onClickListener = { _, _, _, i ->
+            when (i) {
+                0 -> {
+                }
+                1 -> {
+                }
+                2 -> {
+                    LibsBuilder().start(requireContext())
+                }
+            }
+            true
+        }
+    }
 
     private var binding: LibraryFragmentBinding? = null
 
