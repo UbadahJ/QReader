@@ -14,7 +14,7 @@ import com.ubadahj.qidianundergroud.ui.adapters.items.MenuAdapterItem
  * This is a FastAdapter adapter implementation for the awesome Sticky-Headers lib by timehop
  * https://github.com/timehop/sticky-headers-recyclerview
  */
-class FastScrollAdapter<Item : GenericItem>(private val onClick: ((Item) -> Unit)? = null) :
+class FastScrollAdapter<Item : GenericItem> :
     RecyclerView.Adapter<RecyclerView.ViewHolder>(), FastScroller.SectionIndexer {
 
     companion object {
@@ -212,7 +212,6 @@ class FastScrollAdapter<Item : GenericItem>(private val onClick: ((Item) -> Unit
     }
 
     override fun getSectionText(position: Int): CharSequence {
-        onClick?.invoke(getItem(position)!!)
         return getDefinedString(getItem(position)!!)
     }
 

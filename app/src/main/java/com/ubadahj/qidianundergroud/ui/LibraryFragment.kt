@@ -14,6 +14,7 @@ import com.ubadahj.qidianundergroud.R
 import com.ubadahj.qidianundergroud.database.DatabaseInstance
 import com.ubadahj.qidianundergroud.databinding.LibraryFragmentBinding
 import com.ubadahj.qidianundergroud.ui.adapters.BookAdapter
+import com.ubadahj.qidianundergroud.ui.adapters.FastScrollAdapter
 import com.ubadahj.qidianundergroud.ui.adapters.MenuAdapter
 import com.ubadahj.qidianundergroud.ui.adapters.items.BookItem
 import com.ubadahj.qidianundergroud.ui.adapters.items.MenuAdapterItem
@@ -77,9 +78,11 @@ class LibraryFragment : Fragment() {
             }
 
             bookListingView.layoutManager = LinearLayoutManager(requireContext())
-            bookListingView.adapter = FastAdapter.with(
-                BookAdapter(DatabaseInstance.getInstance(requireContext()).get())
-            ).apply { onClickListener = onBookSelected }
+            bookListingView.adapter = FastScrollAdapter<BookItem>().wrap(
+                FastAdapter.with(
+                    BookAdapter(DatabaseInstance.getInstance(requireContext()).get())
+                ).apply { onClickListener = onBookSelected }
+            )
         }
     }
 
