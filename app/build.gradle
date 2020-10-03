@@ -3,6 +3,7 @@ apply plugin: 'kotlin-android'
 apply plugin: 'kotlin-android-extensions'
 apply plugin: 'kotlin-kapt'
 apply plugin: "androidx.navigation.safeargs.kotlin"
+apply plugin: 'com.mikepenz.aboutlibraries.plugin'
 
 android {
     compileSdkVersion 29
@@ -109,5 +110,9 @@ dependencies {
 
     // For for working with JSoup
     implementation "org.jsoup:jsoup:1.13.1"
+
+    // About page
+    implementation "com.mikepenz:aboutlibraries-core:$about_lib_version"
+    implementation "com.mikepenz:aboutlibraries:$about_lib_version"
 
 }
