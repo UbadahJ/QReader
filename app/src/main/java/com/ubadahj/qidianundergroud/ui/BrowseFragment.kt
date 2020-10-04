@@ -36,7 +36,7 @@ class BrowseFragment : Fragment() {
             when (i) {
                 0 -> {
                     viewModel
-                        .getBooks(refresh = true)
+                        .getBooks(requireContext(), refresh = true)
                         .observe(viewLifecycleOwner, this@BrowseFragment::getBooks)
                     true
                 }
@@ -61,7 +61,7 @@ class BrowseFragment : Fragment() {
         super.onViewCreated(view, savedInstanceState)
         setHasOptionsMenu(true)
 
-        viewModel.getBooks().observe(viewLifecycleOwner, this::getBooks)
+        viewModel.getBooks(requireContext()).observe(viewLifecycleOwner, this::getBooks)
 
         binding?.apply {
             (requireActivity() as AppCompatActivity).setSupportActionBar(toolbar.appbar)

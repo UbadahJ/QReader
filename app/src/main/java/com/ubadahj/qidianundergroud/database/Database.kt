@@ -16,6 +16,9 @@ class Database(private val preferences: SharedPreferences) {
     fun get(): List<Book> = books
 
     fun add(vararg books: Book) {
+        if (books.any { it in books })
+            throw IllegalArgumentException("${books.filter { it in books }} already in the database")
+
         this.books.addAll(books)
         save()
     }

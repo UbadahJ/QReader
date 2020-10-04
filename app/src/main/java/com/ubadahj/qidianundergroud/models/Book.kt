@@ -17,6 +17,9 @@ data class Book(
     @Json(name = "Status") val _status: String = ""
 ) : Parcelable {
 
+    @Json(name = "InLibrary")
+    var inLibrary: Boolean = false
+
     @Json(name = "Chapters")
     var chapterGroups: List<ChapterGroup> = listOf()
 

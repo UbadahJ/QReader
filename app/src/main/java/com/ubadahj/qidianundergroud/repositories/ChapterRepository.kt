@@ -1,9 +1,12 @@
 package com.ubadahj.qidianundergroud.repositories
 
+import android.content.Context
 import android.webkit.WebView
 import androidx.lifecycle.liveData
 import com.github.ajalt.timberkt.d
+import com.ubadahj.qidianundergroud.database.DatabaseInstance
 import com.ubadahj.qidianundergroud.models.Book
+import com.ubadahj.qidianundergroud.models.Chapter
 import com.ubadahj.qidianundergroud.models.ChapterGroup
 import com.ubadahj.qidianundergroud.models.Resource
 import com.ubadahj.qidianundergroud.ui.adapters.items.ChapterContentItem
@@ -13,13 +16,15 @@ import kotlinx.coroutines.delay
 import org.jsoup.Jsoup
 import java.util.concurrent.TimeoutException
 
-class ChapterRepository {
+class ChapterRepository(context: Context) {
 
     companion object {
         private const val maxTimeDelay: Int = 8000
         private val chapterContents: MutableMap<Pair<Book, ChapterGroup>, List<ChapterContentItem>> =
             mutableMapOf()
     }
+
+    private val database = DatabaseInstance.getInstance(context)
 
     fun getChaptersContent(
         webView: WebView,
@@ -31,7 +36,7 @@ class ChapterRepository {
         try {
             val key = Pair(book, chapters)
             val time = DelayCounter(maxTimeDelay)
-            if (refresh || key !in chapterContents) {
+            if (refresh || chapters.contents.isEmpty()) {
                 d { "getChaptersContent: $refresh || ${key !in chapterContents}" }
                 var doc = Jsoup.parse(webView.getHtml())!!
                 while ("Chapter" !in doc.text()) {
@@ -45,16 +50,18 @@ class ChapterRepository {
                     .filter { "Chapter" in it.text() }
                     .filter { it.select("h2.text-center").first() != null }
                     .map {
-                        ChapterContentItem(
+                        Chapter(
                             it.select("h2.text-center").first().html().unescapeHtml(),
                             it.select("p").outerHtml().unescapeHtml()
                         )
                     }
-
-                chapterContents[key] = data
+                chapters.contents = data
+                database.save()
             }
 
-            emit(Resource.Success(chapterContents[key]))
+            emit(Resource.Success(chapters.contents
+                .map { ChapterContentItem(it.title, it.text) }
+            ))
         } catch (e: TimeoutException) {
             emit(Resource.Error<List<ChapterContentItem>>(e))
         }

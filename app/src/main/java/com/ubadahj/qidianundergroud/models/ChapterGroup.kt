@@ -11,6 +11,10 @@ data class ChapterGroup(
     @Json(name = "Text") val text: String,
     @Json(name = "Href") val link: String
 ) : Parcelable {
+
+    @Json(name = "Contents")
+    var contents: List<Chapter> = listOf()
+
     val firstChapter: Int
         get() = text.split("-").first().trim().toInt()
 
@@ -21,4 +25,5 @@ data class ChapterGroup(
         get() = lastChapter - firstChapter + 1
 
     operator fun contains(chapter: Int): Boolean = chapter in firstChapter..lastChapter
+
 }

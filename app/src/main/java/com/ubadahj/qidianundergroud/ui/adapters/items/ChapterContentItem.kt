@@ -6,7 +6,7 @@ import com.mikepenz.fastadapter.binding.AbstractBindingItem
 import com.ubadahj.qidianundergroud.R
 import com.ubadahj.qidianundergroud.databinding.ChapterContentItemBinding
 
-class ChapterContentItem(val chapterName: CharSequence, private val text: CharSequence) :
+class ChapterContentItem(val chapterName: CharSequence, val text: CharSequence) :
     AbstractBindingItem<ChapterContentItemBinding>() {
 
     override val type: Int

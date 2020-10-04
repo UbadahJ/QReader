@@ -56,7 +56,8 @@ class BookFragment : Fragment() {
             lastUpdated.text = if (book.status) "Completed" else book.formattedLastUpdated
             chapterListView.layoutManager = GridLayoutManager(requireContext(), 2)
             libraryButton.setOnClickListener {
-                database.add(book)
+                book.inLibrary = true
+                database.save()
                 Snackbar.make(root, "Added book to the library", Snackbar.LENGTH_SHORT).show()
                 libraryButton.visibility = View.GONE
             }
@@ -64,7 +65,7 @@ class BookFragment : Fragment() {
                 libraryButton.visibility = View.GONE
         }
 
-        viewModel.getChapters(book).observe(viewLifecycleOwner) { resource ->
+        viewModel.getChapters(requireContext(), book).observe(viewLifecycleOwner) { resource ->
             when (resource) {
                 is Resource.Success -> {
                     book.chapterGroups = resource.data!!

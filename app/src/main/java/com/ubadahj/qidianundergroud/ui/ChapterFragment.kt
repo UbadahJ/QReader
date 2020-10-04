@@ -101,7 +101,7 @@ class ChapterFragment : Fragment() {
 
     @SuppressLint("SetJavaScriptEnabled")
     private fun getChapterContents(chapters: ChapterGroup, refresh: Boolean = false):
-            LiveData<Resource<out List<ChapterContentItem>?>> {
+            LiveData<Resource<List<ChapterContentItem>>> {
         val webView = WebView(requireContext())
         webView.settings.javaScriptEnabled = true
         webView.loadUrl(chapters.link)
