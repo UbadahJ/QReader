@@ -21,6 +21,7 @@ import kotlin.random.Random
 class NotificationWorker(context: Context, params: WorkerParameters) :
     CoroutineWorker(context, params) {
 
+    private var intentCounter = 0
     val api = Api(true)
     val database = DatabaseInstance.getInstance(context)
 
@@ -34,7 +35,7 @@ class NotificationWorker(context: Context, params: WorkerParameters) :
                 updates += Triple(
                     lastChapter - bookLastChapter,
                     book,
-                    chapters.lastReadChapters(lastChapter)
+                    chapters.lastReadChapters(book.lastRead)
                 )
                 if (lastChapter > bookLastChapter) {
                     updates += Triple(
@@ -52,23 +53,17 @@ class NotificationWorker(context: Context, params: WorkerParameters) :
         }
         createNotificationChannel(applicationContext)
         for (triple in updates) {
-            val intent = Intent(applicationContext, MainActivity::class.java).apply {
-                putExtra("book", triple.second)
-                putExtra("chapters", triple.third)
-            }
             val notification = NotificationCompat.Builder(applicationContext, CHANNEL_ID)
                 .setSmallIcon(R.drawable.book)
                 .setContentTitle(triple.second.name)
                 .setContentText("${triple.first} new chapter${if (triple.first > 1) "s" else ""} available")
                 .setPriority(NotificationCompat.PRIORITY_DEFAULT)
-                .setContentIntent(
-                    PendingIntent.getActivity(
-                        applicationContext,
-                        0,
-                        intent,
-                        PendingIntent.FLAG_UPDATE_CURRENT
-                    )
-                )
+                .setContentIntent(createIntent(triple.second, triple.third))
+                .addAction(R.drawable.add, "Open latest", createIntent(
+                    triple.second, triple.second.chapterGroups.maxByOrNull { it.lastChapter }
+                ))
+                .addAction(R.drawable.add, "Open Book", createIntent(triple.second))
+                .setAutoCancel(true)
                 .build()
             with(NotificationManagerCompat.from(applicationContext)) {
                 notify(Random(1).nextInt(), notification)
@@ -76,6 +71,21 @@ class NotificationWorker(context: Context, params: WorkerParameters) :
         }
         return Result.success()
     }
+
+    private fun createIntent(
+        book: Book?,
+        chapters: ChapterGroup? = null,
+        requestCode: Int = intentCounter++
+    ) =
+        PendingIntent.getActivity(
+            applicationContext,
+            requestCode,
+            Intent(applicationContext, MainActivity::class.java).apply {
+                putExtra("book", book)
+                putExtra("chapters", chapters)
+            },
+            PendingIntent.FLAG_UPDATE_CURRENT
+        )
 
     private fun List<ChapterGroup>.lastChapter(): Int {
         return maxByOrNull { it.lastChapter }?.lastChapter ?: 0
