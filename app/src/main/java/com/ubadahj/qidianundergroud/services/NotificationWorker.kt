@@ -1,11 +1,14 @@
 package com.ubadahj.qidianundergroud.services
 
+import android.app.PendingIntent
 import android.content.Context
+import android.content.Intent
 import androidx.core.app.NotificationCompat
 import androidx.core.app.NotificationManagerCompat
 import androidx.work.CoroutineWorker
 import androidx.work.WorkerParameters
 import com.squareup.moshi.JsonDataException
+import com.ubadahj.qidianundergroud.MainActivity
 import com.ubadahj.qidianundergroud.R
 import com.ubadahj.qidianundergroud.api.Api
 import com.ubadahj.qidianundergroud.database.DatabaseInstance
@@ -18,18 +21,28 @@ import kotlin.random.Random
 class NotificationWorker(context: Context, params: WorkerParameters) :
     CoroutineWorker(context, params) {
 
+    private var intentCounter = 0
     val api = Api(true)
     val database = DatabaseInstance.getInstance(context)
 
     override suspend fun doWork(): Result {
-        val updates: MutableList<Pair<Int, Book>> = mutableListOf()
+        val updates: MutableList<Triple<Int, Book, ChapterGroup?>> = mutableListOf()
         for (book in database.get()) {
             try {
                 val chapters = api.getChapters(book)
                 val lastChapter = chapters.lastChapter()
                 val bookLastChapter = book.chapterGroups.lastChapter()
+                updates += Triple(
+                    lastChapter - bookLastChapter,
+                    book,
+                    chapters.lastReadChapters(book.lastRead)
+                )
                 if (lastChapter > bookLastChapter) {
-                    updates.add(Pair(lastChapter - bookLastChapter, book))
+                    updates += Triple(
+                        lastChapter - bookLastChapter,
+                        book,
+                        chapters.lastReadChapters(lastChapter + 1)
+                    )
                     book.chapterGroups = chapters
                     database.save()
                 }
@@ -39,12 +52,18 @@ class NotificationWorker(context: Context, params: WorkerParameters) :
             }
         }
         createNotificationChannel(applicationContext)
-        for (pair in updates) {
+        for (triple in updates) {
             val notification = NotificationCompat.Builder(applicationContext, CHANNEL_ID)
                 .setSmallIcon(R.drawable.book)
-                .setContentTitle(pair.second.name)
-                .setContentText("${pair.first} new chapter${if (pair.first > 1) "s" else ""} available")
+                .setContentTitle(triple.second.name)
+                .setContentText("${triple.first} new chapter${if (triple.first > 1) "s" else ""} available")
                 .setPriority(NotificationCompat.PRIORITY_DEFAULT)
+                .setContentIntent(createIntent(triple.second, triple.third))
+                .addAction(R.drawable.add, "Open latest", createIntent(
+                    triple.second, triple.second.chapterGroups.maxByOrNull { it.lastChapter }
+                ))
+                .addAction(R.drawable.add, "Open Book", createIntent(triple.second))
+                .setAutoCancel(true)
                 .build()
             with(NotificationManagerCompat.from(applicationContext)) {
                 notify(Random(1).nextInt(), notification)
@@ -53,8 +72,26 @@ class NotificationWorker(context: Context, params: WorkerParameters) :
         return Result.success()
     }
 
-    fun List<ChapterGroup>.lastChapter(): Int {
+    private fun createIntent(
+        book: Book?,
+        chapters: ChapterGroup? = null,
+        requestCode: Int = intentCounter++
+    ) =
+        PendingIntent.getActivity(
+            applicationContext,
+            requestCode,
+            Intent(applicationContext, MainActivity::class.java).apply {
+                putExtra("book", book)
+                putExtra("chapters", chapters)
+            },
+            PendingIntent.FLAG_UPDATE_CURRENT
+        )
+
+    private fun List<ChapterGroup>.lastChapter(): Int {
         return maxByOrNull { it.lastChapter }?.lastChapter ?: 0
     }
+
+    private fun List<ChapterGroup>.lastReadChapters(lastRead: Int) =
+        firstOrNull { lastRead in it }
 
 }

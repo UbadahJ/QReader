@@ -1,13 +1,16 @@
 package com.ubadahj.qidianundergroud.models
 
+import android.os.Parcelable
 import com.squareup.moshi.Json
 import com.squareup.moshi.JsonClass
+import kotlinx.android.parcel.Parcelize
 
+@Parcelize
 @JsonClass(generateAdapter = true)
 data class ChapterGroup(
     @Json(name = "Text") val text: String,
     @Json(name = "Href") val link: String
-) {
+) : Parcelable {
     val firstChapter: Int
         get() = text.split("-").first().trim().toInt()
 
