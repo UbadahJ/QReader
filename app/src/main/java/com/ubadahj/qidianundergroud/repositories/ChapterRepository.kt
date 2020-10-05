@@ -3,14 +3,12 @@ package com.ubadahj.qidianundergroud.repositories
 import android.content.Context
 import android.webkit.WebView
 import androidx.lifecycle.liveData
-import com.github.ajalt.timberkt.d
-import com.ubadahj.qidianundergroud.database.DatabaseInstance
-import com.ubadahj.qidianundergroud.models.Book
-import com.ubadahj.qidianundergroud.models.Chapter
+import com.ubadahj.qidianundergroud.database.BookDatabase
 import com.ubadahj.qidianundergroud.models.ChapterGroup
 import com.ubadahj.qidianundergroud.models.Resource
 import com.ubadahj.qidianundergroud.ui.adapters.items.ChapterContentItem
 import com.ubadahj.qidianundergroud.utils.getHtml
+import com.ubadahj.qidianundergroud.utils.md5
 import com.ubadahj.qidianundergroud.utils.unescapeHtml
 import kotlinx.coroutines.delay
 import org.jsoup.Jsoup
@@ -20,24 +18,20 @@ class ChapterRepository(context: Context) {
 
     companion object {
         private const val maxTimeDelay: Int = 8000
-        private val chapterContents: MutableMap<Pair<Book, ChapterGroup>, List<ChapterContentItem>> =
-            mutableMapOf()
     }
 
-    private val database = DatabaseInstance.getInstance(context)
+    private val database = BookDatabase.getInstance(context)
 
     fun getChaptersContent(
         webView: WebView,
-        book: Book,
-        chapters: ChapterGroup,
+        group: ChapterGroup,
         refresh: Boolean = false
     ) = liveData {
         emit(Resource.Loading())
         try {
-            val key = Pair(book, chapters)
+            val dbChapters = database.chapterGroupQueries.contents(group.link).executeAsList()
             val time = DelayCounter(maxTimeDelay)
-            if (refresh || chapters.contents.isEmpty()) {
-                d { "getChaptersContent: $refresh || ${key !in chapterContents}" }
+            if (refresh || dbChapters.isEmpty()) {
                 var doc = Jsoup.parse(webView.getHtml())!!
                 while ("Chapter" !in doc.text()) {
                     doc = Jsoup.parse(webView.getHtml())!!
@@ -46,21 +40,24 @@ class ChapterRepository(context: Context) {
                 }
 
                 doc.select("br").forEach { it.remove() }
-                val data = doc.select(".well")
+                doc.select(".well")
                     .filter { "Chapter" in it.text() }
                     .filter { it.select("h2.text-center").first() != null }
-                    .map {
-                        Chapter(
-                            it.select("h2.text-center").first().html().unescapeHtml(),
-                            it.select("p").outerHtml().unescapeHtml()
+                    .forEach {
+                        val title = it.select("h2.text-center").first().html().unescapeHtml()
+                        val contents = it.select("p").outerHtml().unescapeHtml()
+                        database.chapterQueries.insertByValues(
+                            group.link.md5 + title.md5,
+                            group.link,
+                            title,
+                            contents
                         )
                     }
-                chapters.contents = data
-                database.save()
             }
-
-            emit(Resource.Success(chapters.contents
-                .map { ChapterContentItem(it.title, it.text) }
+            emit(Resource.Success(
+                database.chapterGroupQueries.contents(group.link)
+                    .executeAsList()
+                    .map { ChapterContentItem(it.title, it.contents) }
             ))
         } catch (e: TimeoutException) {
             emit(Resource.Error<List<ChapterContentItem>>(e))

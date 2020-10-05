@@ -8,8 +8,9 @@ import com.ubadahj.qidianundergroud.R
 import com.ubadahj.qidianundergroud.databinding.ChapterItemBinding
 import com.ubadahj.qidianundergroud.models.Book
 import com.ubadahj.qidianundergroud.models.ChapterGroup
+import com.ubadahj.qidianundergroud.utils.models.contains
 
-class ChapterItem(private val book: Book, val chapter: ChapterGroup) :
+class ChapterItem(val book: Book, val chapter: ChapterGroup) :
     AbstractBindingItem<ChapterItemBinding>() {
 
     companion object {

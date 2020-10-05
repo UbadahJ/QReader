@@ -1,7 +1,7 @@
 package com.ubadahj.qidianundergroud.api
 
-import com.ubadahj.qidianundergroud.models.Book
-import com.ubadahj.qidianundergroud.models.ChapterGroup
+import com.ubadahj.qidianundergroud.api.models.BookJson
+import com.ubadahj.qidianundergroud.api.models.ChapterGroupJson
 import retrofit2.http.Field
 import retrofit2.http.FormUrlEncoded
 import retrofit2.http.POST
@@ -13,13 +13,13 @@ interface ProxyApi {
     suspend fun getBooks(
         @Field("url") url: String,
         @Field("server") server: String = "rnd"
-    ): List<Book>
+    ): List<BookJson>
 
     @FormUrlEncoded
     @POST("/")
     suspend fun getChapters(
         @Field("url") url: String,
         @Field("server") server: String = "rnd"
-    ): List<ChapterGroup>
+    ): List<ChapterGroupJson>
 
 }

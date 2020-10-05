@@ -4,44 +4,61 @@ import android.content.Context
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.liveData
 import com.ubadahj.qidianundergroud.api.Api
-import com.ubadahj.qidianundergroud.database.DatabaseInstance
+import com.ubadahj.qidianundergroud.api.models.BookJson
+import com.ubadahj.qidianundergroud.database.BookDatabase
 import com.ubadahj.qidianundergroud.models.Book
-import com.ubadahj.qidianundergroud.models.ChapterGroup
 import com.ubadahj.qidianundergroud.models.Resource
 
 class BookRepository(context: Context) {
 
-    companion object {
-        private var books: List<Book>? = null
-        private var chapters: MutableMap<String, List<ChapterGroup>> = mutableMapOf()
-    }
+    private val database = BookDatabase.getInstance(context)
 
-    private val database = DatabaseInstance.getInstance(context)
+    fun getBooks(): List<Book> = database.bookQueries.getAll().executeAsList()
+
+    fun getBookById(id: String) = database.bookQueries.getById(id).executeAsOneOrNull()
 
     fun getBooks(refresh: Boolean = false): LiveData<Resource<List<Book>>> = liveData {
         emit(Resource.Loading())
         try {
-            if (refresh || books == null)
-                books = Api(proxy = true).getBooks()
+            val dbBookIds = database.bookQueries.getAll().executeAsList().map { it.id }
+            if (refresh || dbBookIds.isEmpty()) {
+                val books = Api(proxy = true).getBooks().map { it.toBook() }
+                for (book in books.filter { it.id !in dbBookIds })
+                    database.bookQueries.insert(book)
 
-            database.add(*(books!!.filter { it !in database.get() }).toTypedArray())
-            emit(Resource.Success(books!!))
+                for (book in books.filter { it.id in dbBookIds })
+                    database.bookQueries.update(
+                        book.name,
+                        book.lastUpdated,
+                        book.completed,
+                        book.id
+                    )
+            }
+
+            emit(Resource.Success(database.bookQueries.getAll().executeAsList()))
         } catch (e: Exception) {
             emit(Resource.Error<List<Book>>(e))
         }
     }
 
-    fun getChapters(book: Book, refresh: Boolean = false) = liveData {
-        emit(Resource.Loading())
-        try {
-            if (refresh || book.chapterGroups.isEmpty())
-                book.chapterGroups = Api(proxy = true).getChapters(book)
+    fun getLibraryBooks() = database.bookQueries.getAllLibraryBooks().executeAsList()
 
-            database.save()
-            emit(Resource.Success(book.chapterGroups))
-        } catch (e: Exception) {
-            emit(Resource.Error<List<ChapterGroup>>(e))
-        }
+    fun getChapters(book: Book) = database.chapterGroupQueries.getByBookId(book.id).executeAsList()
+
+    fun addToLibrary(book: Book) {
+        if (database.bookQueries.getById(book.id).executeAsOneOrNull() == null)
+            throw IllegalArgumentException("$this does not exists in library")
+
+        database.bookQueries.addToLibrary(book.id)
     }
+
+    fun updateLastRead(book: Book, lastRead: Int) {
+        if (database.bookQueries.getById(book.id).executeAsOneOrNull() == null)
+            throw IllegalArgumentException("$this does not exists in library")
+
+        database.bookQueries.updateLastRead(lastRead, book.id)
+    }
+
+    private fun BookJson.toBook() = Book(id, name, lastUpdated, completed, inLibrary, lastRead)
 
 }

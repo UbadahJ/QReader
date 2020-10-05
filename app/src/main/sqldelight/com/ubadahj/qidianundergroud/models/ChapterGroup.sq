@@ -1,0 +1,43 @@
+-- TABLE
+
+CREATE TABLE ChapterGroup
+(
+    bookId TEXT              NOT NULL,
+    text    TEXT             NOT NULL,
+    link    TEXT PRIMARY KEY NOT NULL,
+    CONSTRAINT chapter_group_ibfk
+        FOREIGN KEY (bookId) REFERENCES Book(id)
+);
+
+
+CREATE INDEX book_id
+    ON ChapterGroup (bookId);
+
+-- QUERIES
+get:
+SELECT *
+FROM ChapterGroup
+WHERE link = ?;
+
+getByBookId:
+SELECT *
+FROM ChapterGroup
+WHERE bookId = ?;
+
+insert:
+INSERT OR IGNORE INTO ChapterGroup(bookId, text, link)
+VALUES ?;
+
+insertByValues:
+INSERT OR IGNORE INTO ChapterGroup(bookId, text, link)
+VALUES (?, ?, ?);
+
+deleteByLink:
+DELETE
+FROM ChapterGroup
+WHERE link = ?;
+
+contents:
+SELECT *
+FROM Chapter
+WHERE groupLink = ?;

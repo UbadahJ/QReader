@@ -10,10 +10,13 @@ import androidx.work.WorkerParameters
 import com.squareup.moshi.JsonDataException
 import com.ubadahj.qidianundergroud.MainActivity
 import com.ubadahj.qidianundergroud.R
-import com.ubadahj.qidianundergroud.api.Api
-import com.ubadahj.qidianundergroud.database.DatabaseInstance
 import com.ubadahj.qidianundergroud.models.Book
 import com.ubadahj.qidianundergroud.models.ChapterGroup
+import com.ubadahj.qidianundergroud.repositories.BookRepository
+import com.ubadahj.qidianundergroud.repositories.ChapterGroupRepository
+import com.ubadahj.qidianundergroud.utils.models.contains
+import com.ubadahj.qidianundergroud.utils.models.lastChapter
+import com.ubadahj.qidianundergroud.utils.repositories.getChapters
 import java.io.IOException
 import java.net.SocketException
 import kotlin.random.Random
@@ -22,16 +25,16 @@ class NotificationWorker(context: Context, params: WorkerParameters) :
     CoroutineWorker(context, params) {
 
     private var intentCounter = 0
-    val api = Api(true)
-    val database = DatabaseInstance.getInstance(context)
+    private val bookRepo = BookRepository(context)
+    private val groupRepo = ChapterGroupRepository(context)
 
     override suspend fun doWork(): Result {
         val updates: MutableList<Triple<Int, Book, ChapterGroup?>> = mutableListOf()
-        for (book in database.get()) {
+        for (book in bookRepo.getLibraryBooks()) {
             try {
-                val chapters = api.getChapters(book)
+                val chapters = groupRepo.getGroups(book, true).value!!.data!!
                 val lastChapter = chapters.lastChapter()
-                val bookLastChapter = book.chapterGroups.lastChapter()
+                val bookLastChapter = book.getChapters(applicationContext).lastChapter()
                 updates += Triple(
                     lastChapter - bookLastChapter,
                     book,
@@ -43,8 +46,6 @@ class NotificationWorker(context: Context, params: WorkerParameters) :
                         book,
                         chapters.lastReadChapters(lastChapter + 1)
                     )
-                    book.chapterGroups = chapters
-                    database.save()
                 }
             } catch (e: SocketException) {
             } catch (e: JsonDataException) {
@@ -60,7 +61,8 @@ class NotificationWorker(context: Context, params: WorkerParameters) :
                 .setPriority(NotificationCompat.PRIORITY_DEFAULT)
                 .setContentIntent(createIntent(triple.second, triple.third))
                 .addAction(R.drawable.add, "Open latest", createIntent(
-                    triple.second, triple.second.chapterGroups.maxByOrNull { it.lastChapter }
+                    triple.second,
+                    triple.second.getChapters(applicationContext).maxByOrNull { it.lastChapter }
                 ))
                 .addAction(R.drawable.add, "Open Book", createIntent(triple.second))
                 .setAutoCancel(true)
@@ -81,8 +83,8 @@ class NotificationWorker(context: Context, params: WorkerParameters) :
             applicationContext,
             requestCode,
             Intent(applicationContext, MainActivity::class.java).apply {
-                putExtra("book", book)
-                putExtra("chapters", chapters)
+                putExtra("book", book?.id)
+                putExtra("chapters", chapters?.link)
             },
             PendingIntent.FLAG_UPDATE_CURRENT
         )

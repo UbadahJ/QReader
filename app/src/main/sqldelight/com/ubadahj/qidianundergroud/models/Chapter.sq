@@ -1,0 +1,39 @@
+-- TABLE
+
+CREATE TABLE Chapter
+(
+    id         TEXT PRIMARY KEY NOT NULL,
+    groupLink  TEXT             NOT NULL,
+    title      TEXT             NOT NULL,
+    contents   TEXT             NOT NULL,
+    CONSTRAINT chapter_ibfk
+        FOREIGN KEY (groupLink) REFERENCES ChapterGroup(link)
+);
+
+CREATE INDEX group_link
+    ON Chapter(groupLink);
+
+-- Queries
+
+getByGroupId:
+SELECT *
+FROM Chapter
+WHERE groupLink = ?;
+
+insert:
+INSERT OR IGNORE INTO Chapter(id, groupLink, title, contents)
+VALUES ?;
+
+insertByValues:
+INSERT OR IGNORE INTO Chapter(id, groupLink, title, contents)
+VALUES (?, ?, ?, ?);
+
+deleteByTitle:
+DELETE
+FROM Chapter
+WHERE title = ?;
+
+deleteByGroupId:
+DELETE
+FROM Chapter
+WHERE groupLink = ?;

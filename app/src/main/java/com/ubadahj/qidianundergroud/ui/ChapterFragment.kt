@@ -107,7 +107,6 @@ class ChapterFragment : Fragment() {
         webView.loadUrl(chapters.link)
         return viewModel.getChapterContents(
             webView,
-            viewModel.selectedBook.value!!,
             chapters,
             refresh
         )

@@ -1,0 +1,73 @@
+import java.lang.Boolean;
+
+-- TABLE
+
+CREATE TABLE Book
+(
+    id          TEXT                         NOT NULL,
+    name        TEXT                         NOT NULL,
+    lastUpdated TEXT                         NOT NULL,
+    completed   INTEGER as Boolean           NOT NULL,
+    inLibrary   INTEGER as Boolean DEFAULT 0 NOT NULL,
+    lastRead    INTEGER as Int     DEFAULT 0 NOT NULL,
+    PRIMARY KEY (id)
+);
+
+-- QUERIES
+
+getAll:
+SELECT *
+FROM Book;
+
+getAllLibraryBooks:
+SELECT *
+FROM Book
+WHERE inLibrary = 1;
+
+getById:
+SELECT *
+FROM Book
+WHERE id = ?;
+
+getByName:
+SELECT *
+FROM Book
+WHERE name LIKE ?;
+
+insert:
+INSERT OR IGNORE INTO Book(id, name, lastUpdated, completed, inLibrary, lastRead)
+VALUES ?;
+
+insertByValues:
+INSERT INTO Book(id, name, lastUpdated, completed)
+VALUES (? , ?, ?, ?);
+
+update:
+UPDATE Book
+SET name = ?, lastUpdated = ?, completed = ?
+WHERE id = ?;
+
+overwrite:
+UPDATE Book
+SET name = ?, lastUpdated = ?, completed = ?, inLibrary = ?, lastUpdated = ?
+WHERE id = ?;
+
+deleteById:
+DELETE
+FROM Book
+WHERE id = ?;
+
+addToLibrary:
+UPDATE Book
+SET inLibrary = 1
+WHERE id = ?;
+
+updateLastRead:
+UPDATE Book
+SET lastRead = ?
+WHERE id = ?;
+
+chapters:
+SELECT *
+FROM ChapterGroup
+WHERE bookId = ?;

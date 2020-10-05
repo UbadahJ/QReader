@@ -7,6 +7,7 @@ import androidx.lifecycle.ViewModel
 import com.ubadahj.qidianundergroud.models.Book
 import com.ubadahj.qidianundergroud.models.ChapterGroup
 import com.ubadahj.qidianundergroud.repositories.BookRepository
+import com.ubadahj.qidianundergroud.repositories.ChapterGroupRepository
 import com.ubadahj.qidianundergroud.repositories.ChapterRepository
 
 class MainViewModel : ViewModel() {
@@ -19,13 +20,15 @@ class MainViewModel : ViewModel() {
         MutableLiveData()
     }
 
+    fun libraryBooks(context: Context) = BookRepository(context).getLibraryBooks()
+
     fun getBooks(context: Context, refresh: Boolean = false) =
         BookRepository(context).getBooks(refresh)
 
     fun getChapters(context: Context, book: Book, refresh: Boolean = false) =
-        BookRepository(context).getChapters(book, refresh)
+        ChapterGroupRepository(context).getGroups(book, refresh)
 
-    fun getChapterContents(webView: WebView, book: Book, chapter: ChapterGroup, refresh: Boolean) =
-        ChapterRepository(webView.context).getChaptersContent(webView, book, chapter, refresh)
+    fun getChapterContents(webView: WebView, group: ChapterGroup, refresh: Boolean) =
+        ChapterRepository(webView.context).getChaptersContent(webView, group, refresh)
 
 }
