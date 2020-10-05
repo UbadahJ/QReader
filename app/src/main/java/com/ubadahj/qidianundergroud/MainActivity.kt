@@ -42,7 +42,6 @@ class MainActivity : AppCompatActivity() {
             viewModel.selectedChapter.value = groupRepo.getGroupByLink(this)
         }
 
-
         if (book != null) {
             val navHost = nav_host_fragment as NavHostFragment
             val graphInflater = navHost.navController.navInflater
