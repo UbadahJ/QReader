@@ -2,8 +2,9 @@ apply plugin: 'com.android.application'
 apply plugin: 'kotlin-android'
 apply plugin: 'kotlin-android-extensions'
 apply plugin: 'kotlin-kapt'
-apply plugin: "androidx.navigation.safeargs.kotlin"
+apply plugin: 'androidx.navigation.safeargs.kotlin'
 apply plugin: 'com.mikepenz.aboutlibraries.plugin'
+apply plugin: 'com.squareup.sqldelight'
 
 android {
     compileSdkVersion 29
@@ -62,7 +63,6 @@ dependencies {
     coreLibraryDesugaring 'com.android.tools:desugar_jdk_libs:1.0.10'
 
     // Navigation Support
-    def nav_version = "2.3.0"
     implementation "androidx.navigation:navigation-fragment-ktx:$nav_version"
     implementation "androidx.navigation:navigation-ui-ktx:$nav_version"
 
@@ -114,5 +114,8 @@ dependencies {
     // About page
     implementation "com.mikepenz:aboutlibraries-core:$about_lib_version"
     implementation "com.mikepenz:aboutlibraries:$about_lib_version"
+
+    // Database support
+    implementation "com.squareup.sqldelight:android-driver:$sqldelight_version"
 
 }
