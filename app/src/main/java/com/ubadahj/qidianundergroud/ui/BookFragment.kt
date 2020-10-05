@@ -16,7 +16,6 @@ import com.ubadahj.qidianundergroud.databinding.BookFragmentBinding
 import com.ubadahj.qidianundergroud.models.Book
 import com.ubadahj.qidianundergroud.models.ChapterGroup
 import com.ubadahj.qidianundergroud.models.Resource
-import com.ubadahj.qidianundergroud.repositories.BookRepository
 import com.ubadahj.qidianundergroud.ui.adapters.ChapterAdapter
 import com.ubadahj.qidianundergroud.ui.adapters.items.ChapterItem
 import com.ubadahj.qidianundergroud.utils.models.lastChapter
@@ -61,7 +60,7 @@ class BookFragment : Fragment() {
                 Snackbar.make(root, "Added book to the library", Snackbar.LENGTH_SHORT).show()
                 libraryButton.visibility = View.GONE
             }
-            if (BookRepository(requireContext()).getLibraryBooks().contains(book))
+            if (book.inLibrary)
                 libraryButton.visibility = View.GONE
         }
 
