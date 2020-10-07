@@ -52,6 +52,15 @@ UPDATE Book
 SET name = ?, lastUpdated = ?, completed = ?, inLibrary = ?, lastUpdated = ?
 WHERE id = ?;
 
+upsert {
+    UPDATE Book
+    SET name = :name, lastUpdated = :lastUpdated, completed = :completed
+    WHERE id = :id;
+
+    INSERT OR IGNORE INTO Book(id, name, lastUpdated, completed)
+    VALUES (:id, :name, :lastUpdated, :completed);
+}
+
 deleteById:
 DELETE
 FROM Book

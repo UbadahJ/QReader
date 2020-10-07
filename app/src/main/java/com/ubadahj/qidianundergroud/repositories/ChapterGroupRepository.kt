@@ -24,13 +24,12 @@ class ChapterGroupRepository(context: Context) {
             if (refresh || dbGroups.isEmpty()) {
                 val groups = Api(proxy = true).getChapters(book.id)
                     .map { it.toGroup(book) }
-
                 database.chapterGroupQueries.transaction {
-                    for (group in groups)
-                        database.chapterGroupQueries.insert(group)
-
                     for (group in dbGroups.filter { it !in groups })
                         database.chapterGroupQueries.deleteByLink(group.link)
+
+                    for (group in groups)
+                        database.chapterGroupQueries.insert(group)
                 }
             }
             emit(Resource.Success(database.bookQueries.chapters(book.id).executeAsList()))
