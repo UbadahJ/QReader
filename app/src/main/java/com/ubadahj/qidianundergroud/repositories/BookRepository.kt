@@ -23,16 +23,18 @@ class BookRepository(context: Context) {
             val dbBookIds = database.bookQueries.getAll().executeAsList().map { it.id }
             if (refresh || dbBookIds.isEmpty()) {
                 val books = Api(proxy = true).getBooks().map { it.toBook() }
-                for (book in books.filter { it.id !in dbBookIds })
-                    database.bookQueries.insert(book)
+                database.bookQueries.transaction {
+                    for (book in books.filter { it.id !in dbBookIds })
+                        database.bookQueries.insert(book)
 
-                for (book in books.filter { it.id in dbBookIds })
-                    database.bookQueries.update(
-                        book.name,
-                        book.lastUpdated,
-                        book.completed,
-                        book.id
-                    )
+                    for (book in books.filter { it.id in dbBookIds })
+                        database.bookQueries.update(
+                            book.name,
+                            book.lastUpdated,
+                            book.completed,
+                            book.id
+                        )
+                }
             }
 
             emit(Resource.Success(database.bookQueries.getAll().executeAsList()))

@@ -40,19 +40,21 @@ class ChapterRepository(context: Context) {
                 }
 
                 doc.select("br").forEach { it.remove() }
-                doc.select(".well")
-                    .filter { "Chapter" in it.text() }
-                    .filter { it.select("h2.text-center").first() != null }
-                    .forEach {
-                        val title = it.select("h2.text-center").first().html().unescapeHtml()
-                        val contents = it.select("p").outerHtml().unescapeHtml()
-                        database.chapterQueries.insertByValues(
-                            group.link.md5 + title.md5,
-                            group.link,
-                            title,
-                            contents
-                        )
-                    }
+                database.chapterQueries.transaction {
+                    doc.select(".well")
+                        .filter { "Chapter" in it.text() }
+                        .filter { it.select("h2.text-center").first() != null }
+                        .forEach {
+                            val title = it.select("h2.text-center").first().html().unescapeHtml()
+                            val contents = it.select("p").outerHtml().unescapeHtml()
+                            database.chapterQueries.insertByValues(
+                                group.link.md5 + title.md5,
+                                group.link,
+                                title,
+                                contents
+                            )
+                        }
+                }
             }
             emit(Resource.Success(
                 database.chapterGroupQueries.contents(group.link)
