@@ -117,5 +117,6 @@ dependencies {
 
     // Database support
     implementation "com.squareup.sqldelight:android-driver:$sqldelight_version"
+    implementation "com.squareup.sqldelight:coroutines-extensions-jvm:$sqldelight_version"
 
 }

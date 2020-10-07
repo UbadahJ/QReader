@@ -1,12 +1,13 @@
 package com.ubadahj.qidianundergroud.repositories
 
 import android.content.Context
+import com.squareup.sqldelight.runtime.coroutines.asFlow
+import com.squareup.sqldelight.runtime.coroutines.mapToList
 import com.ubadahj.qidianundergroud.api.Api
 import com.ubadahj.qidianundergroud.api.models.BookJson
 import com.ubadahj.qidianundergroud.database.BookDatabase
 import com.ubadahj.qidianundergroud.models.Book
-import com.ubadahj.qidianundergroud.models.Resource
-import kotlinx.coroutines.flow.flow
+import kotlinx.coroutines.flow.Flow
 
 class BookRepository(context: Context) {
 
@@ -16,28 +17,23 @@ class BookRepository(context: Context) {
 
     fun getBookById(id: String) = database.bookQueries.getById(id).executeAsOneOrNull()
 
-    fun getBooks(refresh: Boolean = false) = flow {
-        emit(Resource.Loading())
-        try {
-            val dbBookIds = database.bookQueries.getAll().executeAsList().map { it.id }
-            if (refresh || dbBookIds.isEmpty()) {
-                val books = Api(proxy = true).getBooks().map { it.toBook() }
-                database.bookQueries.transaction {
-                    books.forEach { book ->
-                        database.bookQueries.upsert(
-                            book.name,
-                            book.lastUpdated,
-                            book.completed,
-                            book.id
-                        )
-                    }
+    suspend fun getBooks(refresh: Boolean = false): Flow<List<Book>> {
+        val dbBookIds = database.bookQueries.getAll().executeAsList().map { it.id }
+        if (refresh || dbBookIds.isEmpty()) {
+            val books = Api(proxy = true).getBooks().map { it.toBook() }
+            database.bookQueries.transaction {
+                books.forEach { book ->
+                    database.bookQueries.upsert(
+                        book.name,
+                        book.lastUpdated,
+                        book.completed,
+                        book.id
+                    )
                 }
             }
-
-            emit(Resource.Success(database.bookQueries.getAll().executeAsList()))
-        } catch (e: Exception) {
-            emit(Resource.Error<List<Book>>(e))
         }
+
+        return database.bookQueries.getAll().asFlow().mapToList()
     }
 
     fun getLibraryBooks() = database.bookQueries.getAllLibraryBooks().executeAsList()
