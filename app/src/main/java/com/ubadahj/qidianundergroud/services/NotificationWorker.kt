@@ -12,11 +12,13 @@ import com.ubadahj.qidianundergroud.MainActivity
 import com.ubadahj.qidianundergroud.R
 import com.ubadahj.qidianundergroud.models.Book
 import com.ubadahj.qidianundergroud.models.ChapterGroup
+import com.ubadahj.qidianundergroud.models.Resource
 import com.ubadahj.qidianundergroud.repositories.BookRepository
 import com.ubadahj.qidianundergroud.repositories.ChapterGroupRepository
 import com.ubadahj.qidianundergroud.utils.models.contains
 import com.ubadahj.qidianundergroud.utils.models.lastChapter
 import com.ubadahj.qidianundergroud.utils.repositories.getChapters
+import kotlinx.coroutines.flow.collect
 import java.io.IOException
 import java.net.SocketException
 import kotlin.random.Random
@@ -32,20 +34,24 @@ class NotificationWorker(context: Context, params: WorkerParameters) :
         val updates: MutableList<Triple<Int, Book, ChapterGroup?>> = mutableListOf()
         for (book in bookRepo.getLibraryBooks()) {
             try {
-                val chapters = groupRepo.getGroups(book, true).value!!.data!!
-                val lastChapter = chapters.lastChapter()
-                val bookLastChapter = book.getChapters(applicationContext).lastChapter()
-                updates += Triple(
-                    lastChapter - bookLastChapter,
-                    book,
-                    chapters.lastReadChapters(book.lastRead)
-                )
-                if (lastChapter > bookLastChapter) {
-                    updates += Triple(
-                        lastChapter - bookLastChapter,
-                        book,
-                        chapters.lastReadChapters(lastChapter + 1)
-                    )
+                groupRepo.getGroups(book, true).collect {
+                    if (it is Resource.Success) {
+                        val chapters = it.data!!
+                        val lastChapter = chapters.lastChapter()
+                        val bookLastChapter = book.getChapters(applicationContext).lastChapter()
+                        updates += Triple(
+                            lastChapter - bookLastChapter,
+                            book,
+                            chapters.lastReadChapters(book.lastRead)
+                        )
+                        if (lastChapter > bookLastChapter) {
+                            updates += Triple(
+                                lastChapter - bookLastChapter,
+                                book,
+                                chapters.lastReadChapters(lastChapter + 1)
+                            )
+                        }
+                    }
                 }
             } catch (e: SocketException) {
             } catch (e: JsonDataException) {

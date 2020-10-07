@@ -1,13 +1,12 @@
 package com.ubadahj.qidianundergroud.repositories
 
 import android.content.Context
-import androidx.lifecycle.LiveData
-import androidx.lifecycle.liveData
 import com.ubadahj.qidianundergroud.api.Api
 import com.ubadahj.qidianundergroud.api.models.BookJson
 import com.ubadahj.qidianundergroud.database.BookDatabase
 import com.ubadahj.qidianundergroud.models.Book
 import com.ubadahj.qidianundergroud.models.Resource
+import kotlinx.coroutines.flow.flow
 
 class BookRepository(context: Context) {
 
@@ -17,7 +16,7 @@ class BookRepository(context: Context) {
 
     fun getBookById(id: String) = database.bookQueries.getById(id).executeAsOneOrNull()
 
-    fun getBooks(refresh: Boolean = false): LiveData<Resource<List<Book>>> = liveData {
+    fun getBooks(refresh: Boolean = false) = flow {
         emit(Resource.Loading())
         try {
             val dbBookIds = database.bookQueries.getAll().executeAsList().map { it.id }

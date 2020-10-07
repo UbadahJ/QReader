@@ -2,7 +2,6 @@ package com.ubadahj.qidianundergroud.repositories
 
 import android.content.Context
 import android.webkit.WebView
-import androidx.lifecycle.liveData
 import com.ubadahj.qidianundergroud.database.BookDatabase
 import com.ubadahj.qidianundergroud.models.ChapterGroup
 import com.ubadahj.qidianundergroud.models.Resource
@@ -11,13 +10,15 @@ import com.ubadahj.qidianundergroud.utils.getHtml
 import com.ubadahj.qidianundergroud.utils.md5
 import com.ubadahj.qidianundergroud.utils.unescapeHtml
 import kotlinx.coroutines.delay
+import kotlinx.coroutines.flow.flow
+import kotlinx.coroutines.withTimeoutOrNull
 import org.jsoup.Jsoup
 import java.util.concurrent.TimeoutException
 
 class ChapterRepository(context: Context) {
 
     companion object {
-        private const val maxTimeDelay: Int = 8000
+        private const val maxTimeDelay: Long = 8000
     }
 
     private val database = BookDatabase.getInstance(context)
@@ -26,18 +27,19 @@ class ChapterRepository(context: Context) {
         webView: WebView,
         group: ChapterGroup,
         refresh: Boolean = false
-    ) = liveData {
+    ) = flow {
         emit(Resource.Loading())
         try {
             val dbChapters = database.chapterGroupQueries.contents(group.link).executeAsList()
-            val time = DelayCounter(maxTimeDelay)
             if (refresh || dbChapters.isEmpty()) {
                 var doc = Jsoup.parse(webView.getHtml())!!
-                while ("Chapter" !in doc.text()) {
-                    doc = Jsoup.parse(webView.getHtml())!!
-                    delay(300)
-                    time.update()
-                }
+                withTimeoutOrNull(maxTimeDelay) {
+                    while ("Chapter" !in doc.text()) {
+                        doc = Jsoup.parse(webView.getHtml())!!
+                        delay(300)
+                    }
+                    true
+                } ?: throw TimeoutException("Exceed $maxTimeDelay fetching contents")
 
                 doc.select("br").forEach { it.remove() }
                 database.chapterQueries.transaction {
@@ -66,15 +68,4 @@ class ChapterRepository(context: Context) {
         }
     }
 
-    private class DelayCounter(private val maxTime: Int) {
-
-        private var total: Int = 0
-
-        fun update() {
-            total += 300
-            if (total > maxTime)
-                throw TimeoutException("Max time exceeded for loading")
-        }
-
-    }
 }

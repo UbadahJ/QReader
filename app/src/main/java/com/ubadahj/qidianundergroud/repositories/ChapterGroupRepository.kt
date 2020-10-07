@@ -1,13 +1,13 @@
 package com.ubadahj.qidianundergroud.repositories
 
 import android.content.Context
-import androidx.lifecycle.liveData
 import com.ubadahj.qidianundergroud.api.Api
 import com.ubadahj.qidianundergroud.api.models.ChapterGroupJson
 import com.ubadahj.qidianundergroud.database.BookDatabase
 import com.ubadahj.qidianundergroud.models.Book
 import com.ubadahj.qidianundergroud.models.ChapterGroup
 import com.ubadahj.qidianundergroud.models.Resource
+import kotlinx.coroutines.flow.flow
 
 class ChapterGroupRepository(context: Context) {
 
@@ -17,7 +17,7 @@ class ChapterGroupRepository(context: Context) {
 
     fun getGroupByLink(link: String) = database.chapterGroupQueries.get(link).executeAsOneOrNull()
 
-    fun getGroups(book: Book, refresh: Boolean = false) = liveData {
+    fun getGroups(book: Book, refresh: Boolean = false) = flow {
         emit(Resource.Loading())
         try {
             val dbGroups = database.bookQueries.chapters(book.id).executeAsList()
