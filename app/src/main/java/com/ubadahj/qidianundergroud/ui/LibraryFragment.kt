@@ -7,11 +7,13 @@ import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
+import com.google.android.material.snackbar.Snackbar
 import com.mikepenz.aboutlibraries.LibsBuilder
 import com.mikepenz.fastadapter.FastAdapter
 import com.mikepenz.fastadapter.IAdapter
 import com.ubadahj.qidianundergroud.R
 import com.ubadahj.qidianundergroud.databinding.LibraryFragmentBinding
+import com.ubadahj.qidianundergroud.models.Resource
 import com.ubadahj.qidianundergroud.ui.adapters.BookAdapter
 import com.ubadahj.qidianundergroud.ui.adapters.FastScrollAdapter
 import com.ubadahj.qidianundergroud.ui.adapters.MenuAdapter
@@ -77,11 +79,28 @@ class LibraryFragment : Fragment() {
             }
 
             bookListingView.layoutManager = LinearLayoutManager(requireContext())
-            bookListingView.adapter = FastScrollAdapter<BookItem>().wrap(
-                FastAdapter.with(
-                    BookAdapter(viewModel.libraryBooks(requireContext()))
-                ).apply { onClickListener = onBookSelected }
-            )
+            viewModel.libraryBooks(requireContext()).observe(viewLifecycleOwner) {
+                when (it) {
+                    is Resource.Success -> {
+                        progressBar.visibility = View.GONE
+                        bookListingView.adapter = FastScrollAdapter<BookItem>().wrap(
+                            FastAdapter.with(BookAdapter(it.data!!)).apply {
+                                onClickListener = onBookSelected
+                            }
+                        )
+                    }
+                    is Resource.Loading -> {
+                        progressBar.visibility = View.VISIBLE
+                    }
+                    is Resource.Error -> {
+                        Snackbar.make(
+                            root,
+                            "CRITICAL: Failed to fetch data from internal DB",
+                            Snackbar.LENGTH_SHORT
+                        ).show()
+                    }
+                }
+            }
         }
     }
 

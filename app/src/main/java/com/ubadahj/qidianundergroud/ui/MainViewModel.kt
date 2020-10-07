@@ -26,7 +26,19 @@ class MainViewModel : ViewModel() {
         MutableLiveData()
     }
 
-    fun libraryBooks(context: Context) = BookRepository(context).getLibraryBooks()
+    fun libraryBooks(context: Context) = liveData {
+        emit(Resource.Loading())
+        try {
+            emitSource(
+                BookRepository(context).getLibraryBooks()
+                    .catch { Resource.Error<List<Book>>(it) }
+                    .map { Resource.Success(it) }
+                    .asLiveData()
+            )
+        } catch (e: Exception) {
+            emit(Resource.Error<List<Book>>(e))
+        }
+    }
 
     fun getBooks(context: Context, refresh: Boolean = false) = liveData {
         emit(Resource.Loading())

@@ -11,4 +11,4 @@ fun Book.updateLastRead(context: Context, lastRead: Int) =
     BookRepository(context).updateLastRead(this, lastRead)
 
 fun Book.getChapters(context: Context) =
-    BookRepository(context).getChapters(this)
+    BookRepository(context).getGroups(this)

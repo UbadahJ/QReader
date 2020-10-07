@@ -3,6 +3,7 @@ package com.ubadahj.qidianundergroud.repositories
 import android.content.Context
 import com.squareup.sqldelight.runtime.coroutines.asFlow
 import com.squareup.sqldelight.runtime.coroutines.mapToList
+import com.squareup.sqldelight.runtime.coroutines.mapToOne
 import com.ubadahj.qidianundergroud.api.Api
 import com.ubadahj.qidianundergroud.api.models.ChapterGroupJson
 import com.ubadahj.qidianundergroud.database.BookDatabase
@@ -14,9 +15,12 @@ class ChapterGroupRepository(context: Context) {
 
     private val database = BookDatabase.getInstance(context)
 
-    fun getBook(group: ChapterGroup) = database.chapterGroupQueries.getByBookId(group.bookId)
+    fun getBook(group: ChapterGroup) = database.chapterGroupQueries
+        .getByBookId(group.bookId)
+        .asFlow()
+        .mapToOne()
 
-    fun getGroupByLink(link: String) = database.chapterGroupQueries.get(link).executeAsOneOrNull()
+    fun getGroupByLink(link: String) = database.chapterGroupQueries.get(link).asFlow().mapToOne()
 
     suspend fun getGroups(book: Book, refresh: Boolean = false): Flow<List<ChapterGroup>> {
         val dbGroups = database.bookQueries.chapters(book.id).executeAsList()

@@ -3,6 +3,7 @@ package com.ubadahj.qidianundergroud.repositories
 import android.content.Context
 import com.squareup.sqldelight.runtime.coroutines.asFlow
 import com.squareup.sqldelight.runtime.coroutines.mapToList
+import com.squareup.sqldelight.runtime.coroutines.mapToOne
 import com.ubadahj.qidianundergroud.api.Api
 import com.ubadahj.qidianundergroud.api.models.BookJson
 import com.ubadahj.qidianundergroud.database.BookDatabase
@@ -13,9 +14,7 @@ class BookRepository(context: Context) {
 
     private val database = BookDatabase.getInstance(context)
 
-    fun getBooks(): List<Book> = database.bookQueries.getAll().executeAsList()
-
-    fun getBookById(id: String) = database.bookQueries.getById(id).executeAsOneOrNull()
+    fun getBookById(id: String) = database.bookQueries.getById(id).asFlow().mapToOne()
 
     suspend fun getBooks(refresh: Boolean = false): Flow<List<Book>> {
         val dbBookIds = database.bookQueries.getAll().executeAsList().map { it.id }
@@ -36,9 +35,10 @@ class BookRepository(context: Context) {
         return database.bookQueries.getAll().asFlow().mapToList()
     }
 
-    fun getLibraryBooks() = database.bookQueries.getAllLibraryBooks().executeAsList()
+    fun getLibraryBooks() = database.bookQueries.getAllLibraryBooks().asFlow().mapToList()
 
-    fun getChapters(book: Book) = database.chapterGroupQueries.getByBookId(book.id).executeAsList()
+    fun getGroups(book: Book) =
+        database.chapterGroupQueries.getByBookId(book.id).asFlow().mapToList()
 
     fun addToLibrary(book: Book) {
         if (database.bookQueries.getById(book.id).executeAsOneOrNull() == null)
