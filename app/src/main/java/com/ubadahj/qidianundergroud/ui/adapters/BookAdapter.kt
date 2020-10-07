@@ -9,7 +9,7 @@ class BookAdapter(books: List<Book>) : ItemAdapter<BookItem>() {
     init {
         super.add(books.map { BookItem(it) })
         itemFilter.filterPredicate = { item, constraint ->
-            item.book.name.contains(constraint.toString(), false)
+            item.book.name.contains(constraint.toString(), true)
         }
     }
 
