@@ -6,27 +6,28 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
+import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.GridLayoutManager
 import com.google.android.material.snackbar.Snackbar
 import com.mikepenz.fastadapter.FastAdapter
 import com.ubadahj.qidianundergroud.R
-import com.ubadahj.qidianundergroud.api.Api
 import com.ubadahj.qidianundergroud.databinding.BookFragmentBinding
 import com.ubadahj.qidianundergroud.models.Book
 import com.ubadahj.qidianundergroud.models.ChapterGroup
 import com.ubadahj.qidianundergroud.models.Resource
+import com.ubadahj.qidianundergroud.repositories.ChapterGroupRepository
 import com.ubadahj.qidianundergroud.ui.adapters.ChapterAdapter
 import com.ubadahj.qidianundergroud.ui.adapters.items.ChapterItem
 import com.ubadahj.qidianundergroud.utils.models.lastChapter
 import com.ubadahj.qidianundergroud.utils.repositories.addToLibrary
 import com.ubadahj.qidianundergroud.utils.repositories.updateLastRead
+import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.launch
 
 class BookFragment : Fragment() {
 
     private val viewModel: MainViewModel by activityViewModels()
-    private val api = Api(true)
-
     private var binding: BookFragmentBinding? = null
 
     override fun onCreateView(
@@ -90,10 +91,15 @@ class BookFragment : Fragment() {
             onClickListener = { _, _, item, _ ->
                 book.updateLastRead(requireContext(), item.chapter.lastChapter)
                 viewModel.selectedChapter.value = item.chapter
+                lifecycleScope.launch {
+                    viewModel.selectedBook.value =
+                        ChapterGroupRepository(this@BookFragment.requireContext())
+                            .getBook(groups.first())
+                            .first()
+                }
                 findNavController().navigate(
                     BookFragmentDirections.actionBookFragmentToChapterFragment()
                 )
-                notifyAdapterDataSetChanged()
                 true
             }
         }

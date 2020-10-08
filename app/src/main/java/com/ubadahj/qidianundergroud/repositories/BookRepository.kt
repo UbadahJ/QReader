@@ -38,7 +38,7 @@ class BookRepository(context: Context) {
     fun getLibraryBooks() = database.bookQueries.getAllLibraryBooks().asFlow().mapToList()
 
     fun getGroups(book: Book) =
-        database.chapterGroupQueries.getByBookId(book.id).asFlow().mapToList()
+        database.bookQueries.chapters(book.id).asFlow().mapToList()
 
     fun addToLibrary(book: Book) {
         if (database.bookQueries.getById(book.id).executeAsOneOrNull() == null)
