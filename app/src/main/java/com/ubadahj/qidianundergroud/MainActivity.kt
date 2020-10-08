@@ -3,6 +3,7 @@ package com.ubadahj.qidianundergroud
 import android.os.Bundle
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
+import androidx.lifecycle.lifecycleScope
 import androidx.navigation.ActivityNavigator
 import androidx.navigation.findNavController
 import androidx.navigation.fragment.NavHostFragment
@@ -11,11 +12,13 @@ import androidx.work.PeriodicWorkRequestBuilder
 import androidx.work.WorkManager
 import com.github.ajalt.timberkt.Timber
 import com.ubadahj.qidianundergroud.databinding.MainActivityBinding
-import com.ubadahj.qidianundergroud.models.Book
-import com.ubadahj.qidianundergroud.models.ChapterGroup
+import com.ubadahj.qidianundergroud.repositories.BookRepository
+import com.ubadahj.qidianundergroud.repositories.ChapterGroupRepository
 import com.ubadahj.qidianundergroud.services.NotificationWorker
 import com.ubadahj.qidianundergroud.ui.MainViewModel
 import kotlinx.android.synthetic.main.main_activity.*
+import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.launch
 import java.util.concurrent.TimeUnit
 
 class MainActivity : AppCompatActivity() {
@@ -33,21 +36,28 @@ class MainActivity : AppCompatActivity() {
         if (BuildConfig.DEBUG)
             Timber.plant(Timber.DebugTree())
 
-        val book = intent.extras?.get("book") as Book?
-        val chapters = intent.extras?.get("chapters") as ChapterGroup?
-        viewModel.selectedBook.value = book
-        viewModel.selectedChapter.value = chapters
+        lifecycleScope.launch {
+            val bookRepo = BookRepository(baseContext)
+            val groupRepo = ChapterGroupRepository(baseContext)
+            val book = (intent.extras?.get("book") as String?)?.apply {
+                viewModel.selectedBook.value = bookRepo.getBookById(this).first()
+            }
+            val groups = (intent.extras?.get("chapters") as String?)?.apply {
+                viewModel.selectedChapter.value = groupRepo.getGroupByLink(this).first()
+            }
 
-        if (book != null) {
-            val navHost = nav_host_fragment as NavHostFragment
-            val graphInflater = navHost.navController.navInflater
-            navHost.navController.graph = graphInflater.inflate(R.navigation.nav_graph).apply {
-                startDestination = if (chapters != null) R.id.chapterFragment else R.id.bookFragment
+            if (book != null) {
+                val navHost = nav_host_fragment as NavHostFragment
+                val graphInflater = navHost.navController.navInflater
+                navHost.navController.graph = graphInflater.inflate(R.navigation.nav_graph).apply {
+                    startDestination =
+                        if (groups != null) R.id.chapterFragment else R.id.bookFragment
+                }
             }
         }
 
         WorkManager.getInstance(applicationContext).enqueueUniquePeriodicWork(
-            "NotificationService", ExistingPeriodicWorkPolicy.KEEP, notificationRequest
+            "NotificationService", ExistingPeriodicWorkPolicy.REPLACE, notificationRequest
         )
     }
 

@@ -3,11 +3,9 @@ package com.ubadahj.qidianundergroud.ui
 import android.annotation.SuppressLint
 import android.os.Bundle
 import android.view.*
-import android.webkit.WebView
 import androidx.appcompat.app.AppCompatActivity
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
-import androidx.lifecycle.LiveData
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.google.android.material.snackbar.Snackbar
 import com.mikepenz.fastadapter.FastAdapter
@@ -99,19 +97,8 @@ class ChapterFragment : Fragment() {
         }
     }
 
-    @SuppressLint("SetJavaScriptEnabled")
-    private fun getChapterContents(chapters: ChapterGroup, refresh: Boolean = false):
-            LiveData<Resource<out List<ChapterContentItem>?>> {
-        val webView = WebView(requireContext())
-        webView.settings.javaScriptEnabled = true
-        webView.loadUrl(chapters.link)
-        return viewModel.getChapterContents(
-            webView,
-            viewModel.selectedBook.value!!,
-            chapters,
-            refresh
-        )
-    }
+    private fun getChapterContents(chapters: ChapterGroup, refresh: Boolean = false) =
+        viewModel.getChapterContents(requireContext(), chapters, refresh)
 
     private fun getAdapter(items: List<ChapterContentItem>) =
         FastScrollAdapter<ChapterContentItem>()

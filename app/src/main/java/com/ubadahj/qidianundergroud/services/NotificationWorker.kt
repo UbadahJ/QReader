@@ -1,5 +1,6 @@
 package com.ubadahj.qidianundergroud.services
 
+import android.app.Notification
 import android.app.PendingIntent
 import android.content.Context
 import android.content.Intent
@@ -7,91 +8,87 @@ import androidx.core.app.NotificationCompat
 import androidx.core.app.NotificationManagerCompat
 import androidx.work.CoroutineWorker
 import androidx.work.WorkerParameters
-import com.squareup.moshi.JsonDataException
 import com.ubadahj.qidianundergroud.MainActivity
 import com.ubadahj.qidianundergroud.R
-import com.ubadahj.qidianundergroud.api.Api
-import com.ubadahj.qidianundergroud.database.DatabaseInstance
 import com.ubadahj.qidianundergroud.models.Book
 import com.ubadahj.qidianundergroud.models.ChapterGroup
-import java.io.IOException
-import java.net.SocketException
-import kotlin.random.Random
+import com.ubadahj.qidianundergroud.repositories.BookRepository
+import com.ubadahj.qidianundergroud.repositories.ChapterGroupRepository
+import com.ubadahj.qidianundergroud.utils.models.contains
+import com.ubadahj.qidianundergroud.utils.models.lastChapter
+import com.ubadahj.qidianundergroud.utils.repositories.getChapters
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.flow.collect
+import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.flow.flow
+import kotlinx.coroutines.flow.flowOn
 
 class NotificationWorker(context: Context, params: WorkerParameters) :
     CoroutineWorker(context, params) {
 
-    private var intentCounter = 0
-    val api = Api(true)
-    val database = DatabaseInstance.getInstance(context)
+    private val bookRepo = BookRepository(context)
+    private val groupRepo = ChapterGroupRepository(context)
 
     override suspend fun doWork(): Result {
-        val updates: MutableList<Triple<Int, Book, ChapterGroup?>> = mutableListOf()
-        for (book in database.get()) {
-            try {
-                val chapters = api.getChapters(book)
-                val lastChapter = chapters.lastChapter()
-                val bookLastChapter = book.chapterGroups.lastChapter()
-                updates += Triple(
-                    lastChapter - bookLastChapter,
-                    book,
-                    chapters.lastReadChapters(book.lastRead)
-                )
-                if (lastChapter > bookLastChapter) {
-                    updates += Triple(
-                        lastChapter - bookLastChapter,
-                        book,
-                        chapters.lastReadChapters(lastChapter + 1)
-                    )
-                    book.chapterGroups = chapters
-                    database.save()
-                }
-            } catch (e: SocketException) {
-            } catch (e: JsonDataException) {
-            } catch (e: IOException) {
-            }
-        }
         createNotificationChannel(applicationContext)
-        for (triple in updates) {
-            val notification = NotificationCompat.Builder(applicationContext, CHANNEL_ID)
-                .setSmallIcon(R.drawable.book)
-                .setContentTitle(triple.second.name)
-                .setContentText("${triple.first} new chapter${if (triple.first > 1) "s" else ""} available")
-                .setPriority(NotificationCompat.PRIORITY_DEFAULT)
-                .setContentIntent(createIntent(triple.second, triple.third))
-                .addAction(R.drawable.add, "Open latest", createIntent(
-                    triple.second, triple.second.chapterGroups.maxByOrNull { it.lastChapter }
-                ))
-                .addAction(R.drawable.add, "Open Book", createIntent(triple.second))
-                .setAutoCancel(true)
-                .build()
+        getNotifications().collect {
             with(NotificationManagerCompat.from(applicationContext)) {
-                notify(Random(1).nextInt(), notification)
+                notify(it.hashCode(), it.createNotification())
             }
         }
         return Result.success()
     }
 
-    private fun createIntent(
-        book: Book?,
-        chapters: ChapterGroup? = null,
-        requestCode: Int = intentCounter++
-    ) =
-        PendingIntent.getActivity(
-            applicationContext,
-            requestCode,
-            Intent(applicationContext, MainActivity::class.java).apply {
-                putExtra("book", book)
-                putExtra("chapters", chapters)
-            },
-            PendingIntent.FLAG_UPDATE_CURRENT
-        )
+    private fun getNotifications() = flow {
+        for (book in bookRepo.getLibraryBooks().first()) {
+            val refreshedGroups = groupRepo.getGroups(book, true).first()
+            val updateCount = refreshedGroups.lastChapter() -
+                    book.getChapters(applicationContext).first().lastChapter()
+            if (updateCount > 0)
+                emit(BookNotification(applicationContext, book, refreshedGroups, updateCount))
+        }
+    }.flowOn(Dispatchers.IO)
 
     private fun List<ChapterGroup>.lastChapter(): Int {
         return maxByOrNull { it.lastChapter }?.lastChapter ?: 0
     }
 
-    private fun List<ChapterGroup>.lastReadChapters(lastRead: Int) =
-        firstOrNull { lastRead in it }
+    private data class BookNotification(
+        val context: Context,
+        val book: Book,
+        val groups: List<ChapterGroup>,
+        val updateCount: Int
+    ) {
+
+        val currentGroup = groups.lastReadGroup(book.lastRead)
+        val lastGroup = groups.maxByOrNull { it.lastChapter }!!
+
+        fun createNotification(): Notification =
+            NotificationCompat.Builder(context, CHANNEL_ID)
+                .setSmallIcon(R.drawable.book)
+                .setContentTitle(book.name)
+                .setContentText("$updateCount new chapter${if (updateCount > 1) "s" else ""} available")
+                .setPriority(NotificationCompat.PRIORITY_DEFAULT)
+                .setContentIntent(createIntent(currentGroup))
+                .addAction(R.drawable.add, "Open latest", createIntent(lastGroup))
+                .addAction(R.drawable.add, "Open Book", createIntent())
+                .setAutoCancel(true)
+                .build()
+
+        private fun createIntent(group: ChapterGroup? = null) =
+            PendingIntent.getActivity(
+                context,
+                hashCode() + group.hashCode(),
+                Intent(context, MainActivity::class.java).apply {
+                    putExtra("book", book.id)
+                    putExtra("chapters", group?.link)
+                },
+                PendingIntent.FLAG_UPDATE_CURRENT
+            )!!
+
+        private fun List<ChapterGroup>.lastReadGroup(lastRead: Int) =
+            firstOrNull { lastRead in it } ?: first()
+
+    }
 
 }

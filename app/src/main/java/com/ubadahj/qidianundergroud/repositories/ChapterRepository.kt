@@ -1,74 +1,66 @@
 package com.ubadahj.qidianundergroud.repositories
 
+import android.content.Context
 import android.webkit.WebView
-import androidx.lifecycle.liveData
-import com.github.ajalt.timberkt.d
-import com.ubadahj.qidianundergroud.models.Book
+import com.squareup.sqldelight.runtime.coroutines.asFlow
+import com.squareup.sqldelight.runtime.coroutines.mapToList
+import com.ubadahj.qidianundergroud.database.BookDatabase
+import com.ubadahj.qidianundergroud.models.Chapter
 import com.ubadahj.qidianundergroud.models.ChapterGroup
-import com.ubadahj.qidianundergroud.models.Resource
-import com.ubadahj.qidianundergroud.ui.adapters.items.ChapterContentItem
 import com.ubadahj.qidianundergroud.utils.getHtml
+import com.ubadahj.qidianundergroud.utils.md5
 import com.ubadahj.qidianundergroud.utils.unescapeHtml
 import kotlinx.coroutines.delay
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.withTimeoutOrNull
 import org.jsoup.Jsoup
 import java.util.concurrent.TimeoutException
 
-class ChapterRepository {
+class ChapterRepository(val context: Context) {
 
     companion object {
-        private const val maxTimeDelay: Int = 8000
-        private val chapterContents: MutableMap<Pair<Book, ChapterGroup>, List<ChapterContentItem>> =
-            mutableMapOf()
+        private const val maxTimeDelay: Long = 8000
     }
 
-    fun getChaptersContent(
-        webView: WebView,
-        book: Book,
-        chapters: ChapterGroup,
+    private val database = BookDatabase.getInstance(context)
+
+    suspend fun getChaptersContent(
+        webViewFactory: (Context) -> WebView,
+        group: ChapterGroup,
         refresh: Boolean = false
-    ) = liveData {
-        emit(Resource.Loading())
-        try {
-            val key = Pair(book, chapters)
-            val time = DelayCounter(maxTimeDelay)
-            if (refresh || key !in chapterContents) {
-                d { "getChaptersContent: $refresh || ${key !in chapterContents}" }
-                var doc = Jsoup.parse(webView.getHtml())!!
+    ): Flow<List<Chapter>> {
+        val dbChapters = database.chapterGroupQueries.contents(group.link).executeAsList()
+        if (refresh || dbChapters.isEmpty()) {
+            val webView = webViewFactory(context)
+            var doc = Jsoup.parse(webView.getHtml())!!
+            withTimeoutOrNull(maxTimeDelay) {
                 while ("Chapter" !in doc.text()) {
                     doc = Jsoup.parse(webView.getHtml())!!
                     delay(300)
-                    time.update()
                 }
+                true
+            } ?: throw TimeoutException("Exceed $maxTimeDelay fetching contents")
 
-                doc.select("br").forEach { it.remove() }
-                val data = doc.select(".well")
+            doc.select("br").forEach { it.remove() }
+            database.chapterQueries.transaction {
+                doc.select(".well")
                     .filter { "Chapter" in it.text() }
                     .filter { it.select("h2.text-center").first() != null }
-                    .map {
-                        ChapterContentItem(
-                            it.select("h2.text-center").first().html().unescapeHtml(),
-                            it.select("p").outerHtml().unescapeHtml()
+                    .forEach {
+                        val title = it.select("h2.text-center").first().html().unescapeHtml()
+                        val contents = it.select("p").outerHtml().unescapeHtml()
+                        database.chapterQueries.insertByValues(
+                            group.link.md5 + title.md5,
+                            group.link,
+                            title,
+                            contents
                         )
                     }
-
-                chapterContents[key] = data
             }
-
-            emit(Resource.Success(chapterContents[key]))
-        } catch (e: TimeoutException) {
-            emit(Resource.Error<List<ChapterContentItem>>(e))
-        }
-    }
-
-    private class DelayCounter(private val maxTime: Int) {
-
-        private var total: Int = 0
-
-        fun update() {
-            total += 300
-            if (total > maxTime)
-                throw TimeoutException("Max time exceeded for loading")
+            webView.clearCache(true)
         }
 
+        return database.chapterGroupQueries.contents(group.link).asFlow().mapToList()
     }
+
 }

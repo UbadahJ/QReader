@@ -1,8 +1,8 @@
 package com.ubadahj.qidianundergroud.api
 
+import com.ubadahj.qidianundergroud.api.models.BookJson
+import com.ubadahj.qidianundergroud.api.models.ChapterGroupJson
 import com.ubadahj.qidianundergroud.database.moshi
-import com.ubadahj.qidianundergroud.models.Book
-import com.ubadahj.qidianundergroud.models.ChapterGroup
 import okhttp3.OkHttpClient
 import okhttp3.logging.HttpLoggingInterceptor
 import retrofit2.Retrofit
@@ -37,21 +37,21 @@ class Api(private val proxy: Boolean = false) {
         }
     }
 
-    suspend fun getBooks(): List<Book> {
+    suspend fun getBooks(): List<BookJson> {
         if (proxy)
             return proxyApi.getBooks(
                 "https://toc.qidianunderground.org/api/v1/pages/public/",
                 "rnd"
             )
-        return api._getBooks()
+        return api.getBooks()
     }
 
-    suspend fun getChapters(book: Book): List<ChapterGroup> {
+    suspend fun getChapters(bookId: String): List<ChapterGroupJson> {
         if (proxy)
             return proxyApi.getChapters(
-                "https://toc.qidianunderground.org/api/v1/pages/public/${book.id}/chapters",
+                "https://toc.qidianunderground.org/api/v1/pages/public/${bookId}/chapters",
                 "rnd"
             )
-        return api._getChapters(book.id)
+        return api.getChapters(bookId)
     }
 }
