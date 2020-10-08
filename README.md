@@ -4,11 +4,13 @@ A simple application intended provide extension to the capabilities of the websi
 
 ## Features :sparkles:
 
-- Access all the books avaliable on the website
+- Access all the books available on the website
 - A builtin chapter reader optimized for reading on mobile devices
 - Notifications service for book updates
 - Bookmark progress on chapters
 - Day/Night theme support (Requires Android P or above)
+- Improved caching to allow offline content access
+- Improve notifications to allow opening chapters directly
 
 ## Screenshots :camera:
 
@@ -20,8 +22,6 @@ A simple application intended provide extension to the capabilities of the websi
 
 ## Upcoming features :rocket:
 
-- [ ] Improved caching to allow offline content access
-- [ ] Improve notifications to allow opening chapters directly
-- [ ] Per-chapter bookmark instead of chapter group
-- [ ] Support for downloading books
-- [ ] Book metadata support
+- Per-chapter bookmark instead of chapter group
+- Support for downloading books
+- Book metadata support
