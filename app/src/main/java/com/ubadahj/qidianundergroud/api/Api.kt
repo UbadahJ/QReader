@@ -43,7 +43,7 @@ class Api(private val proxy: Boolean = false) {
                 "https://toc.qidianunderground.org/api/v1/pages/public/",
                 "rnd"
             )
-        return api._getBooks()
+        return api.getBooks()
     }
 
     suspend fun getChapters(bookId: String): List<ChapterGroupJson> {
@@ -52,6 +52,6 @@ class Api(private val proxy: Boolean = false) {
                 "https://toc.qidianunderground.org/api/v1/pages/public/${bookId}/chapters",
                 "rnd"
             )
-        return api._getChapters(bookId)
+        return api.getChapters(bookId)
     }
 }

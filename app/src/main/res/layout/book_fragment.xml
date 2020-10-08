@@ -114,4 +114,15 @@
         android:orientation="vertical"
         app:layout_constraintGuide_percent="0.9" />
 
+    <ProgressBar
+        android:id="@+id/loading_progress"
+        style="?android:attr/progressBarStyle"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:translationZ="32dp"
+        app:layout_constraintBottom_toBottomOf="@+id/materialCardView"
+        app:layout_constraintEnd_toEndOf="@+id/materialCardView"
+        app:layout_constraintStart_toStartOf="@+id/materialCardView"
+        app:layout_constraintTop_toTopOf="@+id/materialCardView" />
+
 </androidx.constraintlayout.widget.ConstraintLayout>

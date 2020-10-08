@@ -68,11 +68,12 @@ class BookFragment : Fragment() {
         viewModel.getChapters(requireContext(), book).observe(viewLifecycleOwner) { resource ->
             when (resource) {
                 is Resource.Success -> {
+                    binding?.loadingProgress?.visibility = View.GONE
                     binding?.chapterListView?.adapter = createAdapter(book, resource.data!!)
                 }
-                is Resource.Loading -> {
-                }
+                is Resource.Loading -> binding?.loadingProgress?.visibility = View.VISIBLE
                 is Resource.Error -> {
+                    binding?.loadingProgress?.visibility = View.GONE
                     binding?.apply {
                         Snackbar.make(root, R.string.error_refreshing, Snackbar.LENGTH_SHORT).show()
                     }

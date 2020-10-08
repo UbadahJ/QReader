@@ -8,9 +8,9 @@ import retrofit2.http.Path
 interface UndergroundApi {
 
     @GET("public/")
-    suspend fun _getBooks(): List<BookJson>
+    suspend fun getBooks(): List<BookJson>
 
     @GET("public/{id}/chapters/")
-    suspend fun _getChapters(@Path("id") id: String): List<ChapterGroupJson>
+    suspend fun getChapters(@Path("id") id: String): List<ChapterGroupJson>
 
 }
