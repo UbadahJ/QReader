@@ -57,6 +57,7 @@ class ChapterRepository(val context: Context) {
                         )
                     }
             }
+            webView.clearCache(true)
         }
 
         return database.chapterGroupQueries.contents(group.link).asFlow().mapToList()
