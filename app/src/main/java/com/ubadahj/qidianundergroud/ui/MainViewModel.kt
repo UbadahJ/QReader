@@ -1,5 +1,6 @@
 package com.ubadahj.qidianundergroud.ui
 
+import android.annotation.SuppressLint
 import android.content.Context
 import android.webkit.WebView
 import androidx.lifecycle.MutableLiveData
@@ -68,11 +69,17 @@ class MainViewModel : ViewModel() {
         }
     }
 
-    fun getChapterContents(webView: WebView, group: ChapterGroup, refresh: Boolean) = liveData {
+    @SuppressLint("SetJavaScriptEnabled")
+    fun getChapterContents(context: Context, group: ChapterGroup, refresh: Boolean) = liveData {
         emit(Resource.Loading())
         try {
             emitSource(
-                ChapterRepository(webView.context).getChaptersContent(webView, group, refresh)
+                ChapterRepository(context).getChaptersContent({
+                    WebView(it).apply {
+                        settings.javaScriptEnabled = true
+                        loadUrl(group.link)
+                    }
+                }, group, refresh)
                     .catch { Resource.Error<List<ChapterContentItem>>(it) }
                     .map {
                         Resource.Success(it.map { c ->

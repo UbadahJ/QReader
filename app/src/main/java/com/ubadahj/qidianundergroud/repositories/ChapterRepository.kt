@@ -16,7 +16,7 @@ import kotlinx.coroutines.withTimeoutOrNull
 import org.jsoup.Jsoup
 import java.util.concurrent.TimeoutException
 
-class ChapterRepository(context: Context) {
+class ChapterRepository(val context: Context) {
 
     companion object {
         private const val maxTimeDelay: Long = 8000
@@ -25,12 +25,13 @@ class ChapterRepository(context: Context) {
     private val database = BookDatabase.getInstance(context)
 
     suspend fun getChaptersContent(
-        webView: WebView,
+        webViewFactory: (Context) -> WebView,
         group: ChapterGroup,
         refresh: Boolean = false
     ): Flow<List<Chapter>> {
         val dbChapters = database.chapterGroupQueries.contents(group.link).executeAsList()
         if (refresh || dbChapters.isEmpty()) {
+            val webView = webViewFactory(context)
             var doc = Jsoup.parse(webView.getHtml())!!
             withTimeoutOrNull(maxTimeDelay) {
                 while ("Chapter" !in doc.text()) {
