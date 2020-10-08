@@ -15,10 +15,15 @@ class ChapterGroupRepository(context: Context) {
 
     private val database = BookDatabase.getInstance(context)
 
-    fun getBook(group: ChapterGroup) = database.chapterGroupQueries
-        .getByBookId(group.bookId)
+    fun getBook(group: ChapterGroup) = database.bookQueries
+        .getById(group.bookId)
         .asFlow()
         .mapToOne()
+
+    fun getChaptersByBook(group: ChapterGroup) = database.chapterGroupQueries
+        .getByBookId(group.bookId)
+        .asFlow()
+        .mapToList()
 
     fun getGroupByLink(link: String) = database.chapterGroupQueries.get(link).asFlow().mapToOne()
 

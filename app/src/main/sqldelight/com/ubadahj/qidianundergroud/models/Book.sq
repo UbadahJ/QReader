@@ -79,4 +79,5 @@ WHERE id = ?;
 chapters:
 SELECT *
 FROM ChapterGroup
-WHERE bookId = ?;
+WHERE bookId = ?
+ORDER BY CAST(TRIM(SUBSTR(text, 1, INSTR(text, '-') - 1)) AS INTEGER);

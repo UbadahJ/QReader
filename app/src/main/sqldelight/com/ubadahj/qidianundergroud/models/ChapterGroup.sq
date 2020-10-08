@@ -21,8 +21,9 @@ WHERE link = ?;
 
 getByBookId:
 SELECT *
-FROM Book
-WHERE id = ?;
+FROM ChapterGroup
+WHERE bookId = ?
+ORDER BY CAST(TRIM(SUBSTR(text, 1, INSTR(text, '-') - 1)) AS INTEGER);
 
 insert:
 INSERT OR IGNORE INTO ChapterGroup(bookId, text, link)
