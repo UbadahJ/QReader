@@ -8,6 +8,7 @@ import androidx.core.app.NotificationCompat
 import androidx.core.app.NotificationManagerCompat
 import androidx.work.CoroutineWorker
 import androidx.work.WorkerParameters
+import com.github.ajalt.timberkt.e
 import com.ubadahj.qidianundergroud.MainActivity
 import com.ubadahj.qidianundergroud.R
 import com.ubadahj.qidianundergroud.models.Book
@@ -41,11 +42,15 @@ class NotificationWorker(context: Context, params: WorkerParameters) :
 
     private fun getNotifications() = flow {
         for (book in bookRepo.getLibraryBooks().first()) {
-            val refreshedGroups = groupRepo.getGroups(book, true).first()
-            val updateCount = refreshedGroups.lastChapter() -
-                    book.getChapters(applicationContext).first().lastChapter()
-            if (updateCount > 0)
-                emit(BookNotification(applicationContext, book, refreshedGroups, updateCount))
+            try {
+                val refreshedGroups = groupRepo.getGroups(book, true).first()
+                val updateCount = refreshedGroups.lastChapter() -
+                        book.getChapters(applicationContext).first().lastChapter()
+                if (updateCount > 0)
+                    emit(BookNotification(applicationContext, book, refreshedGroups, updateCount))
+            } catch (e: Exception) {
+                e(e) { "getNotifications: Failed to query $book" }
+            }
         }
     }.flowOn(Dispatchers.IO)
 
@@ -65,7 +70,7 @@ class NotificationWorker(context: Context, params: WorkerParameters) :
 
         fun createNotification(): Notification =
             NotificationCompat.Builder(context, CHANNEL_ID)
-                .setSmallIcon(R.drawable.book)
+                .setSmallIcon(R.drawable.app_image_outline)
                 .setContentTitle(book.name)
                 .setContentText("$updateCount new chapter${if (updateCount > 1) "s" else ""} available")
                 .setPriority(NotificationCompat.PRIORITY_DEFAULT)
