@@ -6,7 +6,9 @@ CREATE TABLE ChapterGroup
     text    TEXT             NOT NULL,
     link    TEXT PRIMARY KEY NOT NULL,
     CONSTRAINT chapter_group_ibfk
-        FOREIGN KEY (bookId) REFERENCES Book(id)
+        FOREIGN KEY (bookId)
+        REFERENCES Book(id)
+        ON DELETE CASCADE
 );
 
 
@@ -26,11 +28,11 @@ WHERE bookId = ?
 ORDER BY CAST(TRIM(SUBSTR(text, 1, INSTR(text, '-') - 1)) AS INTEGER);
 
 insert:
-INSERT OR IGNORE INTO ChapterGroup(bookId, text, link)
+INSERT OR REPLACE INTO ChapterGroup(bookId, text, link)
 VALUES ?;
 
 insertByValues:
-INSERT OR IGNORE INTO ChapterGroup(bookId, text, link)
+INSERT OR REPLACE INTO ChapterGroup(bookId, text, link)
 VALUES (?, ?, ?);
 
 deleteByLink:
