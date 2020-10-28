@@ -15,7 +15,7 @@ import com.ubadahj.qidianundergroud.databinding.MainActivityBinding
 import com.ubadahj.qidianundergroud.repositories.BookRepository
 import com.ubadahj.qidianundergroud.repositories.ChapterGroupRepository
 import com.ubadahj.qidianundergroud.services.NotificationWorker
-import com.ubadahj.qidianundergroud.ui.MainViewModel
+import com.ubadahj.qidianundergroud.ui.main.MainViewModel
 import kotlinx.android.synthetic.main.main_activity.*
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch

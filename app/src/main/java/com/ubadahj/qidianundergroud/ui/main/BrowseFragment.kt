@@ -1,4 +1,4 @@
-package com.ubadahj.qidianundergroud.ui
+package com.ubadahj.qidianundergroud.ui.main
 
 import android.os.Bundle
 import android.text.Editable

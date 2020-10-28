@@ -1,4 +1,4 @@
-package com.ubadahj.qidianundergroud.ui
+package com.ubadahj.qidianundergroud.ui.main
 
 import android.annotation.SuppressLint
 import android.content.Context

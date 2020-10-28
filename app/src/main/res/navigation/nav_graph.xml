@@ -7,7 +7,7 @@
 
     <fragment
         android:id="@+id/libraryFragment"
-        android:name="com.ubadahj.qidianundergroud.ui.LibraryFragment"
+        android:name="com.ubadahj.qidianundergroud.ui.main.LibraryFragment"
         android:label="book_list_fragment"
         tools:layout="@layout/book_list_fragment">
         <action
@@ -27,7 +27,7 @@
     </fragment>
     <fragment
         android:id="@+id/browseFragment"
-        android:name="com.ubadahj.qidianundergroud.ui.BrowseFragment"
+        android:name="com.ubadahj.qidianundergroud.ui.main.BrowseFragment"
         android:label="BrowseFragment">
         <action
             android:id="@+id/action_browseFragment_to_bookFragment"
@@ -39,7 +39,7 @@
     </fragment>
     <fragment
         android:id="@+id/bookFragment"
-        android:name="com.ubadahj.qidianundergroud.ui.BookFragment"
+        android:name="com.ubadahj.qidianundergroud.ui.main.BookFragment"
         android:label="book_fragment"
         tools:layout="@layout/book_fragment">
         <action
@@ -52,7 +52,7 @@
     </fragment>
     <fragment
         android:id="@+id/chapterFragment"
-        android:name="com.ubadahj.qidianundergroud.ui.ChapterFragment"
+        android:name="com.ubadahj.qidianundergroud.ui.main.ChapterFragment"
         android:label="chapter_fragment"
         tools:layout="@layout/chapter_fragment" />
 </navigation>
