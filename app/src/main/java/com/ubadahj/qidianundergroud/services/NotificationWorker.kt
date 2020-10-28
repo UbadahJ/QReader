@@ -29,6 +29,7 @@ class NotificationWorker(context: Context, params: WorkerParameters) :
 
     private val bookRepo = BookRepository(context)
     private val groupRepo = ChapterGroupRepository(context)
+    private val notificationId = 42069
 
     override suspend fun doWork(): Result {
         createNotificationChannel(applicationContext)
@@ -41,16 +42,42 @@ class NotificationWorker(context: Context, params: WorkerParameters) :
     }
 
     private fun getNotifications() = flow {
-        for (book in bookRepo.getLibraryBooks().first()) {
-            try {
-                val refreshedGroups = groupRepo.getGroups(book, true).first()
-                val updateCount = refreshedGroups.lastChapter() -
-                        book.getChapters(applicationContext).first().lastChapter()
-                if (updateCount > 0)
-                    emit(BookNotification(applicationContext, book, refreshedGroups, updateCount))
-            } catch (e: Exception) {
-                e(e) { "getNotifications: Failed to query $book" }
+        val builder = NotificationCompat.Builder(applicationContext, CHANNEL_ID).apply {
+            setContentTitle("Checking for updates")
+            setSmallIcon(R.drawable.app_image_outline)
+            setOnlyAlertOnce(true)
+            priority = NotificationCompat.PRIORITY_LOW
+        }
+        val books = bookRepo.getLibraryBooks().first()
+        NotificationManagerCompat.from(applicationContext).apply {
+            builder.setProgress(books.size, 0, false)
+            notify(notificationId, builder.build())
+
+            var counter = 0
+            for (book in books) {
+                try {
+                    val lastGroup = book.getChapters(applicationContext).first()
+                    val refreshedGroups = groupRepo.getGroups(book, true).first()
+                    val updateCount = refreshedGroups.lastChapter() - lastGroup.lastChapter()
+                    builder.setContentText(book.name)
+                    builder.setProgress(books.size, ++counter, false)
+                    notify(notificationId, builder.build())
+                    if (updateCount > 0)
+                        emit(
+                            BookNotification(
+                                applicationContext,
+                                book,
+                                refreshedGroups,
+                                updateCount
+                            )
+                        )
+                } catch (e: Exception) {
+                    e(e) { "getNotifications: Failed to query $book" }
+                }
             }
+
+            builder.setProgress(0, 0, false)
+            cancel(notificationId)
         }
     }.flowOn(Dispatchers.IO)
 
