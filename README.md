@@ -1,4 +1,4 @@
-# Qidian Underground :books:
+# ![QReader](images/app_image_logo.svg)
 
 A simple application intended provide extension to the capabilities of the website <https://toc.qidianunderground.org/>
 
@@ -6,11 +6,10 @@ A simple application intended provide extension to the capabilities of the websi
 
 - Access all the books available on the website
 - A builtin chapter reader optimized for reading on mobile devices
-- Notifications service for book updates
+- Notifications service for book updates with multiple actions
 - Bookmark progress on chapters
 - Day/Night theme support (Requires Android P or above)
-- Improved caching to allow offline content access
-- Improve notifications to allow opening chapters directly
+- Caching to allow offline content access
 
 ## Screenshots :camera:
 

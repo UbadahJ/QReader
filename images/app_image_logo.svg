@@ -1,0 +1,68 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<svg xmlns:cc="http://creativecommons.org/ns#" xmlns:dc="http://purl.org/dc/elements/1.1/"
+    xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
+    xmlns:osb="http://www.openswatchbook.org/uri/2009/osb"
+    xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+    xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
+    xmlns:xlink="http://www.w3.org/1999/xlink" height="128" id="svg8" version="1.1"
+    viewBox="0 0 101.6 33.866667" width="384" xmlns="http://www.w3.org/2000/svg"
+    inkscape:version="1.0.1 (3bc2e813f5, 2020-09-07)" sodipodi:docname="app_image_logo.svg">
+    <defs id="defs2">
+        <linearGradient id="linearGradient2924" osb:paint="solid">
+            <stop style="stop-color:#03a9f4;stop-opacity:1;" id="stop2922" offset="0" />
+        </linearGradient>
+        <linearGradient id="linearGradient936" inkscape:collect="always">
+            <stop style="stop-color:#f44336;stop-opacity:1;" id="stop932" offset="0" />
+            <stop style="stop-color:#f44336;stop-opacity:0;" id="stop934" offset="1" />
+        </linearGradient>
+        <linearGradient id="linearGradient926" inkscape:collect="always">
+            <stop style="stop-color:#03a9f4;stop-opacity:1;" id="stop922" offset="0" />
+            <stop style="stop-color:#03a9f4;stop-opacity:0;" id="stop924" offset="1" />
+        </linearGradient>
+        <linearGradient gradientUnits="userSpaceOnUse" id="linearGradient930" x1="15.875" x2="31.75"
+            y1="17.197918" y2="17.197918" inkscape:collect="always"
+            xlink:href="#linearGradient926" />
+        <linearGradient gradientUnits="userSpaceOnUse" id="linearGradient938" x1="17.197916"
+            x2="2.6458333" y1="15.875" y2="15.875" inkscape:collect="always"
+            xlink:href="#linearGradient936" />
+        <linearGradient gradientUnits="userSpaceOnUse" id="linearGradient2940" x1="17.197916"
+            x2="2.6458333" y1="15.875" y2="15.875" inkscape:collect="always"
+            xlink:href="#linearGradient936" />
+    </defs>
+    <sodipodi:namedview bordercolor="#666666" borderopacity="1.0" id="base" pagecolor="#ffffff"
+        showgrid="true" units="px" inkscape:current-layer="layer1" inkscape:cx="243.22551"
+        inkscape:cy="79.081272" inkscape:document-rotation="0" inkscape:document-units="px"
+        inkscape:pageopacity="0.0" inkscape:pageshadow="2" inkscape:window-height="868"
+        inkscape:window-maximized="1" inkscape:window-width="1600" inkscape:window-x="0"
+        inkscape:window-y="32" inkscape:zoom="1.979899">
+        <inkscape:grid id="grid842" type="xygrid" />
+    </sodipodi:namedview>
+    <metadata id="metadata5">
+        <rdf:RDF>
+            <cc:Work rdf:about="">
+                <dc:format>image/svg+xml</dc:format>
+                <dc:type rdf:resource="http://purl.org/dc/dcmitype/StillImage" />
+                <dc:title></dc:title>
+            </cc:Work>
+        </rdf:RDF>
+    </metadata>
+    <g id="layer1" inkscape:groupmode="layer" inkscape:label="Layer 1">
+        <g id="g2947" transform="translate(2.6458332)">
+            <g id="g2938" transform="translate(13.229167)">
+                <rect style="fill:url(#linearGradient2940);fill-opacity:1;stroke-width:0.776287"
+                    height="20.149691" id="rect833" width="15.060498" x="2.6458333" y="5.2916665" />
+                <rect
+                    style="fill:url(#linearGradient930);fill-opacity:1;stroke:none;stroke-width:0.776287;stroke-opacity:1"
+                    height="21.166668" id="rect844" width="15.875" x="15.875" y="6.6145835" />
+            </g>
+            <text
+                style="font-style:normal;font-weight:normal;font-size:10.5833px;line-height:1.25;font-family:sans-serif;fill:#121313;fill-opacity:1;stroke:none;stroke-width:0.264583"
+                id="text978" x="38.301815" y="22.600437" xml:space="preserve"><tspan
+           style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-family:FreeMono;-inkscape-font-specification:FreeMono;fill:#121313;fill-opacity:1;stroke-width:0.264583"
+           id="tspan976"
+           x="38.301815"
+           y="22.600437"
+           sodipodi:role="line">QReader</tspan></text>
+        </g>
+    </g>
+</svg>
