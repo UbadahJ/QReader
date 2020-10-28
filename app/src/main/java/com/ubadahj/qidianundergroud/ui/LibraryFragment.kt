@@ -12,7 +12,7 @@ import com.mikepenz.aboutlibraries.LibsBuilder
 import com.mikepenz.fastadapter.FastAdapter
 import com.mikepenz.fastadapter.IAdapter
 import com.ubadahj.qidianundergroud.R
-import com.ubadahj.qidianundergroud.databinding.LibraryFragmentBinding
+import com.ubadahj.qidianundergroud.databinding.BookListFragmentBinding
 import com.ubadahj.qidianundergroud.models.Resource
 import com.ubadahj.qidianundergroud.ui.adapters.BookAdapter
 import com.ubadahj.qidianundergroud.ui.adapters.FastScrollAdapter
@@ -55,14 +55,14 @@ class LibraryFragment : Fragment() {
         }
     }
 
-    private var binding: LibraryFragmentBinding? = null
+    private var binding: BookListFragmentBinding? = null
 
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View {
-        binding = LibraryFragmentBinding.inflate(inflater, container, false)
+        binding = BookListFragmentBinding.inflate(inflater, container, false)
         return binding!!.root
     }
 
@@ -72,6 +72,7 @@ class LibraryFragment : Fragment() {
         binding?.apply {
             (requireActivity() as AppCompatActivity).setSupportActionBar(toolbar.appbar)
             toolbar.appbar.title = resources.getText(R.string.library)
+            floatingButton.visibility = View.VISIBLE
             floatingButton.setOnClickListener {
                 findNavController().navigate(
                     LibraryFragmentDirections.actionLibraryFragmentToBrowseFragment()

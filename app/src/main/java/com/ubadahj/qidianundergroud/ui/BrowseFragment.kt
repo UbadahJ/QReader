@@ -14,7 +14,7 @@ import com.google.android.material.snackbar.Snackbar
 import com.mikepenz.fastadapter.FastAdapter
 import com.mikepenz.fastadapter.adapters.ItemAdapter
 import com.ubadahj.qidianundergroud.R
-import com.ubadahj.qidianundergroud.databinding.BrowseFragmentBinding
+import com.ubadahj.qidianundergroud.databinding.BookListFragmentBinding
 import com.ubadahj.qidianundergroud.models.Book
 import com.ubadahj.qidianundergroud.models.Resource
 import com.ubadahj.qidianundergroud.ui.adapters.BookAdapter
@@ -45,7 +45,7 @@ class BrowseFragment : Fragment() {
         }
     }
 
-    private var binding: BrowseFragmentBinding? = null
+    private var binding: BookListFragmentBinding? = null
     private var adapter: ItemAdapter<BookItem>? = null
 
     override fun onCreateView(
@@ -53,7 +53,7 @@ class BrowseFragment : Fragment() {
         container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View {
-        binding = BrowseFragmentBinding.inflate(inflater, container, false)
+        binding = BookListFragmentBinding.inflate(inflater, container, false)
         return binding!!.root
     }
 
