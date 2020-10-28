@@ -7,7 +7,6 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import androidx.recyclerview.widget.LinearLayoutManager
-import com.google.android.material.snackbar.Snackbar
 import com.mikepenz.fastadapter.FastAdapter
 import com.ubadahj.qidianundergroud.R
 import com.ubadahj.qidianundergroud.databinding.ChapterFragmentBinding
@@ -67,38 +66,44 @@ class ChapterFragment : Fragment() {
         setHasOptionsMenu(true)
         binding?.apply {
             (requireActivity() as AppCompatActivity).setSupportActionBar(toolbar.appbar)
-            toolbar.appbar.title = "Loading"
             chapterRecyclerView.layoutManager = LinearLayoutManager(requireContext())
-            getChapterContents(chapters).observe(viewLifecycleOwner, {
-                when (it) {
-                    is Resource.Success -> {
-                        chapterRecyclerView.adapter = getAdapter(it.data!!)
-                        menu = getMenu(it.data)
-                        toolbar.appbar.title = it.data[0].chapterName
-                        progressBar.visibility = View.GONE
-                    }
-                    is Resource.Loading -> {
-                        progressBar.visibility = View.VISIBLE
-                    }
-                    is Resource.Error -> {
-                        toolbar.appbar.title = "Error"
-                        menu = MenuDialog(
-                            MenuAdapter(
-                                listOf(
-                                    MenuAdapterItem("Error", R.drawable.unlink)
-                                )
-                            )
-                        )
-                        Snackbar.make(root, R.string.time_out, Snackbar.LENGTH_SHORT).show()
-                        progressBar.visibility = View.GONE
-                    }
-                }
-            })
+            errorButton.setOnClickListener { getChapterContents(chapters, true) }
         }
+        getChapterContents(chapters)
     }
 
     private fun getChapterContents(chapters: ChapterGroup, refresh: Boolean = false) =
         viewModel.getChapterContents(requireContext(), chapters, refresh)
+            .observe(viewLifecycleOwner, {
+                binding?.apply {
+                    when (it) {
+                        is Resource.Success -> {
+                            chapterRecyclerView.adapter = getAdapter(it.data!!)
+                            menu = getMenu(it.data)
+                            toolbar.appbar.title = it.data[0].chapterName
+                            progressBar.visibility = View.GONE
+                            errorGroup.visibility = View.GONE
+                        }
+                        is Resource.Loading -> {
+                            toolbar.appbar.title = "Loading"
+                            progressBar.visibility = View.VISIBLE
+                            errorGroup.visibility = View.GONE
+                        }
+                        is Resource.Error -> {
+                            toolbar.appbar.title = "Error"
+                            menu = MenuDialog(
+                                MenuAdapter(
+                                    listOf(
+                                        MenuAdapterItem("Error", R.drawable.unlink)
+                                    )
+                                )
+                            )
+                            errorGroup.visibility = View.VISIBLE
+                            progressBar.visibility = View.GONE
+                        }
+                    }
+                }
+            })
 
     private fun getAdapter(items: List<ChapterContentItem>) =
         FastScrollAdapter<ChapterContentItem>()
