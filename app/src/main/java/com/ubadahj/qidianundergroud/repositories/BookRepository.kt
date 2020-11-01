@@ -1,6 +1,7 @@
 package com.ubadahj.qidianundergroud.repositories
 
 import android.content.Context
+import android.webkit.WebView
 import com.squareup.sqldelight.runtime.coroutines.asFlow
 import com.squareup.sqldelight.runtime.coroutines.mapToList
 import com.squareup.sqldelight.runtime.coroutines.mapToOne
@@ -9,8 +10,10 @@ import com.ubadahj.qidianundergroud.api.models.BookJson
 import com.ubadahj.qidianundergroud.database.BookDatabase
 import com.ubadahj.qidianundergroud.models.Book
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.flow.flow
 
-class BookRepository(context: Context) {
+class BookRepository(val context: Context) {
 
     private val database = BookDatabase.getInstance(context)
 
@@ -52,6 +55,24 @@ class BookRepository(context: Context) {
             throw IllegalArgumentException("$this does not exists in library")
 
         database.bookQueries.updateLastRead(lastRead, book.id)
+    }
+
+    fun download(book: Book, factory: (Context) -> WebView, totalRetries: Int = 3) = flow {
+        val chapterRepo = ChapterRepository(context)
+        val groups = getGroups(book).first()
+        groups.forEachIndexed { i, group ->
+            var retries = totalRetries
+            var success = false
+            while (!success || retries < 0) {
+                try {
+                    chapterRepo.getChaptersContent(factory, group).first()
+                    success = true
+                } catch (e: Exception) {
+                    if (--retries < 0) throw e
+                }
+            }
+            emit(group)
+        }
     }
 
     private fun BookJson.toBook() = Book(id, name, lastUpdated, completed, inLibrary, lastRead)

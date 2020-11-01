@@ -31,7 +31,9 @@ class ChapterRepository(val context: Context) {
     ): Flow<List<Chapter>> {
         val dbChapters = database.chapterGroupQueries.contents(group.link).executeAsList()
         if (refresh || dbChapters.isEmpty()) {
-            val webView = webViewFactory(context)
+            val webView = webViewFactory(context).apply {
+                loadUrl(group.link)
+            }
             var doc = Jsoup.parse(webView.getHtml())!!
             withTimeoutOrNull(maxTimeDelay) {
                 while ("Chapter" !in doc.text()) {

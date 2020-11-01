@@ -9,6 +9,10 @@ import androidx.fragment.app.activityViewModels
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.GridLayoutManager
+import androidx.work.Data
+import androidx.work.OneTimeWorkRequestBuilder
+import androidx.work.WorkManager
+import com.github.ajalt.timberkt.d
 import com.google.android.material.snackbar.Snackbar
 import com.mikepenz.fastadapter.FastAdapter
 import com.ubadahj.qidianundergroud.R
@@ -17,6 +21,7 @@ import com.ubadahj.qidianundergroud.models.Book
 import com.ubadahj.qidianundergroud.models.ChapterGroup
 import com.ubadahj.qidianundergroud.models.Resource
 import com.ubadahj.qidianundergroud.repositories.ChapterGroupRepository
+import com.ubadahj.qidianundergroud.services.DownloadService
 import com.ubadahj.qidianundergroud.ui.adapters.ChapterAdapter
 import com.ubadahj.qidianundergroud.ui.adapters.items.ChapterItem
 import com.ubadahj.qidianundergroud.utils.models.lastChapter
@@ -63,6 +68,17 @@ class BookFragment : Fragment() {
             }
             if (book.inLibrary)
                 libraryButton.visibility = View.GONE
+
+            downloadImageView.setOnClickListener {
+                d { "downloadImageView: Starting WorkManager" }
+                WorkManager.getInstance(requireContext()).enqueue(
+                    OneTimeWorkRequestBuilder<DownloadService>().apply {
+                        setInputData(Data.Builder().apply {
+                            putString("book_id", book.id)
+                        }.build())
+                    }.build()
+                )
+            }
         }
 
         viewModel.getChapters(requireContext(), book).observe(viewLifecycleOwner) { resource ->
