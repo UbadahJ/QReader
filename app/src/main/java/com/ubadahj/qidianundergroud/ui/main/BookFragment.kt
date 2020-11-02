@@ -10,9 +10,9 @@ import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.GridLayoutManager
 import androidx.work.Data
+import androidx.work.ExistingWorkPolicy
 import androidx.work.OneTimeWorkRequestBuilder
 import androidx.work.WorkManager
-import com.github.ajalt.timberkt.d
 import com.google.android.material.snackbar.Snackbar
 import com.mikepenz.fastadapter.FastAdapter
 import com.ubadahj.qidianundergroud.R
@@ -70,13 +70,13 @@ class BookFragment : Fragment() {
                 libraryButton.visibility = View.GONE
 
             downloadImageView.setOnClickListener {
-                d { "downloadImageView: Starting WorkManager" }
-                WorkManager.getInstance(requireContext()).enqueue(
-                    OneTimeWorkRequestBuilder<DownloadService>().apply {
-                        setInputData(Data.Builder().apply {
-                            putString("book_id", book.id)
-                        }.build())
-                    }.build()
+                val work = OneTimeWorkRequestBuilder<DownloadService>().apply {
+                    setInputData(Data.Builder().apply {
+                        putString("book_id", book.id)
+                    }.build())
+                }.build()
+                WorkManager.getInstance(requireContext()).enqueueUniqueWork(
+                    "download-service", ExistingWorkPolicy.KEEP, work
                 )
             }
         }
