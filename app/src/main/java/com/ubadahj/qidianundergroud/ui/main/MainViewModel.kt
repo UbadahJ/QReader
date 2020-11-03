@@ -77,7 +77,6 @@ class MainViewModel : ViewModel() {
                 ChapterRepository(context).getChaptersContent({
                     WebView(it).apply {
                         settings.javaScriptEnabled = true
-                        loadUrl(group.link)
                     }
                 }, group, refresh)
                     .catch { Resource.Error<List<ChapterContentItem>>(it) }

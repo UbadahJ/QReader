@@ -23,11 +23,11 @@ FROM Chapter
 WHERE groupLink = ?;
 
 insert:
-INSERT OR REPLACE INTO Chapter(id, groupLink, title, contents)
+INSERT OR IGNORE INTO Chapter(id, groupLink, title, contents)
 VALUES ?;
 
 insertByValues:
-INSERT OR REPLACE INTO Chapter(id, groupLink, title, contents)
+INSERT OR IGNORE INTO Chapter(id, groupLink, title, contents)
 VALUES (?, ?, ?, ?);
 
 deleteByTitle:

@@ -6,6 +6,7 @@ A simple application intended provide extension to the capabilities of the websi
 
 - Access all the books available on the website
 - A builtin chapter reader optimized for reading on mobile devices
+- Support for downloading books for offline reading
 - Notifications service for book updates with multiple actions
 - Bookmark progress on chapters
 - Day/Night theme support (Requires Android P or above)
@@ -22,5 +23,4 @@ A simple application intended provide extension to the capabilities of the websi
 ## Upcoming features :rocket:
 
 - Per-chapter bookmark instead of chapter group
-- Support for downloading books
 - Book metadata support
