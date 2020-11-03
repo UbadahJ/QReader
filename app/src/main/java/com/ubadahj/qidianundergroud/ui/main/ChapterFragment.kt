@@ -65,7 +65,10 @@ class ChapterFragment : Fragment() {
     private fun init(chapters: ChapterGroup) {
         setHasOptionsMenu(true)
         binding?.apply {
-            (requireActivity() as AppCompatActivity).setSupportActionBar(toolbar.appbar)
+            (requireActivity() as AppCompatActivity).apply {
+                setSupportActionBar(toolbar.appbar)
+                supportActionBar?.setDisplayHomeAsUpEnabled(true)
+            }
             chapterRecyclerView.layoutManager = LinearLayoutManager(requireContext())
             errorButton.setOnClickListener { getChapterContents(chapters, true) }
         }
