@@ -132,6 +132,7 @@
         android:layout_marginStart="8dp"
         android:padding="8dp"
         android:src="@drawable/download"
+        app:tint="?android:attr/textColorPrimary"
         app:layout_constraintBottom_toBottomOf="@+id/last_updated"
         app:layout_constraintStart_toEndOf="@+id/last_updated"
         app:layout_constraintTop_toTopOf="@+id/last_updated" />
