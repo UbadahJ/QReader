@@ -15,7 +15,7 @@ class ChapterContentItem(val chapterName: CharSequence, val text: CharSequence) 
         get() = R.id.title
 
     override fun bindView(binding: ChapterContentItemBinding, payloads: List<Any>) {
-        binding.contents.textSize = 14f
+        binding.contents.textSize = 16f
         binding.contents.setTextFuture(
             PrecomputedTextCompat.getTextFuture(
                 text,
