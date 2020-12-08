@@ -6,7 +6,6 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.ActivityNavigator
 import androidx.navigation.findNavController
-import androidx.navigation.fragment.NavHostFragment
 import androidx.work.ExistingPeriodicWorkPolicy
 import androidx.work.PeriodicWorkRequestBuilder
 import androidx.work.WorkManager
@@ -16,7 +15,6 @@ import com.ubadahj.qidianundergroud.repositories.BookRepository
 import com.ubadahj.qidianundergroud.repositories.ChapterGroupRepository
 import com.ubadahj.qidianundergroud.services.NotificationWorker
 import com.ubadahj.qidianundergroud.ui.main.MainViewModel
-import kotlinx.android.synthetic.main.main_activity.*
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
 import java.util.concurrent.TimeUnit
@@ -47,9 +45,9 @@ class MainActivity : AppCompatActivity() {
             }
 
             if (book != null) {
-                val navHost = nav_host_fragment as NavHostFragment
-                val graphInflater = navHost.navController.navInflater
-                navHost.navController.graph = graphInflater.inflate(R.navigation.nav_graph).apply {
+                val navHost = binding.navHostFragment.findNavController()
+                val graphInflater = navHost.navInflater
+                navHost.graph = graphInflater.inflate(R.navigation.nav_graph).apply {
                     startDestination =
                         if (groups != null) R.id.chapterFragment else R.id.bookFragment
                 }
