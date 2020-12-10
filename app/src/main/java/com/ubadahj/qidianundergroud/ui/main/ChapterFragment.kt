@@ -36,9 +36,9 @@ class ChapterFragment : Fragment() {
         savedInstanceState: Bundle?
     ): View? {
         binding = ChapterFragmentBinding.inflate(inflater, container, false)
-        viewModel.selectedChapter.observe(viewLifecycleOwner, {
-            it?.apply { init(this) }
-        })
+        viewModel.selectedChapter?.apply {
+            init(this)
+        }
         return binding?.root
     }
 

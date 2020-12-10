@@ -92,15 +92,15 @@ class BrowseFragment : Fragment() {
             progressBar.visibility = View.GONE
             adapter = BookAdapter(books)
             bookListingView.adapter = FastScrollAdapter<BookItem>().wrap(
-                FastAdapter.with(adapter!!).apply {
-                    onClickListener = { _, _, item, _ ->
-                        viewModel.selectedBook.value = item.book
-                        findNavController().navigate(
-                            BrowseFragmentDirections.actionBrowseFragmentToBookFragment()
-                        )
-                        false
+                    FastAdapter.with(adapter!!).apply {
+                        onClickListener = { _, _, item, _ ->
+                            viewModel.selectedBook = item.book
+                            findNavController().navigate(
+                                    BrowseFragmentDirections.actionBrowseFragmentToBookFragment()
+                            )
+                            false
+                        }
                     }
-                }
 
             )
         }

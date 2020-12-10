@@ -45,14 +45,14 @@ class BookFragment : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        viewModel.selectedBook.observe(viewLifecycleOwner) {
-            it?.apply { init(this) }
+        viewModel.selectedBook?.apply {
+            init(this)
         }
     }
 
     override fun onResume() {
         super.onResume()
-        if (viewModel.selectedBook.value == null)
+        if (viewModel.selectedBook == null)
             findNavController().popBackStack()
     }
 
@@ -107,12 +107,12 @@ class BookFragment : Fragment() {
         FastAdapter.with(ChapterAdapter(book, groups)).apply {
             onClickListener = { _, _, item, _ ->
                 book.updateLastRead(requireContext(), item.chapter.lastChapter)
-                viewModel.selectedChapter.value = item.chapter
+                viewModel.selectedChapter = item.chapter
                 lifecycleScope.launch {
-                    viewModel.selectedBook.value =
-                        ChapterGroupRepository(this@BookFragment.requireContext())
-                            .getBook(groups.first())
-                            .first()
+                    viewModel.selectedBook =
+                            ChapterGroupRepository(this@BookFragment.requireContext())
+                                    .getBook(groups.first())
+                                    .first()
                 }
                 findNavController().navigate(
                     BookFragmentDirections.actionBookFragmentToChapterFragment()

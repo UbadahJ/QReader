@@ -3,7 +3,6 @@ package com.ubadahj.qidianundergroud.ui.main
 import android.annotation.SuppressLint
 import android.content.Context
 import android.webkit.WebView
-import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.asLiveData
 import androidx.lifecycle.liveData
@@ -19,22 +18,17 @@ import kotlinx.coroutines.flow.map
 
 class MainViewModel : ViewModel() {
 
-    val selectedBook: MutableLiveData<Book?> by lazy {
-        MutableLiveData()
-    }
-
-    val selectedChapter: MutableLiveData<ChapterGroup?> by lazy {
-        MutableLiveData()
-    }
+    var selectedBook: Book? = null
+    var selectedChapter: ChapterGroup? = null
 
     fun libraryBooks(context: Context) = liveData {
         emit(Resource.Loading())
         try {
             emitSource(
-                BookRepository(context).getLibraryBooks()
-                    .catch { Resource.Error<List<Book>>(it) }
-                    .map { Resource.Success(it) }
-                    .asLiveData()
+                    BookRepository(context).getLibraryBooks()
+                            .catch { Resource.Error<List<Book>>(it) }
+                            .map { Resource.Success(it) }
+                            .asLiveData()
             )
         } catch (e: Exception) {
             emit(Resource.Error<List<Book>>(e))
