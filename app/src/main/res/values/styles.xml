@@ -1,55 +1,43 @@
+<?xml version="1.0" encoding="utf-8"?><!--
+~ Copyright (C) 2019 The Android Open Source Project
+~
+~ Licensed under the Apache License, Version 2.0 (the "License");
+~ you may not use this file except in compliance with the License.
+~ You may obtain a copy of the License at
+~
+~      http://www.apache.org/licenses/LICENSE-2.0
+~
+~ Unless required by applicable law or agreed to in writing, software
+~ distributed under the License is distributed on an "AS IS" BASIS,
+~ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+~ See the License for the specific language governing permissions and
+~ limitations under the License.
+-->
+
 <resources xmlns:tools="http://schemas.android.com/tools">
 
-    <!-- TODO: Add light and dark book list accent tint -->
+    <!--Components-->
 
-    <style name="AppTheme" parent="Theme.MaterialComponents.DayNight.NoActionBar">
-        <item name="colorPrimary">@color/primaryColor</item>
-        <item name="colorAccent">@color/secondaryColor</item>
-
-        <item name="statusBarForeground">@color/primaryTextColor</item>
-        <item name="statusBarBackground">@color/primaryColor</item>
-        <item name="statusBarScrim">@color/primaryColor</item>
-
-        <item name="android:colorBackground">@color/primaryColor</item>
-        <item name="android:statusBarColor">@color/primaryColor</item>
-        <item name="android:navigationBarColor">@color/primaryColor</item>
-
-        <item name="android:textColorPrimary">@color/primaryTextColor</item>
-
-        <item name="android:windowLightStatusBar" tools:targetApi="m">true</item>
-
-        <item name="android:navigationBarDividerColor" tools:targetApi="o_mr1">
-            @color/colorTransparent
+    <!--Bottom Sheets-->
+    <style name="ThemeOverlay.MyTheme.BottomSheetDialog" parent="ThemeOverlay.MaterialComponents.Dialog">
+        <item name="android:windowIsFloating">true</item>
+        <item name="android:windowBackground">@android:color/transparent</item>
+        <item name="android:windowAnimationStyle">@style/Animation.MyTheme.BottomSheet.Modal</item>
+        <item name="android:statusBarColor">@android:color/transparent</item>
+        <item name="bottomSheetStyle">@style/Widget.MyTheme.BottomSheet.Modal</item>
+        <item name="android:navigationBarColor">?attr/colorSurface</item>
+        <item name="android:navigationBarDividerColor" tools:ignore="NewApi">
+            @android:color/transparent
         </item>
-        <item name="android:windowLightNavigationBar" tools:targetApi="o_mr1">true</item>
     </style>
 
-    <style name="Toolbar.AppTheme" parent="ThemeOverlay.MaterialComponents.ActionBar">
-        <item name="theme">?theme</item>
-        <item name="android:background">@color/primaryColor</item>
-        <item name="titleTextAppearance">@style/TextAppearance.MaterialComponents.Button</item>
+    <style name="Widget.MyTheme.BottomSheet.Modal" parent="Widget.MaterialComponents.BottomSheet.Modal">
+        <item name="shapeAppearanceOverlay">?attr/shapeAppearanceLargeComponent</item>
     </style>
 
-    <style name="TextInputLayout.AppTheme" parent="Widget.MaterialComponents.TextInputLayout.OutlinedBox">
-        <item name="boxStrokeColor">?attr/colorAccent</item>
-        <item name="boxStrokeWidth">0dp</item>
-        <item name="boxStrokeWidthFocused">1dp</item>
-        <item name="boxBackgroundColor">?android:attr/colorBackground</item>
-    </style>
-
-    <style name="FloatingActionButton.AppTheme" parent="Widget.MaterialComponents.ExtendedFloatingActionButton">
-        <item name="android:backgroundTint">@color/secondaryColor</item>
-        <item name="android:textColor">@color/secondaryTextColor</item>
-        <item name="iconTint">@color/secondaryTextColor</item>
-    </style>
-
-    <style name="AppTheme.Title">
-        <item name="android:fontFamily">@font/elliptica</item>
-        <item name="android:textSize">36sp</item>
-    </style>
-
-    <style name="AppTheme.Icon">
-        <item name="tint">@color/primaryTextColor</item>
+    <!--Navigation Drawer-->
+    <style name="Widget.MyTheme.NavigationView" parent="Widget.MaterialComponents.NavigationView">
+        <item name="itemTextAppearance">?attr/textAppearanceBody2</item>
     </style>
 
 </resources>

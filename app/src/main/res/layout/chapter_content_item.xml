@@ -9,7 +9,6 @@
         android:id="@+id/contents"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:fontFamily="@font/lato"
         android:lineSpacingExtra="8sp"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
