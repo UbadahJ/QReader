@@ -21,37 +21,29 @@ import com.ubadahj.qidianundergroud.ui.adapters.BookAdapter
 import com.ubadahj.qidianundergroud.ui.adapters.FastScrollAdapter
 import com.ubadahj.qidianundergroud.ui.adapters.MenuAdapter
 import com.ubadahj.qidianundergroud.ui.adapters.items.BookItem
-import com.ubadahj.qidianundergroud.ui.adapters.items.MenuAdapterItem
 import com.ubadahj.qidianundergroud.ui.dialog.MenuDialog
+import com.ubadahj.qidianundergroud.ui.models.MenuDialogItem
 
 class BrowseFragment : Fragment() {
 
     private val viewModel: MainViewModel by activityViewModels()
     private val menu = MenuDialog(
-        MenuAdapter(
-            listOf(MenuAdapterItem("Refresh", R.drawable.refresh))
-        )
-    ).apply {
-        adapter.onClickListener = { _, _, _, i ->
-            when (i) {
-                0 -> {
-                    viewModel
-                        .getBooks(requireContext(), refresh = true)
-                        .observe(viewLifecycleOwner, this@BrowseFragment::getBooks)
-                    true
-                }
-                else -> false
+            MenuAdapter().apply {
+                submitList(listOf(MenuDialogItem("Refresh", R.drawable.refresh)))
             }
-        }
+    ) { _, i, _ ->
+        if (i == 0) viewModel
+                .getBooks(requireContext(), refresh = true)
+                .observe(viewLifecycleOwner, this@BrowseFragment::getBooks)
     }
 
     private var binding: BookListFragmentBinding? = null
     private var adapter: ItemAdapter<BookItem>? = null
 
     override fun onCreateView(
-        inflater: LayoutInflater,
-        container: ViewGroup?,
-        savedInstanceState: Bundle?
+            inflater: LayoutInflater,
+            container: ViewGroup?,
+            savedInstanceState: Bundle?
     ): View {
         binding = BookListFragmentBinding.inflate(inflater, container, false)
         return binding!!.root
@@ -112,9 +104,9 @@ class BrowseFragment : Fragment() {
                 binding?.apply {
                     val searchBarVisible = bookListingView.y != searchBar.root.y
                     bookListingView.animate()
-                        .alpha(1f)
-                        .translationY(if (!searchBarVisible) searchBar.root.height + 32f else 0f)
-                        .start()
+                            .alpha(1f)
+                            .translationY(if (!searchBarVisible) searchBar.root.height + 32f else 0f)
+                            .start()
                 }
                 true
             }

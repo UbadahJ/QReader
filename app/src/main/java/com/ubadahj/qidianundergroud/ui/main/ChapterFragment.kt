@@ -16,24 +16,22 @@ import com.ubadahj.qidianundergroud.ui.adapters.ChapterContentAdapter
 import com.ubadahj.qidianundergroud.ui.adapters.FastScrollAdapter
 import com.ubadahj.qidianundergroud.ui.adapters.MenuAdapter
 import com.ubadahj.qidianundergroud.ui.adapters.items.ChapterContentItem
-import com.ubadahj.qidianundergroud.ui.adapters.items.MenuAdapterItem
 import com.ubadahj.qidianundergroud.ui.dialog.MenuDialog
+import com.ubadahj.qidianundergroud.ui.models.MenuDialogItem
 
 class ChapterFragment : Fragment() {
 
     private val viewModel: MainViewModel by activityViewModels()
     private var binding: ChapterFragmentBinding? = null
     private var menu: MenuDialog = MenuDialog(
-        MenuAdapter(
-            listOf(
-                MenuAdapterItem("Loading", R.drawable.pulse)
-            )
-        )
+            MenuAdapter().apply {
+                submitList(listOf(MenuDialogItem("Loading", R.drawable.pulse)))
+            }
     )
 
     override fun onCreateView(
-        inflater: LayoutInflater, container: ViewGroup?,
-        savedInstanceState: Bundle?
+            inflater: LayoutInflater, container: ViewGroup?,
+            savedInstanceState: Bundle?
     ): View? {
         binding = ChapterFragmentBinding.inflate(inflater, container, false)
         viewModel.selectedChapter?.apply {
@@ -75,58 +73,53 @@ class ChapterFragment : Fragment() {
     }
 
     private fun getChapterContents(chapters: ChapterGroup, refresh: Boolean = false) =
-        viewModel.getChapterContents(requireContext(), chapters, refresh)
-            .observe(viewLifecycleOwner, {
-                binding?.apply {
-                    when (it) {
-                        is Resource.Success -> {
-                            chapterRecyclerView.adapter = getAdapter(it.data!!)
-                            menu = getMenu(it.data)
-                            toolbar.appbar.title = it.data[0].chapterName
-                            progressBar.visibility = View.GONE
-                            errorGroup.visibility = View.GONE
-                        }
-                        is Resource.Loading -> {
-                            toolbar.appbar.title = "Loading"
-                            progressBar.visibility = View.VISIBLE
-                            errorGroup.visibility = View.GONE
-                        }
-                        is Resource.Error -> {
-                            toolbar.appbar.title = "Error"
-                            menu = MenuDialog(
-                                MenuAdapter(
-                                    listOf(
-                                        MenuAdapterItem("Error", R.drawable.unlink)
+            viewModel.getChapterContents(requireContext(), chapters, refresh)
+                    .observe(viewLifecycleOwner, {
+                        binding?.apply {
+                            when (it) {
+                                is Resource.Success -> {
+                                    chapterRecyclerView.adapter = getAdapter(it.data!!)
+                                    updateMenu(it.data)
+                                    toolbar.appbar.title = it.data[0].chapterName
+                                    progressBar.visibility = View.GONE
+                                    errorGroup.visibility = View.GONE
+                                }
+                                is Resource.Loading -> {
+                                    toolbar.appbar.title = "Loading"
+                                    progressBar.visibility = View.VISIBLE
+                                    errorGroup.visibility = View.GONE
+                                }
+                                is Resource.Error -> {
+                                    toolbar.appbar.title = "Error"
+                                    menu.adapter.submitList(
+                                            listOf(MenuDialogItem("Error", R.drawable.unlink))
                                     )
-                                )
-                            )
-                            errorGroup.visibility = View.VISIBLE
-                            progressBar.visibility = View.GONE
+                                    errorGroup.visibility = View.VISIBLE
+                                    progressBar.visibility = View.GONE
+                                }
+                            }
                         }
-                    }
-                }
-            })
+                    })
 
     private fun getAdapter(items: List<ChapterContentItem>) =
-        FastScrollAdapter<ChapterContentItem>()
-            .wrap(FastAdapter.with(ChapterContentAdapter(items)).apply {
-                onTouchListener = { _, _, _, item, _ ->
-                    binding?.toolbar?.appbar?.title = item.chapterName
-                    true
-                }
-            })
+            FastScrollAdapter<ChapterContentItem>()
+                    .wrap(FastAdapter.with(ChapterContentAdapter(items)).apply {
+                        onTouchListener = { _, _, _, item, _ ->
+                            binding?.toolbar?.appbar?.title = item.chapterName
+                            true
+                        }
+                    })
 
-    private fun getMenu(items: List<ChapterContentItem>) =
-        MenuDialog(MenuAdapter(items.map { MenuAdapterItem(it.chapterName.toString()) })).apply {
-            adapter.onClickListener = { _, _, item, pos ->
-                binding?.apply {
-                    chapterRecyclerView.layoutManager?.let {
-                        (it as LinearLayoutManager).scrollToPositionWithOffset(pos, 0)
-                    }
-                    toolbar.appbar.title = item.text
+    private fun updateMenu(items: List<ChapterContentItem>) {
+        menu.adapter.submitList(items.map { MenuDialogItem(it.chapterName.toString()) })
+        menu.onClick = { _, pos, _ ->
+            binding?.apply {
+                chapterRecyclerView.layoutManager?.let {
+                    (it as LinearLayoutManager).scrollToPositionWithOffset(pos, 0)
                 }
-                dismiss()
-                true
+                toolbar.appbar.title = menu.adapter.currentList[pos].text
             }
+            menu.dismiss()
         }
+    }
 }

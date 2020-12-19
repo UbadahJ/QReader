@@ -7,7 +7,6 @@ import com.mikepenz.fastadapter.FastAdapter
 import com.mikepenz.fastadapter.GenericItem
 import com.ubadahj.qidianundergroud.ui.adapters.items.BookItem
 import com.ubadahj.qidianundergroud.ui.adapters.items.ChapterContentItem
-import com.ubadahj.qidianundergroud.ui.adapters.items.MenuAdapterItem
 
 /**
  * Created by mikepenz on 30.12.15.
@@ -20,7 +19,6 @@ class FastScrollAdapter<Item : GenericItem> :
     companion object {
         private fun getDefinedString(item: GenericItem): String {
             return when (item) {
-                is MenuAdapterItem -> item.text.first().toString()
                 is BookItem -> item.book.name.first().toString()
                 is ChapterContentItem -> item.chapterName.split(':').first().trim()
                 else -> throw IllegalArgumentException("Item type not registered: ${item.javaClass}")

@@ -1,12 +1,44 @@
 package com.ubadahj.qidianundergroud.ui.adapters
 
-import com.mikepenz.fastadapter.adapters.ItemAdapter
-import com.ubadahj.qidianundergroud.ui.adapters.items.MenuItem
+import android.view.LayoutInflater
+import android.view.ViewGroup
+import androidx.core.content.ContextCompat
+import androidx.recyclerview.widget.DiffUtil
+import androidx.recyclerview.widget.ListAdapter
+import androidx.recyclerview.widget.RecyclerView
+import com.ubadahj.qidianundergroud.databinding.MenuItemBinding
+import com.ubadahj.qidianundergroud.ui.models.MenuDialogItem
 
-class MenuAdapter(items: List<MenuItem>) : ItemAdapter<MenuItem>() {
+class MenuAdapter() : ListAdapter<MenuDialogItem, MenuAdapter.MenuViewHolder>(DiffCallback()) {
 
-    init {
-        super.add(items)
+    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): MenuViewHolder {
+        return MenuViewHolder(
+                MenuItemBinding.inflate(
+                        LayoutInflater.from(parent.context),
+                        parent,
+                        false
+                )
+        )
     }
 
+    override fun onBindViewHolder(holder: MenuViewHolder, position: Int) {
+        val item = getItem(position)
+        holder.binding.menuItem.text = item.text
+        if (item.icon != 0)
+            holder.binding.menuItem.icon =
+                    ContextCompat.getDrawable(holder.binding.root.context, item.icon)
+    }
+
+    class MenuViewHolder(val binding: MenuItemBinding) :
+            RecyclerView.ViewHolder(binding.root)
+}
+
+private class DiffCallback : DiffUtil.ItemCallback<MenuDialogItem>() {
+    override fun areItemsTheSame(oldItem: MenuDialogItem, newItem: MenuDialogItem): Boolean {
+        return oldItem.text == newItem.text
+    }
+
+    override fun areContentsTheSame(oldItem: MenuDialogItem, newItem: MenuDialogItem): Boolean {
+        return oldItem.icon == newItem.icon
+    }
 }
