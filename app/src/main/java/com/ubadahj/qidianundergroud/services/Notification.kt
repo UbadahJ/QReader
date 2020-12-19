@@ -6,8 +6,8 @@ import android.content.Context
 import android.os.Build
 import com.ubadahj.qidianundergroud.R
 
-val CHANNEL_ID: String = "42000"
-val DOWNLOADER_ID: String = "69"
+const val CHANNEL_ID: String = "42000"
+const val DOWNLOADER_ID: String = "69"
 
 fun createDownloaderChannel(context: Context) {
     // Create the NotificationChannel, but only on API 26+ because
