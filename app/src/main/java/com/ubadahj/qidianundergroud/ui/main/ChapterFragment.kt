@@ -17,6 +17,9 @@ import com.ubadahj.qidianundergroud.ui.adapters.ChapterContentAdapter
 import com.ubadahj.qidianundergroud.ui.adapters.MenuAdapter
 import com.ubadahj.qidianundergroud.ui.dialog.MenuDialog
 import com.ubadahj.qidianundergroud.ui.models.MenuDialogItem
+import com.ubadahj.qidianundergroud.utils.models.lastChapter
+import com.ubadahj.qidianundergroud.utils.repositories.updateLastRead
+import com.ubadahj.qidianundergroud.utils.ui.addOnScrollStateListener
 
 class ChapterFragment : Fragment() {
 
@@ -30,14 +33,37 @@ class ChapterFragment : Fragment() {
     private var adapter: ChapterContentAdapter = ChapterContentAdapter(listOf())
 
     override fun onCreateView(
-            inflater: LayoutInflater, container: ViewGroup?,
-            savedInstanceState: Bundle?
+        inflater: LayoutInflater, container: ViewGroup?,
+        savedInstanceState: Bundle?
     ): View? {
         binding = ChapterFragmentBinding.inflate(inflater, container, false)
         viewModel.selectedChapter?.apply {
             init(this)
         }
         return binding?.root
+    }
+
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        super.onViewCreated(view, savedInstanceState)
+        setHasOptionsMenu(true)
+        binding?.apply {
+            (requireActivity() as AppCompatActivity).apply {
+                setSupportActionBar(toolbar.appbar)
+                supportActionBar?.setDisplayHomeAsUpEnabled(true)
+            }
+            chapterRecyclerView.adapter = adapter
+            chapterRecyclerView.addOnScrollStateListener { rc, state ->
+                if (state != RecyclerView.SCROLL_STATE_IDLE)
+                    return@addOnScrollStateListener
+
+                val chapter = this@ChapterFragment.adapter.currentList[
+                        (rc.layoutManager as LinearLayoutManager).findFirstVisibleItemPosition()
+                ]
+                toolbar.appbar.title = chapter.title
+                viewModel.selectedBook?.updateLastRead(requireContext(), chapter.getIndex())
+            }
+
+        }
     }
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
@@ -61,58 +87,40 @@ class ChapterFragment : Fragment() {
 
     @SuppressLint("SetJavaScriptEnabled")
     private fun init(chapters: ChapterGroup) {
-        setHasOptionsMenu(true)
         binding?.apply {
-            (requireActivity() as AppCompatActivity).apply {
-                setSupportActionBar(toolbar.appbar)
-                supportActionBar?.setDisplayHomeAsUpEnabled(true)
-            }
-            chapterRecyclerView.adapter = adapter
-            chapterRecyclerView.apply {
-                clearOnScrollListeners()
-                addOnScrollListener(object : RecyclerView.OnScrollListener() {
-                    override fun onScrollStateChanged(recyclerView: RecyclerView, newState: Int) {
-                        super.onScrollStateChanged(recyclerView, newState)
-                        if (newState == RecyclerView.SCROLL_STATE_IDLE)
-                            toolbar.appbar.title = this@ChapterFragment.adapter.currentList[
-                                    (layoutManager as LinearLayoutManager)
-                                        .findFirstVisibleItemPosition()
-                            ].title
-                    }
-                })
-            }
             errorButton.setOnClickListener { getChapterContents(chapters, true) }
         }
         getChapterContents(chapters)
     }
 
     private fun getChapterContents(chapters: ChapterGroup, refresh: Boolean = false) =
-            viewModel.getChapterContents(requireContext(), chapters, refresh)
-                    .observe(viewLifecycleOwner, {
-                        binding?.apply {
-                            when (it) {
-                                is Resource.Success -> {
-                                    adapter.submitList(it.data!!)
-                                    updateMenu(it.data)
-                                    progressBar.visibility = View.GONE
-                                    errorGroup.visibility = View.GONE
-                                }
-                                is Resource.Loading -> {
-                                    toolbar.appbar.title = "Loading"
-                                    progressBar.visibility = View.VISIBLE
-                                    errorGroup.visibility = View.GONE
-                                }
-                                is Resource.Error -> {
-                                    toolbar.appbar.title = "Error"
-                                    menu.adapter.submitList(
-                                        listOf(MenuDialogItem("Error", R.drawable.unlink))
-                                    )
-                                    errorGroup.visibility = View.VISIBLE
-                                    progressBar.visibility = View.GONE
-                                }
-                            }
+        viewModel.getChapterContents(requireContext(), chapters, refresh)
+            .observe(viewLifecycleOwner, {
+                binding?.apply {
+                    when (it) {
+                        is Resource.Success -> {
+                            adapter.submitList(it.data!!)
+                            updateMenu(it.data)
+                            toolbar.appbar.title = it.data.first().title
+                            progressBar.visibility = View.GONE
+                            errorGroup.visibility = View.GONE
                         }
-                    })
+                        is Resource.Loading -> {
+                            toolbar.appbar.title = "Loading"
+                            progressBar.visibility = View.VISIBLE
+                            errorGroup.visibility = View.GONE
+                        }
+                        is Resource.Error -> {
+                            toolbar.appbar.title = "Error"
+                            menu.adapter.submitList(
+                                listOf(MenuDialogItem("Error", R.drawable.unlink))
+                            )
+                            errorGroup.visibility = View.VISIBLE
+                            progressBar.visibility = View.GONE
+                        }
+                    }
+                }
+            })
 
     private fun updateMenu(items: List<Chapter>) {
         menu.adapter.submitList(items.map { MenuDialogItem(it.title) })
@@ -121,9 +129,18 @@ class ChapterFragment : Fragment() {
                 chapterRecyclerView.layoutManager?.let {
                     (it as LinearLayoutManager).scrollToPositionWithOffset(pos, 0)
                 }
-                toolbar.appbar.title = menu.adapter.currentList[pos].text
             }
             menu.dismiss()
+        }
+    }
+
+    private fun Chapter.getIndex(): Int {
+        return try {
+            title.split(':').first().trim().split(" ").last().toInt()
+        } catch (e: NoSuchElementException) {
+            viewModel.selectedChapter?.lastChapter ?: throw IllegalStateException(
+                "Failed to get lastChapter from ViewModel selectChapterGroup"
+            )
         }
     }
 }

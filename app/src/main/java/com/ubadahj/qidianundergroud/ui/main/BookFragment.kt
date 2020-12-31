@@ -24,9 +24,7 @@ import com.ubadahj.qidianundergroud.repositories.ChapterGroupRepository
 import com.ubadahj.qidianundergroud.services.DownloadService
 import com.ubadahj.qidianundergroud.ui.adapters.ChapterAdapter
 import com.ubadahj.qidianundergroud.ui.adapters.items.ChapterItem
-import com.ubadahj.qidianundergroud.utils.models.lastChapter
 import com.ubadahj.qidianundergroud.utils.repositories.addToLibrary
-import com.ubadahj.qidianundergroud.utils.repositories.updateLastRead
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
 
@@ -106,7 +104,6 @@ class BookFragment : Fragment() {
     private fun createAdapter(book: Book, groups: List<ChapterGroup>): FastAdapter<ChapterItem> =
         FastAdapter.with(ChapterAdapter(book, groups)).apply {
             onClickListener = { _, _, item, _ ->
-                book.updateLastRead(requireContext(), item.chapter.lastChapter)
                 viewModel.selectedChapter = item.chapter
                 lifecycleScope.launch {
                     viewModel.selectedBook =
