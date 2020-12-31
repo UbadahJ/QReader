@@ -20,7 +20,7 @@ class MenuDialog(
     var onClick = _onClick
         set(value) {
             field = value
-            dismiss()
+            if (isAdded) dismiss()
         }
 
     override fun onCreateView(
