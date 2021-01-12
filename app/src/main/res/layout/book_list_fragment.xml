@@ -5,7 +5,7 @@
     android:id="@+id/main"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".ui.LibraryFragment">
+    tools:context=".ui.main.LibraryFragment">
 
     <include
         android:id="@+id/toolbar"
@@ -34,7 +34,6 @@
 
     <com.google.android.material.floatingactionbutton.ExtendedFloatingActionButton
         android:id="@+id/floating_button"
-        style="@style/FloatingActionButton.AppTheme"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginEnd="24dp"
@@ -42,6 +41,7 @@
         android:clickable="true"
         android:focusable="true"
         android:text="@string/browse"
+        android:visibility="gone"
         app:icon="@drawable/add"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent" />

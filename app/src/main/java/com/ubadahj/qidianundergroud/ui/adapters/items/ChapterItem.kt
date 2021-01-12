@@ -34,7 +34,7 @@ class ChapterItem(val book: Book, val chapter: ChapterGroup) :
         if (defaultColor == 0)
             defaultColor = binding.root.currentTextColor
         if (highlightColor == 0)
-            highlightColor = ContextCompat.getColor(binding.root.context, R.color.secondaryColor)
+            highlightColor = ContextCompat.getColor(binding.root.context, R.color.blue_500)
 
         return binding
     }

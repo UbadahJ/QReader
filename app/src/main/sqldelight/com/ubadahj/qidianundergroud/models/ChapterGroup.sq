@@ -28,11 +28,11 @@ WHERE bookId = ?
 ORDER BY CAST(TRIM(SUBSTR(text, 1, INSTR(text, '-') - 1)) AS INTEGER);
 
 insert:
-INSERT OR REPLACE INTO ChapterGroup(bookId, text, link)
+INSERT OR IGNORE INTO ChapterGroup(bookId, text, link)
 VALUES ?;
 
 insertByValues:
-INSERT OR REPLACE INTO ChapterGroup(bookId, text, link)
+INSERT OR IGNORE INTO ChapterGroup(bookId, text, link)
 VALUES (?, ?, ?);
 
 deleteByLink:

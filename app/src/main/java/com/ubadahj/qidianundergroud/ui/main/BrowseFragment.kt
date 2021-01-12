@@ -1,4 +1,4 @@
-package com.ubadahj.qidianundergroud.ui
+package com.ubadahj.qidianundergroud.ui.main
 
 import android.os.Bundle
 import android.text.Editable
@@ -14,46 +14,38 @@ import com.google.android.material.snackbar.Snackbar
 import com.mikepenz.fastadapter.FastAdapter
 import com.mikepenz.fastadapter.adapters.ItemAdapter
 import com.ubadahj.qidianundergroud.R
-import com.ubadahj.qidianundergroud.databinding.BrowseFragmentBinding
+import com.ubadahj.qidianundergroud.databinding.BookListFragmentBinding
 import com.ubadahj.qidianundergroud.models.Book
 import com.ubadahj.qidianundergroud.models.Resource
 import com.ubadahj.qidianundergroud.ui.adapters.BookAdapter
 import com.ubadahj.qidianundergroud.ui.adapters.FastScrollAdapter
 import com.ubadahj.qidianundergroud.ui.adapters.MenuAdapter
 import com.ubadahj.qidianundergroud.ui.adapters.items.BookItem
-import com.ubadahj.qidianundergroud.ui.adapters.items.MenuAdapterItem
 import com.ubadahj.qidianundergroud.ui.dialog.MenuDialog
+import com.ubadahj.qidianundergroud.ui.models.MenuDialogItem
 
 class BrowseFragment : Fragment() {
 
     private val viewModel: MainViewModel by activityViewModels()
     private val menu = MenuDialog(
-        MenuAdapter(
-            listOf(MenuAdapterItem("Refresh", R.drawable.refresh))
-        )
-    ).apply {
-        adapter.onClickListener = { _, _, _, i ->
-            when (i) {
-                0 -> {
-                    viewModel
-                        .getBooks(requireContext(), refresh = true)
-                        .observe(viewLifecycleOwner, this@BrowseFragment::getBooks)
-                    true
-                }
-                else -> false
+            MenuAdapter().apply {
+                submitList(listOf(MenuDialogItem("Refresh", R.drawable.refresh)))
             }
-        }
+    ) { _, i, _ ->
+        if (i == 0) viewModel
+                .getBooks(requireContext(), refresh = true)
+                .observe(viewLifecycleOwner, this@BrowseFragment::getBooks)
     }
 
-    private var binding: BrowseFragmentBinding? = null
+    private var binding: BookListFragmentBinding? = null
     private var adapter: ItemAdapter<BookItem>? = null
 
     override fun onCreateView(
-        inflater: LayoutInflater,
-        container: ViewGroup?,
-        savedInstanceState: Bundle?
+            inflater: LayoutInflater,
+            container: ViewGroup?,
+            savedInstanceState: Bundle?
     ): View {
-        binding = BrowseFragmentBinding.inflate(inflater, container, false)
+        binding = BookListFragmentBinding.inflate(inflater, container, false)
         return binding!!.root
     }
 
@@ -92,15 +84,15 @@ class BrowseFragment : Fragment() {
             progressBar.visibility = View.GONE
             adapter = BookAdapter(books)
             bookListingView.adapter = FastScrollAdapter<BookItem>().wrap(
-                FastAdapter.with(adapter!!).apply {
-                    onClickListener = { _, _, item, _ ->
-                        viewModel.selectedBook.value = item.book
-                        findNavController().navigate(
-                            BrowseFragmentDirections.actionBrowseFragmentToBookFragment()
-                        )
-                        false
+                    FastAdapter.with(adapter!!).apply {
+                        onClickListener = { _, _, item, _ ->
+                            viewModel.selectedBook = item.book
+                            findNavController().navigate(
+                                    BrowseFragmentDirections.actionBrowseFragmentToBookFragment()
+                            )
+                            false
+                        }
                     }
-                }
 
             )
         }
@@ -112,9 +104,9 @@ class BrowseFragment : Fragment() {
                 binding?.apply {
                     val searchBarVisible = bookListingView.y != searchBar.root.y
                     bookListingView.animate()
-                        .alpha(1f)
-                        .translationY(if (!searchBarVisible) searchBar.root.height + 32f else 0f)
-                        .start()
+                            .alpha(1f)
+                            .translationY(if (!searchBarVisible) searchBar.root.height + 32f else 0f)
+                            .start()
                 }
                 true
             }

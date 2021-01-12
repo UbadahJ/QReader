@@ -4,7 +4,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".ui.ChapterFragment">
+    tools:context=".ui.main.ChapterFragment">
 
     <include
         android:id="@+id/toolbar"
@@ -17,6 +17,7 @@
         android:layout_marginStart="16dp"
         android:layout_marginEnd="16dp"
         android:layout_marginBottom="16dp"
+        app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
         app:bubbleSize="small"
         app:bubbleTextSize="14sp"
         app:layout_constraintBottom_toBottomOf="parent"
@@ -33,5 +34,56 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
+
+    <ImageView
+        android:id="@+id/error_image"
+        android:layout_width="96dp"
+        android:layout_height="96dp"
+        android:layout_marginBottom="8dp"
+        android:contentDescription="error"
+        android:src="@drawable/unlink"
+        app:layout_constraintBottom_toTopOf="@+id/guideline"
+        app:layout_constraintEnd_toEndOf="@+id/chapter_recycler_view"
+        app:layout_constraintStart_toStartOf="@+id/chapter_recycler_view"
+        app:tint="?android:attr/textColorPrimary" />
+
+    <com.google.android.material.textview.MaterialTextView
+        android:id="@+id/error_text"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="8dp"
+        android:text="Failed to fetch data from server"
+        app:layout_constraintEnd_toEndOf="@+id/chapter_recycler_view"
+        app:layout_constraintStart_toStartOf="@+id/chapter_recycler_view"
+        app:layout_constraintTop_toTopOf="@+id/guideline" />
+
+
+    <com.google.android.material.button.MaterialButton
+        android:id="@+id/error_button"
+        style="@style/Widget.MaterialComponents.Button.TextButton"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="8dp"
+        android:text="Retry"
+        android:textColor="?android:attr/textColorPrimary"
+        app:icon="@drawable/refresh"
+        app:iconTint="?android:attr/textColorPrimary"
+        app:layout_constraintEnd_toEndOf="@+id/chapter_recycler_view"
+        app:layout_constraintStart_toStartOf="@+id/chapter_recycler_view"
+        app:layout_constraintTop_toBottomOf="@+id/error_text" />
+
+    <androidx.constraintlayout.widget.Guideline
+        android:id="@+id/guideline"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        app:layout_constraintGuide_percent="0.5" />
+
+    <androidx.constraintlayout.widget.Group
+        android:id="@+id/error_group"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+
+        app:constraint_referenced_ids="error_image,error_text,error_button" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

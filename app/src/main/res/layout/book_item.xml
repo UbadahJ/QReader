@@ -10,9 +10,9 @@
 
     <ImageView
         android:id="@+id/imageView"
-        style="@style/AppTheme.Icon"
         android:layout_width="36dp"
         android:layout_height="36dp"
+        app:tint="?android:attr/textColorPrimary"
         app:srcCompat="@drawable/book" />
 
     <TextView

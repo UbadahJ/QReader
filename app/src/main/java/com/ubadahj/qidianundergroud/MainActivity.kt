@@ -6,7 +6,6 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.ActivityNavigator
 import androidx.navigation.findNavController
-import androidx.navigation.fragment.NavHostFragment
 import androidx.work.ExistingPeriodicWorkPolicy
 import androidx.work.PeriodicWorkRequestBuilder
 import androidx.work.WorkManager
@@ -15,8 +14,7 @@ import com.ubadahj.qidianundergroud.databinding.MainActivityBinding
 import com.ubadahj.qidianundergroud.repositories.BookRepository
 import com.ubadahj.qidianundergroud.repositories.ChapterGroupRepository
 import com.ubadahj.qidianundergroud.services.NotificationWorker
-import com.ubadahj.qidianundergroud.ui.MainViewModel
-import kotlinx.android.synthetic.main.main_activity.*
+import com.ubadahj.qidianundergroud.ui.main.MainViewModel
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
 import java.util.concurrent.TimeUnit
@@ -40,16 +38,16 @@ class MainActivity : AppCompatActivity() {
             val bookRepo = BookRepository(baseContext)
             val groupRepo = ChapterGroupRepository(baseContext)
             val book = (intent.extras?.get("book") as String?)?.apply {
-                viewModel.selectedBook.value = bookRepo.getBookById(this).first()
+                viewModel.selectedBook = bookRepo.getBookById(this).first()
             }
             val groups = (intent.extras?.get("chapters") as String?)?.apply {
-                viewModel.selectedChapter.value = groupRepo.getGroupByLink(this).first()
+                viewModel.selectedChapter = groupRepo.getGroupByLink(this).first()
             }
 
             if (book != null) {
-                val navHost = nav_host_fragment as NavHostFragment
-                val graphInflater = navHost.navController.navInflater
-                navHost.navController.graph = graphInflater.inflate(R.navigation.nav_graph).apply {
+                val navHost = binding.navHostFragment.findNavController()
+                val graphInflater = navHost.navInflater
+                navHost.graph = graphInflater.inflate(R.navigation.nav_graph).apply {
                     startDestination =
                         if (groups != null) R.id.chapterFragment else R.id.bookFragment
                 }

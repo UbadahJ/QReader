@@ -1,4 +1,4 @@
-package com.ubadahj.qidianundergroud.ui
+package com.ubadahj.qidianundergroud.ui.main
 
 import android.os.Bundle
 import android.view.*
@@ -8,61 +8,57 @@ import androidx.fragment.app.activityViewModels
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.google.android.material.snackbar.Snackbar
-import com.mikepenz.aboutlibraries.LibsBuilder
 import com.mikepenz.fastadapter.FastAdapter
 import com.mikepenz.fastadapter.IAdapter
 import com.ubadahj.qidianundergroud.R
-import com.ubadahj.qidianundergroud.databinding.LibraryFragmentBinding
+import com.ubadahj.qidianundergroud.databinding.BookListFragmentBinding
 import com.ubadahj.qidianundergroud.models.Resource
 import com.ubadahj.qidianundergroud.ui.adapters.BookAdapter
 import com.ubadahj.qidianundergroud.ui.adapters.FastScrollAdapter
 import com.ubadahj.qidianundergroud.ui.adapters.MenuAdapter
 import com.ubadahj.qidianundergroud.ui.adapters.items.BookItem
-import com.ubadahj.qidianundergroud.ui.adapters.items.MenuAdapterItem
 import com.ubadahj.qidianundergroud.ui.dialog.MenuDialog
+import com.ubadahj.qidianundergroud.ui.models.MenuDialogItem
 
 class LibraryFragment : Fragment() {
 
     private val viewModel: MainViewModel by activityViewModels()
     private val onBookSelected: (View?, IAdapter<BookItem>, BookItem, Int) -> Boolean =
-        { _, _, item, _ ->
-            viewModel.selectedBook.value = item.book
-            findNavController().navigate(
-                LibraryFragmentDirections.actionLibraryFragmentToBookFragment()
-            )
-            true
-        }
-    private val menu = MenuDialog(
-        MenuAdapter(
-            listOf(
-                MenuAdapterItem("History", R.drawable.archive),
-                MenuAdapterItem("Settings", R.drawable.settings),
-                MenuAdapterItem("About", R.drawable.info)
-            )
-        )
-    ).apply {
-        adapter.onClickListener = { _, _, _, i ->
-            when (i) {
-                0 -> {
-                }
-                1 -> {
-                }
-                2 -> {
-                    LibsBuilder().start(requireContext())
-                }
+            { _, _, item, _ ->
+                viewModel.selectedBook = item.book
+                findNavController().navigate(
+                        LibraryFragmentDirections.actionLibraryFragmentToBookFragment()
+                )
+                true
             }
-            true
+    private val menu = MenuDialog(
+            MenuAdapter().apply {
+                submitList(listOf(
+                        MenuDialogItem("History", R.drawable.archive),
+                        MenuDialogItem("Settings", R.drawable.settings),
+                        MenuDialogItem("About", R.drawable.info)
+                ))
+            }
+    ) { _, i, _ ->
+        when (i) {
+            0 -> {
+            }
+            1 -> {
+            }
+            2 -> {
+                com.mikepenz.aboutlibraries.LibsBuilder().start(requireContext())
+            }
         }
     }
 
-    private var binding: LibraryFragmentBinding? = null
+    private var binding: BookListFragmentBinding? = null
 
     override fun onCreateView(
-        inflater: LayoutInflater,
-        container: ViewGroup?,
-        savedInstanceState: Bundle?
+            inflater: LayoutInflater,
+            container: ViewGroup?,
+            savedInstanceState: Bundle?
     ): View {
-        binding = LibraryFragmentBinding.inflate(inflater, container, false)
+        binding = BookListFragmentBinding.inflate(inflater, container, false)
         return binding!!.root
     }
 
@@ -72,9 +68,10 @@ class LibraryFragment : Fragment() {
         binding?.apply {
             (requireActivity() as AppCompatActivity).setSupportActionBar(toolbar.appbar)
             toolbar.appbar.title = resources.getText(R.string.library)
+            floatingButton.visibility = View.VISIBLE
             floatingButton.setOnClickListener {
                 findNavController().navigate(
-                    LibraryFragmentDirections.actionLibraryFragmentToBrowseFragment()
+                        LibraryFragmentDirections.actionLibraryFragmentToBrowseFragment()
                 )
             }
 
@@ -84,9 +81,9 @@ class LibraryFragment : Fragment() {
                     is Resource.Success -> {
                         progressBar.visibility = View.GONE
                         bookListingView.adapter = FastScrollAdapter<BookItem>().wrap(
-                            FastAdapter.with(BookAdapter(it.data!!)).apply {
-                                onClickListener = onBookSelected
-                            }
+                                FastAdapter.with(BookAdapter(it.data!!)).apply {
+                                    onClickListener = onBookSelected
+                                }
                         )
                     }
                     is Resource.Loading -> {
@@ -94,9 +91,9 @@ class LibraryFragment : Fragment() {
                     }
                     is Resource.Error -> {
                         Snackbar.make(
-                            root,
-                            "CRITICAL: Failed to fetch data from internal DB",
-                            Snackbar.LENGTH_SHORT
+                                root,
+                                "CRITICAL: Failed to fetch data from internal DB",
+                                Snackbar.LENGTH_SHORT
                         ).show()
                     }
                 }
@@ -115,9 +112,9 @@ class LibraryFragment : Fragment() {
                 binding?.apply {
                     val searchBarVisible = bookListingView.y != searchBar.root.y
                     bookListingView.animate()
-                        .alpha(1f)
-                        .translationY(if (!searchBarVisible) searchBar.root.height + 32f else 0f)
-                        .start()
+                            .alpha(1f)
+                            .translationY(if (!searchBarVisible) searchBar.root.height + 32f else 0f)
+                            .start()
                 }
                 true
             }

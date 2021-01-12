@@ -1,4 +1,4 @@
-package com.ubadahj.qidianundergroud.ui
+package com.ubadahj.qidianundergroud.ui.main
 
 import android.os.Bundle
 import android.view.LayoutInflater
@@ -9,6 +9,10 @@ import androidx.fragment.app.activityViewModels
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.GridLayoutManager
+import androidx.work.Data
+import androidx.work.ExistingWorkPolicy
+import androidx.work.OneTimeWorkRequestBuilder
+import androidx.work.WorkManager
 import com.google.android.material.snackbar.Snackbar
 import com.mikepenz.fastadapter.FastAdapter
 import com.ubadahj.qidianundergroud.R
@@ -17,11 +21,10 @@ import com.ubadahj.qidianundergroud.models.Book
 import com.ubadahj.qidianundergroud.models.ChapterGroup
 import com.ubadahj.qidianundergroud.models.Resource
 import com.ubadahj.qidianundergroud.repositories.ChapterGroupRepository
+import com.ubadahj.qidianundergroud.services.DownloadService
 import com.ubadahj.qidianundergroud.ui.adapters.ChapterAdapter
 import com.ubadahj.qidianundergroud.ui.adapters.items.ChapterItem
-import com.ubadahj.qidianundergroud.utils.models.lastChapter
 import com.ubadahj.qidianundergroud.utils.repositories.addToLibrary
-import com.ubadahj.qidianundergroud.utils.repositories.updateLastRead
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
 
@@ -40,14 +43,14 @@ class BookFragment : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        viewModel.selectedBook.observe(viewLifecycleOwner) {
-            it?.apply { init(this) }
+        viewModel.selectedBook?.apply {
+            init(this)
         }
     }
 
     override fun onResume() {
         super.onResume()
-        if (viewModel.selectedBook.value == null)
+        if (viewModel.selectedBook == null)
             findNavController().popBackStack()
     }
 
@@ -63,6 +66,17 @@ class BookFragment : Fragment() {
             }
             if (book.inLibrary)
                 libraryButton.visibility = View.GONE
+
+            downloadImageView.setOnClickListener {
+                val work = OneTimeWorkRequestBuilder<DownloadService>().apply {
+                    setInputData(Data.Builder().apply {
+                        putString("book_id", book.id)
+                    }.build())
+                }.build()
+                WorkManager.getInstance(requireContext()).enqueueUniqueWork(
+                    "download-service", ExistingWorkPolicy.KEEP, work
+                )
+            }
         }
 
         viewModel.getChapters(requireContext(), book).observe(viewLifecycleOwner) { resource ->
@@ -90,13 +104,12 @@ class BookFragment : Fragment() {
     private fun createAdapter(book: Book, groups: List<ChapterGroup>): FastAdapter<ChapterItem> =
         FastAdapter.with(ChapterAdapter(book, groups)).apply {
             onClickListener = { _, _, item, _ ->
-                book.updateLastRead(requireContext(), item.chapter.lastChapter)
-                viewModel.selectedChapter.value = item.chapter
+                viewModel.selectedChapter = item.chapter
                 lifecycleScope.launch {
-                    viewModel.selectedBook.value =
-                        ChapterGroupRepository(this@BookFragment.requireContext())
-                            .getBook(groups.first())
-                            .first()
+                    viewModel.selectedBook =
+                            ChapterGroupRepository(this@BookFragment.requireContext())
+                                    .getBook(groups.first())
+                                    .first()
                 }
                 findNavController().navigate(
                     BookFragmentDirections.actionBookFragmentToChapterFragment()
