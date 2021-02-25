@@ -38,10 +38,10 @@ class MainActivity : AppCompatActivity() {
             val bookRepo = BookRepository(baseContext)
             val groupRepo = ChapterGroupRepository(baseContext)
             val book = (intent.extras?.get("book") as String?)?.apply {
-                viewModel.selectedBook = bookRepo.getBookById(this).first()
+                viewModel.selectedBook.value = bookRepo.getBookById(this).first()
             }
             val groups = (intent.extras?.get("chapters") as String?)?.apply {
-                viewModel.selectedChapter = groupRepo.getGroupByLink(this).first()
+                viewModel.selectedChapter.value = groupRepo.getGroupByLink(this).first()
             }
 
             if (book != null) {

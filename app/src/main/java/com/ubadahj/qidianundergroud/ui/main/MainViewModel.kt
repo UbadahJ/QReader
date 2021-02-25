@@ -3,6 +3,7 @@ package com.ubadahj.qidianundergroud.ui.main
 import android.annotation.SuppressLint
 import android.content.Context
 import android.webkit.WebView
+import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.asLiveData
 import androidx.lifecycle.liveData
@@ -18,8 +19,8 @@ import kotlinx.coroutines.flow.map
 
 class MainViewModel : ViewModel() {
 
-    var selectedBook: Book? = null
-    var selectedChapter: ChapterGroup? = null
+    val selectedBook: MutableLiveData<Book?> = MutableLiveData()
+    val selectedChapter: MutableLiveData<ChapterGroup?> = MutableLiveData()
 
     fun libraryBooks(context: Context) = liveData {
         emit(Resource.Loading())

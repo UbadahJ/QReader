@@ -26,20 +26,20 @@ class ChapterFragment : Fragment() {
     private val viewModel: MainViewModel by activityViewModels()
     private var binding: ChapterFragmentBinding? = null
     private var menu: MenuDialog = MenuDialog(
-        MenuAdapter().apply {
-            submitList(listOf(MenuDialogItem("Loading", R.drawable.pulse)))
-        }
+            MenuAdapter().apply {
+                submitList(listOf(MenuDialogItem("Loading", R.drawable.pulse)))
+            }
     )
     private var adapter: ChapterContentAdapter = ChapterContentAdapter(listOf())
 
     override fun onCreateView(
-        inflater: LayoutInflater, container: ViewGroup?,
-        savedInstanceState: Bundle?
+            inflater: LayoutInflater, container: ViewGroup?,
+            savedInstanceState: Bundle?
     ): View? {
         binding = ChapterFragmentBinding.inflate(inflater, container, false)
-        viewModel.selectedChapter?.apply {
-            init(this)
-        }
+        viewModel.selectedChapter.observe(viewLifecycleOwner, { value ->
+            value?.apply { init(this) }
+        })
         return binding?.root
     }
 
@@ -60,7 +60,7 @@ class ChapterFragment : Fragment() {
                         (rc.layoutManager as LinearLayoutManager).findFirstVisibleItemPosition()
                 ]
                 toolbar.appbar.title = chapter.title
-                viewModel.selectedBook?.updateLastRead(requireContext(), chapter.getIndex())
+                viewModel.selectedBook.value?.updateLastRead(requireContext(), chapter.getIndex())
             }
 
         }
@@ -94,33 +94,33 @@ class ChapterFragment : Fragment() {
     }
 
     private fun getChapterContents(chapters: ChapterGroup, refresh: Boolean = false) =
-        viewModel.getChapterContents(requireContext(), chapters, refresh)
-            .observe(viewLifecycleOwner, {
-                binding?.apply {
-                    when (it) {
-                        is Resource.Success -> {
-                            adapter.submitList(it.data!!)
-                            updateMenu(it.data)
-                            toolbar.appbar.title = it.data.first().title
-                            progressBar.visibility = View.GONE
-                            errorGroup.visibility = View.GONE
+            viewModel.getChapterContents(requireContext(), chapters, refresh)
+                    .observe(viewLifecycleOwner, {
+                        binding?.apply {
+                            when (it) {
+                                is Resource.Success -> {
+                                    adapter.submitList(it.data!!)
+                                    updateMenu(it.data)
+                                    toolbar.appbar.title = it.data.first().title
+                                    progressBar.visibility = View.GONE
+                                    errorGroup.visibility = View.GONE
+                                }
+                                is Resource.Loading -> {
+                                    toolbar.appbar.title = "Loading"
+                                    progressBar.visibility = View.VISIBLE
+                                    errorGroup.visibility = View.GONE
+                                }
+                                is Resource.Error -> {
+                                    toolbar.appbar.title = "Error"
+                                    menu.adapter.submitList(
+                                            listOf(MenuDialogItem("Error", R.drawable.unlink))
+                                    )
+                                    errorGroup.visibility = View.VISIBLE
+                                    progressBar.visibility = View.GONE
+                                }
+                            }
                         }
-                        is Resource.Loading -> {
-                            toolbar.appbar.title = "Loading"
-                            progressBar.visibility = View.VISIBLE
-                            errorGroup.visibility = View.GONE
-                        }
-                        is Resource.Error -> {
-                            toolbar.appbar.title = "Error"
-                            menu.adapter.submitList(
-                                listOf(MenuDialogItem("Error", R.drawable.unlink))
-                            )
-                            errorGroup.visibility = View.VISIBLE
-                            progressBar.visibility = View.GONE
-                        }
-                    }
-                }
-            })
+                    })
 
     private fun updateMenu(items: List<Chapter>) {
         menu.adapter.submitList(items.map { MenuDialogItem(it.title) })
@@ -138,8 +138,8 @@ class ChapterFragment : Fragment() {
         return try {
             title.split(':').first().trim().split(" ").last().toInt()
         } catch (e: NoSuchElementException) {
-            viewModel.selectedChapter?.lastChapter ?: throw IllegalStateException(
-                "Failed to get lastChapter from ViewModel selectChapterGroup"
+            viewModel.selectedChapter.value?.lastChapter ?: throw IllegalStateException(
+                    "Failed to get lastChapter from ViewModel selectChapterGroup"
             )
         }
     }

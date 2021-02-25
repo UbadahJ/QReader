@@ -34,8 +34,8 @@ class BookFragment : Fragment() {
     private var binding: BookFragmentBinding? = null
 
     override fun onCreateView(
-        inflater: LayoutInflater, container: ViewGroup?,
-        savedInstanceState: Bundle?
+            inflater: LayoutInflater, container: ViewGroup?,
+            savedInstanceState: Bundle?
     ): View {
         binding = BookFragmentBinding.inflate(inflater, container, false)
         return binding!!.root
@@ -43,14 +43,14 @@ class BookFragment : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        viewModel.selectedBook?.apply {
-            init(this)
-        }
+        viewModel.selectedBook.observe(viewLifecycleOwner, { value ->
+            value?.apply { init(this) }
+        })
     }
 
     override fun onResume() {
         super.onResume()
-        if (viewModel.selectedBook == null)
+        if (viewModel.selectedBook.value == null)
             findNavController().popBackStack()
     }
 
@@ -74,7 +74,7 @@ class BookFragment : Fragment() {
                     }.build())
                 }.build()
                 WorkManager.getInstance(requireContext()).enqueueUniqueWork(
-                    "download-service", ExistingWorkPolicy.KEEP, work
+                        "download-service", ExistingWorkPolicy.KEEP, work
                 )
             }
         }
@@ -102,20 +102,20 @@ class BookFragment : Fragment() {
     }
 
     private fun createAdapter(book: Book, groups: List<ChapterGroup>): FastAdapter<ChapterItem> =
-        FastAdapter.with(ChapterAdapter(book, groups)).apply {
-            onClickListener = { _, _, item, _ ->
-                viewModel.selectedChapter = item.chapter
-                lifecycleScope.launch {
-                    viewModel.selectedBook =
-                            ChapterGroupRepository(this@BookFragment.requireContext())
-                                    .getBook(groups.first())
-                                    .first()
+            FastAdapter.with(ChapterAdapter(book, groups)).apply {
+                onClickListener = { _, _, item, _ ->
+                    viewModel.selectedChapter.value = item.chapter
+                    lifecycleScope.launch {
+                        viewModel.selectedBook.value =
+                                ChapterGroupRepository(this@BookFragment.requireContext())
+                                        .getBook(groups.first())
+                                        .first()
+                    }
+                    findNavController().navigate(
+                            BookFragmentDirections.actionBookFragmentToChapterFragment()
+                    )
+                    true
                 }
-                findNavController().navigate(
-                    BookFragmentDirections.actionBookFragmentToChapterFragment()
-                )
-                true
             }
-        }
 
 }

@@ -86,7 +86,7 @@ class BrowseFragment : Fragment() {
             bookListingView.adapter = FastScrollAdapter<BookItem>().wrap(
                     FastAdapter.with(adapter!!).apply {
                         onClickListener = { _, _, item, _ ->
-                            viewModel.selectedBook = item.book
+                            viewModel.selectedBook.value = item.book
                             findNavController().navigate(
                                     BrowseFragmentDirections.actionBrowseFragmentToBookFragment()
                             )

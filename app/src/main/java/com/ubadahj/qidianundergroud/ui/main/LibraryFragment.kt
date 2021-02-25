@@ -25,7 +25,7 @@ class LibraryFragment : Fragment() {
     private val viewModel: MainViewModel by activityViewModels()
     private val onBookSelected: (View?, IAdapter<BookItem>, BookItem, Int) -> Boolean =
             { _, _, item, _ ->
-                viewModel.selectedBook = item.book
+                viewModel.selectedBook.value = item.book
                 findNavController().navigate(
                         LibraryFragmentDirections.actionLibraryFragmentToBookFragment()
                 )
