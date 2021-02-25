@@ -11,16 +11,12 @@ import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.github.ajalt.timberkt.d
 import com.google.android.material.snackbar.Snackbar
-import com.mikepenz.fastadapter.FastAdapter
-import com.mikepenz.fastadapter.adapters.ItemAdapter
 import com.ubadahj.qidianundergroud.R
 import com.ubadahj.qidianundergroud.databinding.BookListFragmentBinding
 import com.ubadahj.qidianundergroud.models.Book
 import com.ubadahj.qidianundergroud.models.Resource
 import com.ubadahj.qidianundergroud.ui.adapters.BookAdapter
-import com.ubadahj.qidianundergroud.ui.adapters.FastScrollAdapter
 import com.ubadahj.qidianundergroud.ui.adapters.MenuAdapter
-import com.ubadahj.qidianundergroud.ui.adapters.items.BookItem
 import com.ubadahj.qidianundergroud.ui.dialog.MenuDialog
 import com.ubadahj.qidianundergroud.ui.models.MenuDialogItem
 
@@ -38,7 +34,12 @@ class BrowseFragment : Fragment() {
     }
 
     private var binding: BookListFragmentBinding? = null
-    private var adapter: ItemAdapter<BookItem>? = null
+    private val adapter: BookAdapter = BookAdapter(listOf()) {
+        viewModel.selectedBook.value = it
+        findNavController().navigate(
+                BrowseFragmentDirections.actionBrowseFragmentToBookFragment()
+        )
+    }
 
     override fun onCreateView(
             inflater: LayoutInflater,
@@ -59,8 +60,9 @@ class BrowseFragment : Fragment() {
             (requireActivity() as AppCompatActivity).setSupportActionBar(toolbar.appbar)
             toolbar.appbar.title = resources.getText(R.string.browse)
             bookListingView.layoutManager = LinearLayoutManager(requireContext())
+            bookListingView.adapter = adapter
             searchBar.searchEditText.addTextChangedListener { text: Editable? ->
-                adapter?.filter(text)
+                adapter.filter.filter((text))
             }
         }
     }
@@ -68,7 +70,10 @@ class BrowseFragment : Fragment() {
     private fun getBooks(resource: Resource<List<Book>>) {
         d { "getBooks(): resource = $resource" }
         when (resource) {
-            is Resource.Success -> updateListing(resource.data!!)
+            is Resource.Success -> {
+                binding?.progressBar?.visibility = View.GONE
+                adapter.submitList(resource.data!!)
+            }
             is Resource.Loading -> binding?.progressBar?.visibility = View.VISIBLE
             is Resource.Error -> {
                 binding?.apply {
@@ -76,25 +81,6 @@ class BrowseFragment : Fragment() {
                     Snackbar.make(root, R.string.error_refreshing, Snackbar.LENGTH_SHORT).show()
                 }
             }
-        }
-    }
-
-    private fun updateListing(books: List<Book>) {
-        binding?.apply {
-            progressBar.visibility = View.GONE
-            adapter = BookAdapter(books)
-            bookListingView.adapter = FastScrollAdapter<BookItem>().wrap(
-                    FastAdapter.with(adapter!!).apply {
-                        onClickListener = { _, _, item, _ ->
-                            viewModel.selectedBook.value = item.book
-                            findNavController().navigate(
-                                    BrowseFragmentDirections.actionBrowseFragmentToBookFragment()
-                            )
-                            false
-                        }
-                    }
-
-            )
         }
     }
 
