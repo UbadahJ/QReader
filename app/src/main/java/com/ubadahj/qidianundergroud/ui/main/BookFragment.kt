@@ -6,27 +6,21 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
-import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.GridLayoutManager
+import androidx.recyclerview.widget.RecyclerView.Adapter.StateRestorationPolicy.PREVENT_WHEN_EMPTY
 import androidx.work.Data
 import androidx.work.ExistingWorkPolicy
 import androidx.work.OneTimeWorkRequestBuilder
 import androidx.work.WorkManager
 import com.google.android.material.snackbar.Snackbar
-import com.mikepenz.fastadapter.FastAdapter
 import com.ubadahj.qidianundergroud.R
 import com.ubadahj.qidianundergroud.databinding.BookFragmentBinding
 import com.ubadahj.qidianundergroud.models.Book
-import com.ubadahj.qidianundergroud.models.ChapterGroup
 import com.ubadahj.qidianundergroud.models.Resource
-import com.ubadahj.qidianundergroud.repositories.ChapterGroupRepository
 import com.ubadahj.qidianundergroud.services.DownloadService
 import com.ubadahj.qidianundergroud.ui.adapters.ChapterAdapter
-import com.ubadahj.qidianundergroud.ui.adapters.items.ChapterItem
 import com.ubadahj.qidianundergroud.utils.repositories.addToLibrary
-import kotlinx.coroutines.flow.first
-import kotlinx.coroutines.launch
 
 class BookFragment : Fragment() {
 
@@ -59,6 +53,12 @@ class BookFragment : Fragment() {
             header.text = book.name
             lastUpdated.text = if (book.completed) "Completed" else book.lastUpdated
             chapterListView.layoutManager = GridLayoutManager(requireContext(), 2)
+            chapterListView.adapter = ChapterAdapter(book, listOf()) {
+                viewModel.selectedChapter.value = it
+                findNavController().navigate(
+                        BookFragmentDirections.actionBookFragmentToChapterFragment()
+                )
+            }.apply { stateRestorationPolicy = PREVENT_WHEN_EMPTY }
             libraryButton.setOnClickListener {
                 book.addToLibrary(requireContext())
                 Snackbar.make(root, "Added book to the library", Snackbar.LENGTH_SHORT).show()
@@ -83,7 +83,8 @@ class BookFragment : Fragment() {
             when (resource) {
                 is Resource.Success -> {
                     binding?.loadingProgress?.visibility = View.GONE
-                    binding?.chapterListView?.adapter = createAdapter(book, resource.data!!)
+                    (binding?.chapterListView?.adapter as? ChapterAdapter)
+                            ?.submitList(book, resource.data!!)
                 }
                 is Resource.Loading -> binding?.loadingProgress?.visibility = View.VISIBLE
                 is Resource.Error -> {
@@ -100,22 +101,5 @@ class BookFragment : Fragment() {
         super.onDestroyView()
         binding = null
     }
-
-    private fun createAdapter(book: Book, groups: List<ChapterGroup>): FastAdapter<ChapterItem> =
-            FastAdapter.with(ChapterAdapter(book, groups)).apply {
-                onClickListener = { _, _, item, _ ->
-                    viewModel.selectedChapter.value = item.chapter
-                    lifecycleScope.launch {
-                        viewModel.selectedBook.value =
-                                ChapterGroupRepository(this@BookFragment.requireContext())
-                                        .getBook(groups.first())
-                                        .first()
-                    }
-                    findNavController().navigate(
-                            BookFragmentDirections.actionBookFragmentToChapterFragment()
-                    )
-                    true
-                }
-            }
 
 }
