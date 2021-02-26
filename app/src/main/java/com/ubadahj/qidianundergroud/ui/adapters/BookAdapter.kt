@@ -69,7 +69,7 @@ class BookAdapter(
     class ViewHolder(val binding: BookItemBinding, onClick: (Int) -> Unit) :
             RecyclerView.ViewHolder(binding.root) {
         init {
-            binding.root.setOnClickListener { onClick(adapterPosition) }
+            binding.root.setOnClickListener { onClick(bindingAdapterPosition) }
         }
     }
 

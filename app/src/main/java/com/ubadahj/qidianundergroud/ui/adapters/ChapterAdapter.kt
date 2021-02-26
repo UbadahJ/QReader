@@ -94,7 +94,7 @@ class ChapterAdapter(
     class ViewHolder(val binding: ChapterItemBinding, onClick: (Int) -> Unit) :
         RecyclerView.ViewHolder(binding.root) {
         init {
-            binding.root.setOnClickListener { onClick(adapterPosition) }
+            binding.root.setOnClickListener { onClick(bindingAdapterPosition) }
         }
     }
 
