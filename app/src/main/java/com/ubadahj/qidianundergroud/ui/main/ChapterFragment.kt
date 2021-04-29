@@ -60,7 +60,10 @@ class ChapterFragment : Fragment() {
                         (rc.layoutManager as LinearLayoutManager).findFirstVisibleItemPosition()
                 ]
                 toolbar.appbar.title = chapter.title
-                viewModel.selectedBook.value?.updateLastRead(requireContext(), chapter.getIndex())
+                viewModel.selectedChapter.value?.updateLastRead(
+                    requireContext(),
+                    chapter.getIndex()
+                )
             }
 
         }

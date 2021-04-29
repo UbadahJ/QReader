@@ -11,4 +11,6 @@ val ChapterGroup.lastChapter: Int
 val ChapterGroup.total: Int
     get() = lastChapter - firstChapter + 1
 
+fun ChapterGroup.isRead() = lastRead == lastChapter
+
 operator fun ChapterGroup.contains(chapter: Int): Boolean = chapter in firstChapter..lastChapter

@@ -50,13 +50,6 @@ class BookRepository(val context: Context) {
         database.bookQueries.addToLibrary(book.id)
     }
 
-    fun updateLastRead(book: Book, lastRead: Int) {
-        if (database.bookQueries.getById(book.id).executeAsOneOrNull() == null)
-            throw IllegalArgumentException("$this does not exists in library")
-
-        database.bookQueries.updateLastRead(lastRead, book.id)
-    }
-
     fun download(book: Book, factory: (Context) -> WebView, totalRetries: Int = 3) = flow {
         val chapterRepo = ChapterRepository(context)
         val groups = getGroups(book).first()
@@ -75,6 +68,6 @@ class BookRepository(val context: Context) {
         }
     }
 
-    private fun BookJson.toBook() = Book(id, name, lastUpdated, completed, inLibrary, lastRead)
+    private fun BookJson.toBook() = Book(id, name, lastUpdated, completed, inLibrary)
 
 }

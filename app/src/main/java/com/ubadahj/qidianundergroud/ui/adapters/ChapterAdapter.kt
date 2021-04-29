@@ -11,26 +11,27 @@ import androidx.recyclerview.widget.RecyclerView
 import com.github.ajalt.timberkt.Timber
 import com.ubadahj.qidianundergroud.R
 import com.ubadahj.qidianundergroud.databinding.ChapterItemBinding
-import com.ubadahj.qidianundergroud.models.Book
 import com.ubadahj.qidianundergroud.models.ChapterGroup
 import com.ubadahj.qidianundergroud.utils.models.contains
+import com.ubadahj.qidianundergroud.utils.models.isRead
 
 class ChapterAdapter(
-    private var book: Book,
     private var groups: List<ChapterGroup>,
     private val onClick: (ChapterGroup) -> Unit
 ) : ListAdapter<ChapterGroup, ChapterAdapter.ViewHolder>(DiffCallback()), Filterable {
 
     private val defaultColors: MutableMap<ChapterGroup, Int> = mutableMapOf()
-    private var highlightColor: Int = 0
+    private var readColor: Int = 0
 
     init {
-        submitList(book, groups)
+        submitList(groups)
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
-        if (highlightColor == 0)
-            highlightColor = ContextCompat.getColor(parent.context, R.color.blue_500)
+        if (readColor == 0)
+            readColor = ContextCompat.getColor(
+                parent.context, R.color.material_on_surface_disabled
+            )
 
         return ViewHolder(
             ChapterItemBinding.inflate(
@@ -45,7 +46,7 @@ class ChapterAdapter(
 
         holder.binding.chapterId.text = getItem(position).text
         holder.binding.chapterId.setTextColor(
-            if (book.lastRead in group) highlightColor else defaultColors[group]!!
+            if (group.isRead()) readColor else defaultColors[group]!!
         )
     }
 
@@ -62,21 +63,18 @@ class ChapterAdapter(
 
             @Suppress("UNCHECKED_CAST")
             override fun publishResults(p0: CharSequence?, p1: FilterResults?) {
-                submitList(book, p1?.values as? MutableList<ChapterGroup>, true)
+                submitList(p1?.values as? List<ChapterGroup>, true)
             }
 
         }
     }
 
     override fun submitList(list: List<ChapterGroup>?) {
-        submitList(book, list, false)
+        submitList(list, false)
     }
 
-    fun submitList(book: Book, list: List<ChapterGroup>?) {
-        submitList(book, list, false)
-    }
-
-    private fun submitList(book: Book, list: List<ChapterGroup>?, filtered: Boolean) {
+    @Suppress("UNCHECKED_CAST")
+    private fun submitList(list: List<Any>?, filtered: Boolean) {
         // This function is responsible for maintaining the
         // actual contents for the list for filtering
         // The submitList for parent class delegates false
@@ -84,11 +82,10 @@ class ChapterAdapter(
         // While a filter pass true which make sure original list
         // is maintained
         if (!filtered) {
-            this.book = book
-            groups = list ?: listOf()
+            groups = (list ?: listOf()) as List<ChapterGroup>
         }
 
-        super.submitList(list)
+        super.submitList(list as List<ChapterGroup>?)
     }
 
     class ViewHolder(val binding: ChapterItemBinding, onClick: (Int) -> Unit) :

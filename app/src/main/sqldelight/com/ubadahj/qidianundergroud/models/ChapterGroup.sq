@@ -2,13 +2,14 @@
 
 CREATE TABLE ChapterGroup
 (
-    bookId TEXT              NOT NULL,
-    text    TEXT             NOT NULL,
-    link    TEXT PRIMARY KEY NOT NULL,
+    bookId   TEXT             NOT NULL,
+    text     TEXT             NOT NULL,
+    link     TEXT PRIMARY KEY NOT NULL,
+    lastRead INTEGER AS Int   NOT NULL DEFAULT 0,
     CONSTRAINT chapter_group_ibfk
         FOREIGN KEY (bookId)
-        REFERENCES Book(id)
-        ON DELETE CASCADE
+            REFERENCES Book (id)
+            ON DELETE CASCADE
 );
 
 
@@ -28,7 +29,7 @@ WHERE bookId = ?
 ORDER BY CAST(TRIM(SUBSTR(text, 1, INSTR(text, '-') - 1)) AS INTEGER);
 
 insert:
-INSERT OR IGNORE INTO ChapterGroup(bookId, text, link)
+INSERT OR IGNORE INTO ChapterGroup(bookId, text, link, lastRead)
 VALUES ?;
 
 insertByValues:
@@ -38,6 +39,11 @@ VALUES (?, ?, ?);
 deleteByLink:
 DELETE
 FROM ChapterGroup
+WHERE link = ?;
+
+updateLastRead:
+UPDATE ChapterGroup
+SET lastRead = ?
 WHERE link = ?;
 
 contents:

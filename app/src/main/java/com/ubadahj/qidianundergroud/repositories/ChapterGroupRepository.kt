@@ -27,6 +27,13 @@ class ChapterGroupRepository(context: Context) {
 
     fun getGroupByLink(link: String) = database.chapterGroupQueries.get(link).asFlow().mapToOne()
 
+    fun updateLastRead(group: ChapterGroup, lastRead: Int) {
+        if (database.chapterGroupQueries.get(group.link).executeAsOneOrNull() == null)
+            throw IllegalArgumentException("$this chapter group does not exists")
+
+        database.chapterGroupQueries.updateLastRead(lastRead, group.link)
+    }
+
     suspend fun getGroups(book: Book, refresh: Boolean = false): Flow<List<ChapterGroup>> {
         val dbGroups = database.bookQueries.chapters(book.id).executeAsList()
         if (refresh || dbGroups.isEmpty()) {
@@ -44,6 +51,6 @@ class ChapterGroupRepository(context: Context) {
         return database.bookQueries.chapters(book.id).asFlow().mapToList()
     }
 
-    private fun ChapterGroupJson.toGroup(book: Book) = ChapterGroup(book.id, text, link)
+    private fun ChapterGroupJson.toGroup(book: Book) = ChapterGroup(book.id, text, link, 0)
 
 }

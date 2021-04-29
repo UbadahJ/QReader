@@ -53,10 +53,10 @@ class BookFragment : Fragment() {
             header.text = book.name
             lastUpdated.text = if (book.completed) "Completed" else book.lastUpdated
             chapterListView.layoutManager = GridLayoutManager(requireContext(), 2)
-            chapterListView.adapter = ChapterAdapter(book, listOf()) {
+            chapterListView.adapter = ChapterAdapter(listOf()) {
                 viewModel.selectedChapter.value = it
                 findNavController().navigate(
-                        BookFragmentDirections.actionBookFragmentToChapterFragment()
+                    BookFragmentDirections.actionBookFragmentToChapterFragment()
                 )
             }.apply { stateRestorationPolicy = PREVENT_WHEN_EMPTY }
             libraryButton.setOnClickListener {
@@ -84,7 +84,7 @@ class BookFragment : Fragment() {
                 is Resource.Success -> {
                     binding?.loadingProgress?.visibility = View.GONE
                     (binding?.chapterListView?.adapter as? ChapterAdapter)
-                            ?.submitList(book, resource.data!!)
+                        ?.submitList(resource.data!!)
                 }
                 is Resource.Loading -> binding?.loadingProgress?.visibility = View.VISIBLE
                 is Resource.Error -> {
