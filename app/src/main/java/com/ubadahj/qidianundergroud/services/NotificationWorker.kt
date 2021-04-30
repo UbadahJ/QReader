@@ -63,12 +63,7 @@ class NotificationWorker(context: Context, params: WorkerParameters) :
                     notify(notificationId, builder.build())
                     if (updateCount > 0)
                         emit(
-                            BookNotification(
-                                applicationContext,
-                                book,
-                                refreshedGroups,
-                                updateCount
-                            )
+                            BookNotification(applicationContext, book, refreshedGroups, updateCount)
                         )
                 } catch (e: Exception) {
                     e(e) { "getNotifications: Failed to query $book" }

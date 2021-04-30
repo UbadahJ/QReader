@@ -7,8 +7,6 @@ import android.view.ViewGroup
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import androidx.navigation.fragment.findNavController
-import androidx.recyclerview.widget.GridLayoutManager
-import androidx.recyclerview.widget.RecyclerView.Adapter.StateRestorationPolicy.PREVENT_WHEN_EMPTY
 import androidx.work.Data
 import androidx.work.ExistingWorkPolicy
 import androidx.work.OneTimeWorkRequestBuilder
@@ -52,13 +50,12 @@ class BookFragment : Fragment() {
         binding?.apply {
             header.text = book.name
             lastUpdated.text = if (book.completed) "Completed" else book.lastUpdated
-            chapterListView.layoutManager = GridLayoutManager(requireContext(), 2)
             chapterListView.adapter = ChapterAdapter(listOf()) {
                 viewModel.selectedChapter.value = it
                 findNavController().navigate(
                     BookFragmentDirections.actionBookFragmentToChapterFragment()
                 )
-            }.apply { stateRestorationPolicy = PREVENT_WHEN_EMPTY }
+            }
             libraryButton.setOnClickListener {
                 book.addToLibrary(requireContext())
                 Snackbar.make(root, "Added book to the library", Snackbar.LENGTH_SHORT).show()

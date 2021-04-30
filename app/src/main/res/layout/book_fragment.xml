@@ -70,15 +70,16 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:padding="8dp"
-                    android:text="Table of Contents"
-                    android:textAlignment="center"
-                    android:textAppearance="@style/TextAppearance.MaterialComponents.Subtitle1" />
+                    android:text="Chapters"
+                    android:textAppearance="@style/TextAppearance.MaterialComponents.Headline5" />
 
                 <androidx.recyclerview.widget.RecyclerView
                     android:id="@+id/chapter_list_view"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:nestedScrollingEnabled="false" />
+                    android:nestedScrollingEnabled="false"
+                    app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
+                    tools:listitem="@layout/chapter_item" />
 
             </androidx.appcompat.widget.LinearLayoutCompat>
 

@@ -36,6 +36,13 @@ insertByValues:
 INSERT OR IGNORE INTO ChapterGroup(bookId, text, link)
 VALUES (?, ?, ?);
 
+update:
+UPDATE ChapterGroup
+SET text = :updatedText,
+    link = :updatedLink
+WHERE
+    link = ?;
+
 deleteByLink:
 DELETE
 FROM ChapterGroup

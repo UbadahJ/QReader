@@ -99,12 +99,6 @@ dependencies {
     // For logging
     implementation 'com.github.ajalt:timberkt:1.5.1'
 
-    // Better recyclerview
-    def fast_adapter_version = '5.4.1'
-    implementation "com.mikepenz:fastadapter:$fast_adapter_version"
-    implementation "com.mikepenz:fastadapter-extensions-binding:$fast_adapter_version"
-    implementation "com.mikepenz:fastadapter-extensions-diff:$fast_adapter_version"
-
     // Fast Scroller for recyclerview
     implementation 'com.l4digital.fastscroll:fastscroll:2.0.1'
 

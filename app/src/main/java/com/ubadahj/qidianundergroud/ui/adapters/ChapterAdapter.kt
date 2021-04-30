@@ -5,6 +5,7 @@ import android.view.ViewGroup
 import android.widget.Filter
 import android.widget.Filterable
 import androidx.core.content.ContextCompat
+import androidx.core.view.children
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
@@ -12,8 +13,8 @@ import com.github.ajalt.timberkt.Timber
 import com.ubadahj.qidianundergroud.R
 import com.ubadahj.qidianundergroud.databinding.ChapterItemBinding
 import com.ubadahj.qidianundergroud.models.ChapterGroup
-import com.ubadahj.qidianundergroud.utils.models.contains
-import com.ubadahj.qidianundergroud.utils.models.isRead
+import com.ubadahj.qidianundergroud.utils.models.*
+import com.ubadahj.qidianundergroud.utils.ui.visible
 
 class ChapterAdapter(
     private var groups: List<ChapterGroup>,
@@ -25,6 +26,7 @@ class ChapterAdapter(
 
     init {
         submitList(groups)
+        stateRestorationPolicy = StateRestorationPolicy.PREVENT_WHEN_EMPTY
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
@@ -41,13 +43,22 @@ class ChapterAdapter(
     }
 
     override fun onBindViewHolder(holder: ViewHolder, position: Int) {
+        val context = holder.binding.root.context
         val group = getItem(position)
         defaultColors[group] = holder.binding.chapterId.currentTextColor
 
-        holder.binding.chapterId.text = getItem(position).text
+        holder.binding.chapterId.text = "Chapter • ${group.firstChapter} ⁓ ${group.lastChapter}"
+        holder.binding.readProgress.text = "➦  Chapter ${group.lastRead}"
+
         holder.binding.chapterId.setTextColor(
             if (group.isRead()) readColor else defaultColors[group]!!
         )
+        holder.binding.downloaderIndicator.setColorFilter(
+            if (group.isRead()) readColor else defaultColors[group]!!
+        )
+        holder.binding.readProgress.visible =
+            group.lastRead != 0 && group.lastRead != group.lastChapter
+        holder.binding.downloaderIndicator.visible = group.isDownloaded(context)
     }
 
     override fun getFilter(): Filter {
@@ -91,7 +102,9 @@ class ChapterAdapter(
     class ViewHolder(val binding: ChapterItemBinding, onClick: (Int) -> Unit) :
         RecyclerView.ViewHolder(binding.root) {
         init {
-            binding.root.setOnClickListener { onClick(bindingAdapterPosition) }
+            binding.root.children.iterator().forEach {
+                it.setOnClickListener { onClick(bindingAdapterPosition) }
+            }
         }
     }
 
