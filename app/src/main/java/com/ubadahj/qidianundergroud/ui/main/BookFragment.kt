@@ -51,7 +51,7 @@ class BookFragment : Fragment() {
             header.text = book.name
             lastUpdated.text = if (book.completed) "Completed" else book.lastUpdated
             chapterListView.adapter = ChapterAdapter(listOf()) {
-                viewModel.selectedChapter.value = it
+                viewModel.selectedGroup.value = it
                 findNavController().navigate(
                     BookFragmentDirections.actionBookFragmentToChapterFragment()
                 )

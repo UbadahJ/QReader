@@ -20,16 +20,17 @@ import kotlinx.coroutines.flow.map
 class MainViewModel : ViewModel() {
 
     val selectedBook: MutableLiveData<Book?> = MutableLiveData()
-    val selectedChapter: MutableLiveData<ChapterGroup?> = MutableLiveData()
+    val selectedGroup: MutableLiveData<ChapterGroup?> = MutableLiveData()
+    val selectedChapter: MutableLiveData<Chapter?> = MutableLiveData()
 
     fun libraryBooks(context: Context) = liveData {
         emit(Resource.Loading())
         try {
             emitSource(
-                    BookRepository(context).getLibraryBooks()
-                            .catch { Resource.Error<List<Book>>(it) }
-                            .map { Resource.Success(it) }
-                            .asLiveData()
+                BookRepository(context).getLibraryBooks()
+                    .catch { Resource.Error<List<Book>>(it) }
+                    .map { Resource.Success(it) }
+                    .asLiveData()
             )
         } catch (e: Exception) {
             emit(Resource.Error<List<Book>>(e))
@@ -84,6 +85,5 @@ class MainViewModel : ViewModel() {
             emit(Resource.Error<List<Chapter>>(e))
         }
     }
-
 
 }
