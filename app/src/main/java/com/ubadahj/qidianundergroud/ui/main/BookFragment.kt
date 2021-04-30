@@ -26,8 +26,8 @@ class BookFragment : Fragment() {
     private var binding: BookFragmentBinding? = null
 
     override fun onCreateView(
-            inflater: LayoutInflater, container: ViewGroup?,
-            savedInstanceState: Bundle?
+        inflater: LayoutInflater, container: ViewGroup?,
+        savedInstanceState: Bundle?
     ): View {
         binding = BookFragmentBinding.inflate(inflater, container, false)
         return binding!!.root
@@ -71,22 +71,27 @@ class BookFragment : Fragment() {
                     }.build())
                 }.build()
                 WorkManager.getInstance(requireContext()).enqueueUniqueWork(
-                        "download-service", ExistingWorkPolicy.KEEP, work
+                    "download-service", ExistingWorkPolicy.KEEP, work
                 )
             }
         }
 
         viewModel.getChapters(requireContext(), book).observe(viewLifecycleOwner) { resource ->
-            when (resource) {
-                is Resource.Success -> {
-                    binding?.loadingProgress?.visibility = View.GONE
-                    (binding?.chapterListView?.adapter as? ChapterAdapter)
-                        ?.submitList(resource.data!!)
-                }
-                is Resource.Loading -> binding?.loadingProgress?.visibility = View.VISIBLE
-                is Resource.Error -> {
-                    binding?.loadingProgress?.visibility = View.GONE
-                    binding?.apply {
+            binding?.apply {
+                when (resource) {
+                    is Resource.Success -> {
+                        materialCardView.visibility = View.VISIBLE
+                        loadingProgress.visibility = View.GONE
+                        (chapterListView.adapter as? ChapterAdapter)
+                            ?.submitList(resource.data!!)
+                    }
+                    is Resource.Loading -> {
+                        loadingProgress.visibility = View.VISIBLE
+                        materialCardView.visibility = View.GONE
+                    }
+                    is Resource.Error -> {
+                        loadingProgress.visibility = View.GONE
+                        materialCardView.visibility = View.GONE
                         Snackbar.make(root, R.string.error_refreshing, Snackbar.LENGTH_SHORT).show()
                     }
                 }
