@@ -93,17 +93,6 @@
             app:constraint_referenced_ids="header,last_updated,book_image"
             tools:layout_editor_absoluteY="112dp" />
 
-        <com.google.android.material.floatingactionbutton.ExtendedFloatingActionButton
-            android:id="@+id/library_button"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginBottom="24dp"
-            android:text="Add to library"
-            app:icon="@drawable/add"
-            app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent" />
-
         <androidx.constraintlayout.widget.Guideline
             android:id="@+id/v_guideline_10"
             android:layout_width="wrap_content"
@@ -136,9 +125,26 @@
             android:layout_marginStart="8dp"
             android:padding="10dp"
             android:src="@drawable/download"
+            android:contentDescription="Download Chapters"
+            android:tooltipText="Download Chapters"
             app:layout_constraintBottom_toBottomOf="@+id/last_updated"
             app:layout_constraintStart_toEndOf="@+id/last_updated"
             app:layout_constraintTop_toTopOf="@+id/last_updated"
+            app:tint="?android:attr/textColorPrimary" />
+
+
+        <ImageView
+            android:id="@+id/library_button"
+            android:layout_width="36dp"
+            android:layout_height="36dp"
+            android:layout_marginStart="8dp"
+            android:contentDescription="Add to library"
+            android:padding="10dp"
+            android:src="@drawable/add"
+            android:tooltipText="Add to library"
+            app:layout_constraintBottom_toBottomOf="@+id/download_image_view"
+            app:layout_constraintStart_toEndOf="@+id/download_image_view"
+            app:layout_constraintTop_toTopOf="@+id/download_image_view"
             app:tint="?android:attr/textColorPrimary" />
 
     </androidx.constraintlayout.widget.ConstraintLayout>
