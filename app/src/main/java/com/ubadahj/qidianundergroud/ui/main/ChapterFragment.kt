@@ -37,18 +37,19 @@ class ChapterFragment : Fragment() {
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
-    ): View? {
-        binding = ChapterFragmentBinding.inflate(inflater, container, false)
-        viewModel.selectedGroup.observe(viewLifecycleOwner, { group ->
-            group?.apply { init(this) }
-        })
-        viewModel.selectedChapter.observe(viewLifecycleOwner, { chapter ->
-            chapter?.apply {
-                binding?.toolbar?.appbar?.title = this.title
-                viewModel.selectedGroup.value?.updateLastRead(requireContext(), getIndex())
-            }
-        })
-        return binding?.root
+    ): View {
+        return ChapterFragmentBinding.inflate(inflater, container, false).apply {
+            binding = this
+            viewModel.selectedGroup.observe(viewLifecycleOwner, { group ->
+                group?.apply { init(this) }
+            })
+            viewModel.selectedChapter.observe(viewLifecycleOwner, { chapter ->
+                chapter?.apply {
+                    toolbar.appbar.title = this.title
+                    viewModel.selectedGroup.value?.updateLastRead(requireContext(), getIndex())
+                }
+            })
+        }.root
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
@@ -104,14 +105,14 @@ class ChapterFragment : Fragment() {
             .getChapterContents(requireContext(), group, refresh)
             .observe(viewLifecycleOwner, {
                 binding?.updateUIIndicators(it)
-                updateRecyclerAdapter(group, it)
+                updateRecyclerAdapter(it)
             })
     }
 
     private fun ChapterFragmentBinding.updateUIIndicators(resource: Resource<List<Chapter>>) {
         when (resource) {
             is Resource.Error -> {
-                toolbar.appbar.title = resource.data!!.first().title
+                toolbar.appbar.title = "Error"
                 errorGroup.visibility = View.VISIBLE
                 progressBar.visibility = View.GONE
 
@@ -125,21 +126,29 @@ class ChapterFragment : Fragment() {
                 errorGroup.visibility = View.GONE
             }
             is Resource.Success -> {
-                toolbar.appbar.title = "Error"
                 progressBar.visibility = View.GONE
                 errorGroup.visibility = View.GONE
             }
         }
     }
 
-    private fun updateRecyclerAdapter(group: ChapterGroup, resource: Resource<List<Chapter>>) {
-        if (resource is Resource.Success) {
+    private fun updateRecyclerAdapter(resource: Resource<List<Chapter>>) {
+        val group = viewModel.selectedGroup.value
+        val chapter = viewModel.selectedChapter.value
+        val hasDataChanged = chapter == null
+                || adapter.currentList.isEmpty()
+                || chapter.groupLink != group?.link
+
+        if (hasDataChanged && resource is Resource.Success) {
             adapter.submitList(resource.data!!)
             updateMenu(resource.data)
 
-            val index = if (group.lastRead != 0) group.lastRead - group.firstChapter else 0
-            viewModel.selectedChapter.value = resource.data[index]
-            binding?.chapterRecyclerView?.linearScroll(index)
+            viewModel.selectedGroup.value?.let { group ->
+                val index = if (group.lastRead != 0) group.lastRead - group.firstChapter else 0
+
+                viewModel.selectedChapter.value = resource.data[index]
+                binding?.chapterRecyclerView?.linearScroll(index)
+            }
         }
     }
 

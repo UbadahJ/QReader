@@ -17,6 +17,7 @@ class ChapterContentAdapter(items: List<Chapter>) :
 
     init {
         submitList(items)
+        stateRestorationPolicy = StateRestorationPolicy.PREVENT_WHEN_EMPTY
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
