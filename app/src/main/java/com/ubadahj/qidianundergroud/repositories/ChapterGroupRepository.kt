@@ -32,7 +32,7 @@ class ChapterGroupRepository(context: Context) {
 
     fun isDownloaded(group: ChapterGroup): Boolean =
         database.chapterQueries
-            .getByGroupId(group.link)
+            .getByGroupLink(group.link)
             .executeAsList()
             .size == group.total
 
@@ -60,7 +60,7 @@ class ChapterGroupRepository(context: Context) {
                     val remoteGroup = remoteChapters[group.firstChapter]!!
                     // We need to delete all the previous chapters to make sure foreign key
                     // doesn't fail
-                    database.chapterQueries.deleteByGroupId(group.link);
+                    database.chapterQueries.deleteByGroupLink(group.link);
                     database.chapterGroupQueries.update(
                         link = group.link,
                         updatedText = remoteGroup.text,
