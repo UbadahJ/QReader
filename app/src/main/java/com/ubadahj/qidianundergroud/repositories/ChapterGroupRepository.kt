@@ -58,6 +58,9 @@ class ChapterGroupRepository(context: Context) {
             database.chapterGroupQueries.transaction {
                 for (group in dbGroupsToUpdate) {
                     val remoteGroup = remoteChapters[group.firstChapter]!!
+                    // We need to delete all the previous chapters to make sure foreign key
+                    // doesn't fail
+                    database.chapterQueries.deleteByGroupId(group.link);
                     database.chapterGroupQueries.update(
                         link = group.link,
                         updatedText = remoteGroup.text,
