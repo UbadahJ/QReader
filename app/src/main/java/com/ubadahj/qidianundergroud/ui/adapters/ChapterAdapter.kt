@@ -47,7 +47,11 @@ class ChapterAdapter(
         val group = getItem(position)
         defaultColors[group] = holder.binding.chapterId.currentTextColor
 
-        holder.binding.chapterId.text = "Chapter • ${group.firstChapter} ⁓ ${group.lastChapter}"
+        var chapterLabel = "Chapter • ${group.firstChapter}"
+        if (group.firstChapter != group.lastChapter)
+            chapterLabel += " ⁓ ${group.lastChapter}"
+
+        holder.binding.chapterId.text = chapterLabel
         holder.binding.readProgress.text = "➦  Chapter ${group.lastRead}"
 
         holder.binding.chapterId.setTextColor(

@@ -14,6 +14,7 @@ import com.ubadahj.qidianundergroud.models.Resource
 import com.ubadahj.qidianundergroud.repositories.BookRepository
 import com.ubadahj.qidianundergroud.repositories.ChapterGroupRepository
 import com.ubadahj.qidianundergroud.repositories.ChapterRepository
+import com.ubadahj.qidianundergroud.utils.models.firstChapter
 import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.map
 
@@ -57,6 +58,7 @@ class MainViewModel : ViewModel() {
             emitSource(
                 ChapterGroupRepository(context).getGroups(book, refresh)
                     .catch { Resource.Error<List<ChapterGroup>>(it) }
+                    .map { it.sortedByDescending(ChapterGroup::firstChapter) }
                     .map { Resource.Success(it) }
                     .asLiveData()
             )
