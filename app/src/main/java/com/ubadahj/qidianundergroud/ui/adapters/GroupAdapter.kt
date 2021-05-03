@@ -13,12 +13,16 @@ import com.github.ajalt.timberkt.Timber
 import com.ubadahj.qidianundergroud.R
 import com.ubadahj.qidianundergroud.databinding.GroupItemBinding
 import com.ubadahj.qidianundergroud.models.ChapterGroup
-import com.ubadahj.qidianundergroud.utils.models.*
+import com.ubadahj.qidianundergroud.utils.models.contains
+import com.ubadahj.qidianundergroud.utils.models.firstChapter
+import com.ubadahj.qidianundergroud.utils.models.isRead
+import com.ubadahj.qidianundergroud.utils.models.lastChapter
 import com.ubadahj.qidianundergroud.utils.ui.visible
 
 class GroupAdapter(
     private var groups: List<ChapterGroup>,
-    private val onClick: (ChapterGroup) -> Unit
+    private val onClick: (ChapterGroup) -> Unit,
+    private val menuClick: (ChapterGroup) -> Unit
 ) : ListAdapter<ChapterGroup, GroupAdapter.ViewHolder>(DiffCallback()), Filterable {
 
     private val defaultColors: MutableMap<ChapterGroup, Int> = mutableMapOf()
@@ -43,7 +47,6 @@ class GroupAdapter(
     }
 
     override fun onBindViewHolder(holder: ViewHolder, position: Int) {
-        val context = holder.binding.root.context
         val group = getItem(position)
         defaultColors[group] = holder.binding.chapterId.currentTextColor
 
@@ -57,12 +60,13 @@ class GroupAdapter(
         holder.binding.chapterId.setTextColor(
             if (group.isRead()) readColor else defaultColors[group]!!
         )
-        holder.binding.downloaderIndicator.setColorFilter(
+        holder.binding.menu.setColorFilter(
             if (group.isRead()) readColor else defaultColors[group]!!
         )
         holder.binding.readProgress.visible =
             group.lastRead != 0 && group.lastRead != group.lastChapter
-        holder.binding.downloaderIndicator.visible = group.isDownloaded(context)
+
+        holder.binding.menu.setOnClickListener { menuClick(group) }
     }
 
     override fun getFilter(): Filter {

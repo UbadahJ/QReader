@@ -18,6 +18,7 @@ import com.ubadahj.qidianundergroud.models.Book
 import com.ubadahj.qidianundergroud.models.Resource
 import com.ubadahj.qidianundergroud.services.DownloadService
 import com.ubadahj.qidianundergroud.ui.adapters.GroupAdapter
+import com.ubadahj.qidianundergroud.ui.dialog.GroupDetailsDialog
 import com.ubadahj.qidianundergroud.utils.repositories.addToLibrary
 
 class BookFragment : Fragment() {
@@ -50,12 +51,17 @@ class BookFragment : Fragment() {
         binding?.apply {
             header.text = book.name
             lastUpdated.text = if (book.completed) "Completed" else book.lastUpdated
-            chapterListView.adapter = GroupAdapter(listOf()) {
+
+            chapterListView.adapter = GroupAdapter(listOf(), {
                 viewModel.selectedGroup.value = it
                 findNavController().navigate(
                     BookFragmentDirections.actionBookFragmentToChapterFragment()
                 )
+            }) {
+                GroupDetailsDialog(it) { loadGroups(book) }
+                    .show(requireActivity().supportFragmentManager, null)
             }
+
             libraryButton.setOnClickListener {
                 book.addToLibrary(requireContext())
                 Snackbar.make(root, "Added book to the library", Snackbar.LENGTH_SHORT).show()
@@ -76,6 +82,10 @@ class BookFragment : Fragment() {
             }
         }
 
+        loadGroups(book)
+    }
+
+    private fun loadGroups(book: Book) {
         viewModel.getChapters(requireContext(), book).observe(viewLifecycleOwner) { resource ->
             binding?.apply {
                 when (resource) {
