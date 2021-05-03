@@ -13,7 +13,7 @@ import com.ubadahj.qidianundergroud.databinding.ChapterFragmentBinding
 import com.ubadahj.qidianundergroud.models.Chapter
 import com.ubadahj.qidianundergroud.models.ChapterGroup
 import com.ubadahj.qidianundergroud.models.Resource
-import com.ubadahj.qidianundergroud.ui.adapters.ChapterContentAdapter
+import com.ubadahj.qidianundergroud.ui.adapters.ChapterAdapter
 import com.ubadahj.qidianundergroud.ui.adapters.MenuAdapter
 import com.ubadahj.qidianundergroud.ui.dialog.MenuDialog
 import com.ubadahj.qidianundergroud.ui.models.MenuDialogItem
@@ -32,7 +32,7 @@ class ChapterFragment : Fragment() {
             submitList(listOf(MenuDialogItem("Loading", R.drawable.pulse)))
         }
     )
-    private var adapter: ChapterContentAdapter = ChapterContentAdapter(listOf())
+    private var adapter: ChapterAdapter = ChapterAdapter(listOf())
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,

@@ -17,7 +17,7 @@ import com.ubadahj.qidianundergroud.databinding.BookFragmentBinding
 import com.ubadahj.qidianundergroud.models.Book
 import com.ubadahj.qidianundergroud.models.Resource
 import com.ubadahj.qidianundergroud.services.DownloadService
-import com.ubadahj.qidianundergroud.ui.adapters.ChapterAdapter
+import com.ubadahj.qidianundergroud.ui.adapters.GroupAdapter
 import com.ubadahj.qidianundergroud.utils.repositories.addToLibrary
 
 class BookFragment : Fragment() {
@@ -50,7 +50,7 @@ class BookFragment : Fragment() {
         binding?.apply {
             header.text = book.name
             lastUpdated.text = if (book.completed) "Completed" else book.lastUpdated
-            chapterListView.adapter = ChapterAdapter(listOf()) {
+            chapterListView.adapter = GroupAdapter(listOf()) {
                 viewModel.selectedGroup.value = it
                 findNavController().navigate(
                     BookFragmentDirections.actionBookFragmentToChapterFragment()
@@ -82,7 +82,7 @@ class BookFragment : Fragment() {
                     is Resource.Success -> {
                         materialCardView.visibility = View.VISIBLE
                         loadingProgress.visibility = View.GONE
-                        (chapterListView.adapter as? ChapterAdapter)
+                        (chapterListView.adapter as? GroupAdapter)
                             ?.submitList(resource.data!!)
                     }
                     is Resource.Loading -> {
