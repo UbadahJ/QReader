@@ -24,27 +24,25 @@ class BrowseFragment : Fragment() {
 
     private val viewModel: MainViewModel by activityViewModels()
     private val menu = MenuDialog(
-            MenuAdapter().apply {
-                submitList(listOf(MenuDialogItem("Refresh", R.drawable.refresh)))
-            }
-    ) { _, i, _ ->
-        if (i == 0) viewModel
+        MenuAdapter(listOf(MenuDialogItem("Refresh", R.drawable.refresh))) { _, i ->
+            if (i == 0) viewModel
                 .getBooks(requireContext(), refresh = true)
                 .observe(viewLifecycleOwner, this@BrowseFragment::getBooks)
-    }
+        }
+    )
 
     private var binding: BookListFragmentBinding? = null
     private val adapter: BookAdapter = BookAdapter(listOf()) {
         viewModel.selectedBook.value = it
         findNavController().navigate(
-                BrowseFragmentDirections.actionBrowseFragmentToBookFragment()
+            BrowseFragmentDirections.actionBrowseFragmentToBookFragment()
         )
     }
 
     override fun onCreateView(
-            inflater: LayoutInflater,
-            container: ViewGroup?,
-            savedInstanceState: Bundle?
+        inflater: LayoutInflater,
+        container: ViewGroup?,
+        savedInstanceState: Bundle?
     ): View {
         binding = BookListFragmentBinding.inflate(inflater, container, false)
         return binding!!.root
@@ -90,9 +88,9 @@ class BrowseFragment : Fragment() {
                 binding?.apply {
                     val searchBarVisible = bookListingView.y != searchBar.root.y
                     bookListingView.animate()
-                            .alpha(1f)
-                            .translationY(if (!searchBarVisible) searchBar.root.height + 32f else 0f)
-                            .start()
+                        .alpha(1f)
+                        .translationY(if (!searchBarVisible) searchBar.root.height + 32f else 0f)
+                        .start()
                 }
                 true
             }

@@ -8,7 +8,7 @@ import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
 import com.l4digital.fastscroll.FastScroller
-import com.ubadahj.qidianundergroud.databinding.ChapterContentItemBinding
+import com.ubadahj.qidianundergroud.databinding.ChapterItemBinding
 import com.ubadahj.qidianundergroud.models.Chapter
 
 class ChapterAdapter(items: List<Chapter>) :
@@ -22,7 +22,7 @@ class ChapterAdapter(items: List<Chapter>) :
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
         return ViewHolder(
-            ChapterContentItemBinding.inflate(
+            ChapterItemBinding.inflate(
                 LayoutInflater.from(parent.context), parent, false
             )
         )
@@ -39,7 +39,7 @@ class ChapterAdapter(items: List<Chapter>) :
         )
     }
 
-    class ViewHolder(val binding: ChapterContentItemBinding) :
+    class ViewHolder(val binding: ChapterItemBinding) :
         RecyclerView.ViewHolder(binding.root)
 
     class DiffCallback : DiffUtil.ItemCallback<Chapter>() {

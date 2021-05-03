@@ -11,7 +11,7 @@ import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
 import com.github.ajalt.timberkt.Timber
 import com.ubadahj.qidianundergroud.R
-import com.ubadahj.qidianundergroud.databinding.ChapterItemBinding
+import com.ubadahj.qidianundergroud.databinding.GroupItemBinding
 import com.ubadahj.qidianundergroud.models.ChapterGroup
 import com.ubadahj.qidianundergroud.utils.models.*
 import com.ubadahj.qidianundergroud.utils.ui.visible
@@ -36,7 +36,7 @@ class GroupAdapter(
             )
 
         return ViewHolder(
-            ChapterItemBinding.inflate(
+            GroupItemBinding.inflate(
                 LayoutInflater.from(parent.context), parent, false
             )
         ) { onClick(getItem(it)) }
@@ -103,7 +103,7 @@ class GroupAdapter(
         super.submitList(list as List<ChapterGroup>?)
     }
 
-    class ViewHolder(val binding: ChapterItemBinding, onClick: (Int) -> Unit) :
+    class ViewHolder(val binding: GroupItemBinding, onClick: (Int) -> Unit) :
         RecyclerView.ViewHolder(binding.root) {
         init {
             binding.root.children.iterator().forEach {

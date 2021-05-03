@@ -24,35 +24,36 @@ class LibraryFragment : Fragment() {
     private val adapter: BookAdapter = BookAdapter(listOf()) {
         viewModel.selectedBook.value = it
         findNavController().navigate(
-                LibraryFragmentDirections.actionLibraryFragmentToBookFragment()
+            LibraryFragmentDirections.actionLibraryFragmentToBookFragment()
         )
     }
     private val menu = MenuDialog(
-            MenuAdapter().apply {
-                submitList(listOf(
-                        MenuDialogItem("History", R.drawable.archive),
-                        MenuDialogItem("Settings", R.drawable.settings),
-                        MenuDialogItem("About", R.drawable.info)
-                ))
-            }
-    ) { _, i, _ ->
-        when (i) {
-            0 -> {
-            }
-            1 -> {
-            }
-            2 -> {
-                com.mikepenz.aboutlibraries.LibsBuilder().start(requireContext())
+        MenuAdapter(
+            listOf(
+                MenuDialogItem("History", R.drawable.archive),
+                MenuDialogItem("Settings", R.drawable.settings),
+                MenuDialogItem("About", R.drawable.info)
+            )
+        ) { _, i ->
+            when (i) {
+                0 -> {
+                }
+                1 -> {
+                }
+                2 -> {
+                    com.mikepenz.aboutlibraries.LibsBuilder().start(requireContext())
+                }
             }
         }
-    }
+    )
 
-    private var binding: BookListFragmentBinding? = null
+    private
+    var binding: BookListFragmentBinding? = null
 
     override fun onCreateView(
-            inflater: LayoutInflater,
-            container: ViewGroup?,
-            savedInstanceState: Bundle?
+        inflater: LayoutInflater,
+        container: ViewGroup?,
+        savedInstanceState: Bundle?
     ): View {
         binding = BookListFragmentBinding.inflate(inflater, container, false)
         return binding!!.root
@@ -67,7 +68,7 @@ class LibraryFragment : Fragment() {
             floatingButton.visibility = View.VISIBLE
             floatingButton.setOnClickListener {
                 findNavController().navigate(
-                        LibraryFragmentDirections.actionLibraryFragmentToBrowseFragment()
+                    LibraryFragmentDirections.actionLibraryFragmentToBrowseFragment()
                 )
             }
             bookListingView.layoutManager = LinearLayoutManager(requireContext())
@@ -86,9 +87,9 @@ class LibraryFragment : Fragment() {
                     }
                     is Resource.Error -> {
                         Snackbar.make(
-                                root,
-                                "CRITICAL: Failed to fetch data from internal DB",
-                                Snackbar.LENGTH_SHORT
+                            root,
+                            "CRITICAL: Failed to fetch data from internal DB",
+                            Snackbar.LENGTH_SHORT
                         ).show()
                     }
                 }
@@ -107,9 +108,9 @@ class LibraryFragment : Fragment() {
                 binding?.apply {
                     val searchBarVisible = bookListingView.y != searchBar.root.y
                     bookListingView.animate()
-                            .alpha(1f)
-                            .translationY(if (!searchBarVisible) searchBar.root.height + 32f else 0f)
-                            .start()
+                        .alpha(1f)
+                        .translationY(if (!searchBarVisible) searchBar.root.height + 32f else 0f)
+                        .start()
                 }
                 true
             }
