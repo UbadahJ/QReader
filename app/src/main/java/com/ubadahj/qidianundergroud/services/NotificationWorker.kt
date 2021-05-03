@@ -15,7 +15,6 @@ import com.ubadahj.qidianundergroud.models.Book
 import com.ubadahj.qidianundergroud.models.ChapterGroup
 import com.ubadahj.qidianundergroud.repositories.BookRepository
 import com.ubadahj.qidianundergroud.repositories.ChapterGroupRepository
-import com.ubadahj.qidianundergroud.utils.models.contains
 import com.ubadahj.qidianundergroud.utils.models.lastChapter
 import com.ubadahj.qidianundergroud.utils.repositories.getChapters
 import kotlinx.coroutines.Dispatchers
@@ -64,12 +63,7 @@ class NotificationWorker(context: Context, params: WorkerParameters) :
                     notify(notificationId, builder.build())
                     if (updateCount > 0)
                         emit(
-                            BookNotification(
-                                applicationContext,
-                                book,
-                                refreshedGroups,
-                                updateCount
-                            )
+                            BookNotification(applicationContext, book, refreshedGroups, updateCount)
                         )
                 } catch (e: Exception) {
                     e(e) { "getNotifications: Failed to query $book" }
@@ -92,7 +86,6 @@ class NotificationWorker(context: Context, params: WorkerParameters) :
         val updateCount: Int
     ) {
 
-        val currentGroup = groups.lastReadGroup(book.lastRead)
         val lastGroup = groups.maxByOrNull { it.lastChapter }!!
 
         fun createNotification(): Notification =
@@ -101,8 +94,7 @@ class NotificationWorker(context: Context, params: WorkerParameters) :
                 .setContentTitle(book.name)
                 .setContentText("$updateCount new chapter${if (updateCount > 1) "s" else ""} available")
                 .setPriority(NotificationCompat.PRIORITY_DEFAULT)
-                .setContentIntent(createIntent(currentGroup))
-                .addAction(R.drawable.add, "Open latest", createIntent(lastGroup))
+                .setContentIntent(createIntent(lastGroup))
                 .addAction(R.drawable.add, "Open Book", createIntent())
                 .setAutoCancel(true)
                 .build()
@@ -117,9 +109,6 @@ class NotificationWorker(context: Context, params: WorkerParameters) :
                 },
                 PendingIntent.FLAG_UPDATE_CURRENT
             )!!
-
-        private fun List<ChapterGroup>.lastReadGroup(lastRead: Int) =
-            firstOrNull { lastRead in it } ?: first()
 
     }
 

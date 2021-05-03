@@ -6,27 +6,20 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
-import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
-import androidx.recyclerview.widget.GridLayoutManager
 import androidx.work.Data
 import androidx.work.ExistingWorkPolicy
 import androidx.work.OneTimeWorkRequestBuilder
 import androidx.work.WorkManager
 import com.google.android.material.snackbar.Snackbar
-import com.mikepenz.fastadapter.FastAdapter
 import com.ubadahj.qidianundergroud.R
 import com.ubadahj.qidianundergroud.databinding.BookFragmentBinding
 import com.ubadahj.qidianundergroud.models.Book
-import com.ubadahj.qidianundergroud.models.ChapterGroup
 import com.ubadahj.qidianundergroud.models.Resource
-import com.ubadahj.qidianundergroud.repositories.ChapterGroupRepository
 import com.ubadahj.qidianundergroud.services.DownloadService
-import com.ubadahj.qidianundergroud.ui.adapters.ChapterAdapter
-import com.ubadahj.qidianundergroud.ui.adapters.items.ChapterItem
+import com.ubadahj.qidianundergroud.ui.adapters.GroupAdapter
+import com.ubadahj.qidianundergroud.ui.dialog.GroupDetailsDialog
 import com.ubadahj.qidianundergroud.utils.repositories.addToLibrary
-import kotlinx.coroutines.flow.first
-import kotlinx.coroutines.launch
 
 class BookFragment : Fragment() {
 
@@ -43,14 +36,14 @@ class BookFragment : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        viewModel.selectedBook?.apply {
-            init(this)
-        }
+        viewModel.selectedBook.observe(viewLifecycleOwner, { value ->
+            value?.apply { init(this) }
+        })
     }
 
     override fun onResume() {
         super.onResume()
-        if (viewModel.selectedBook == null)
+        if (viewModel.selectedBook.value == null)
             findNavController().popBackStack()
     }
 
@@ -58,7 +51,17 @@ class BookFragment : Fragment() {
         binding?.apply {
             header.text = book.name
             lastUpdated.text = if (book.completed) "Completed" else book.lastUpdated
-            chapterListView.layoutManager = GridLayoutManager(requireContext(), 2)
+
+            chapterListView.adapter = GroupAdapter(listOf(), {
+                viewModel.selectedGroup.value = it
+                findNavController().navigate(
+                    BookFragmentDirections.actionBookFragmentToChapterFragment()
+                )
+            }) {
+                GroupDetailsDialog(it) { loadGroups(book) }
+                    .show(requireActivity().supportFragmentManager, null)
+            }
+
             libraryButton.setOnClickListener {
                 book.addToLibrary(requireContext())
                 Snackbar.make(root, "Added book to the library", Snackbar.LENGTH_SHORT).show()
@@ -79,16 +82,26 @@ class BookFragment : Fragment() {
             }
         }
 
+        loadGroups(book)
+    }
+
+    private fun loadGroups(book: Book) {
         viewModel.getChapters(requireContext(), book).observe(viewLifecycleOwner) { resource ->
-            when (resource) {
-                is Resource.Success -> {
-                    binding?.loadingProgress?.visibility = View.GONE
-                    binding?.chapterListView?.adapter = createAdapter(book, resource.data!!)
-                }
-                is Resource.Loading -> binding?.loadingProgress?.visibility = View.VISIBLE
-                is Resource.Error -> {
-                    binding?.loadingProgress?.visibility = View.GONE
-                    binding?.apply {
+            binding?.apply {
+                when (resource) {
+                    is Resource.Success -> {
+                        materialCardView.visibility = View.VISIBLE
+                        loadingProgress.visibility = View.GONE
+                        (chapterListView.adapter as? GroupAdapter)
+                            ?.submitList(resource.data!!)
+                    }
+                    is Resource.Loading -> {
+                        loadingProgress.visibility = View.VISIBLE
+                        materialCardView.visibility = View.GONE
+                    }
+                    is Resource.Error -> {
+                        loadingProgress.visibility = View.GONE
+                        materialCardView.visibility = View.GONE
                         Snackbar.make(root, R.string.error_refreshing, Snackbar.LENGTH_SHORT).show()
                     }
                 }
@@ -100,22 +113,5 @@ class BookFragment : Fragment() {
         super.onDestroyView()
         binding = null
     }
-
-    private fun createAdapter(book: Book, groups: List<ChapterGroup>): FastAdapter<ChapterItem> =
-        FastAdapter.with(ChapterAdapter(book, groups)).apply {
-            onClickListener = { _, _, item, _ ->
-                viewModel.selectedChapter = item.chapter
-                lifecycleScope.launch {
-                    viewModel.selectedBook =
-                            ChapterGroupRepository(this@BookFragment.requireContext())
-                                    .getBook(groups.first())
-                                    .first()
-                }
-                findNavController().navigate(
-                    BookFragmentDirections.actionBookFragmentToChapterFragment()
-                )
-                true
-            }
-        }
 
 }

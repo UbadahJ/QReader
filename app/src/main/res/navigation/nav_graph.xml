@@ -14,15 +14,15 @@
             android:id="@+id/action_libraryFragment_to_browseFragment"
             app:destination="@id/browseFragment"
             app:enterAnim="@anim/bottom_sheet_slide_in"
-            app:exitAnim="@anim/fragment_fade_exit"
-            app:popEnterAnim="@anim/fragment_fade_enter"
+            app:exitAnim="@anim/slide_down"
+            app:popEnterAnim="@anim/slide_up"
             app:popExitAnim="@anim/bottom_sheet_slide_out" />
         <action
             android:id="@+id/action_libraryFragment_to_bookFragment"
             app:destination="@id/bookFragment"
             app:enterAnim="@anim/bottom_sheet_slide_in"
-            app:exitAnim="@anim/fragment_fade_exit"
-            app:popEnterAnim="@anim/fragment_fade_enter"
+            app:exitAnim="@anim/slide_down"
+            app:popEnterAnim="@anim/slide_up"
             app:popExitAnim="@anim/bottom_sheet_slide_out" />
     </fragment>
     <fragment
@@ -33,8 +33,8 @@
             android:id="@+id/action_browseFragment_to_bookFragment"
             app:destination="@id/bookFragment"
             app:enterAnim="@anim/bottom_sheet_slide_in"
-            app:exitAnim="@anim/fragment_fade_exit"
-            app:popEnterAnim="@anim/fragment_fade_enter"
+            app:exitAnim="@anim/slide_down"
+            app:popEnterAnim="@anim/slide_up"
             app:popExitAnim="@anim/bottom_sheet_slide_out" />
     </fragment>
     <fragment
@@ -46,8 +46,8 @@
             android:id="@+id/action_bookFragment_to_chapterFragment"
             app:destination="@id/chapterFragment"
             app:enterAnim="@anim/bottom_sheet_slide_in"
-            app:exitAnim="@anim/fragment_fade_exit"
-            app:popEnterAnim="@anim/fragment_fade_enter"
+            app:exitAnim="@anim/slide_down"
+            app:popEnterAnim="@anim/slide_up"
             app:popExitAnim="@anim/bottom_sheet_slide_out" />
     </fragment>
     <fragment

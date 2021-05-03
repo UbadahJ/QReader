@@ -3,6 +3,7 @@ package com.ubadahj.qidianundergroud.ui.main
 import android.annotation.SuppressLint
 import android.content.Context
 import android.webkit.WebView
+import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.asLiveData
 import androidx.lifecycle.liveData
@@ -13,22 +14,24 @@ import com.ubadahj.qidianundergroud.models.Resource
 import com.ubadahj.qidianundergroud.repositories.BookRepository
 import com.ubadahj.qidianundergroud.repositories.ChapterGroupRepository
 import com.ubadahj.qidianundergroud.repositories.ChapterRepository
+import com.ubadahj.qidianundergroud.utils.models.firstChapter
 import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.map
 
 class MainViewModel : ViewModel() {
 
-    var selectedBook: Book? = null
-    var selectedChapter: ChapterGroup? = null
+    val selectedBook: MutableLiveData<Book?> = MutableLiveData()
+    val selectedGroup: MutableLiveData<ChapterGroup?> = MutableLiveData()
+    val selectedChapter: MutableLiveData<Chapter?> = MutableLiveData()
 
     fun libraryBooks(context: Context) = liveData {
         emit(Resource.Loading())
         try {
             emitSource(
-                    BookRepository(context).getLibraryBooks()
-                            .catch { Resource.Error<List<Book>>(it) }
-                            .map { Resource.Success(it) }
-                            .asLiveData()
+                BookRepository(context).getLibraryBooks()
+                    .catch { Resource.Error<List<Book>>(it) }
+                    .map { Resource.Success(it) }
+                    .asLiveData()
             )
         } catch (e: Exception) {
             emit(Resource.Error<List<Book>>(e))
@@ -55,6 +58,7 @@ class MainViewModel : ViewModel() {
             emitSource(
                 ChapterGroupRepository(context).getGroups(book, refresh)
                     .catch { Resource.Error<List<ChapterGroup>>(it) }
+                    .map { it.sortedByDescending(ChapterGroup::firstChapter) }
                     .map { Resource.Success(it) }
                     .asLiveData()
             )
@@ -83,6 +87,5 @@ class MainViewModel : ViewModel() {
             emit(Resource.Error<List<Chapter>>(e))
         }
     }
-
 
 }

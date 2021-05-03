@@ -8,33 +8,23 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
 import com.ubadahj.qidianundergroud.databinding.MenuLayoutBinding
 import com.ubadahj.qidianundergroud.ui.adapters.MenuAdapter
-import com.ubadahj.qidianundergroud.utils.OnRecyclerViewItemClickListener
-import com.ubadahj.qidianundergroud.utils.onItemClick
 
 class MenuDialog(
-        val adapter: MenuAdapter,
-        _onClick: OnRecyclerViewItemClickListener = { _, _, _ -> }
+    val adapter: MenuAdapter
 ) : BottomSheetDialogFragment() {
 
     private var binding: MenuLayoutBinding? = null
-    var onClick = _onClick
-        set(value) {
-            field = value
-            if (isAdded) dismiss()
-        }
 
     override fun onCreateView(
-            inflater: LayoutInflater,
-            container: ViewGroup?,
-            savedInstanceState: Bundle?
+        inflater: LayoutInflater,
+        container: ViewGroup?,
+        savedInstanceState: Bundle?
     ): View {
-        binding = MenuLayoutBinding.inflate(inflater, container, false)
-        binding?.apply {
+        return MenuLayoutBinding.inflate(inflater, container, false).apply {
+            binding = this
             menu.layoutManager = LinearLayoutManager(requireContext())
-            menu.adapter = adapter
-            menu.onItemClick(onClick)
-        }
-        return binding!!.root
+            menu.adapter = adapter.apply { postOnClick = { dismiss() } }
+        }.root
     }
 
     override fun onDestroyView() {

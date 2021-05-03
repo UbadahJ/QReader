@@ -17,7 +17,7 @@ CREATE INDEX group_link
 
 -- Queries
 
-getByGroupId:
+getByGroupLink:
 SELECT *
 FROM Chapter
 WHERE groupLink = ?;
@@ -35,7 +35,7 @@ DELETE
 FROM Chapter
 WHERE title = ?;
 
-deleteByGroupId:
+deleteByGroupLink:
 DELETE
 FROM Chapter
 WHERE groupLink = ?;

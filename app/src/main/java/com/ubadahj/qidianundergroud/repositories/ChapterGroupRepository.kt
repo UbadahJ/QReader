@@ -9,6 +9,9 @@ import com.ubadahj.qidianundergroud.api.models.ChapterGroupJson
 import com.ubadahj.qidianundergroud.database.BookDatabase
 import com.ubadahj.qidianundergroud.models.Book
 import com.ubadahj.qidianundergroud.models.ChapterGroup
+import com.ubadahj.qidianundergroud.utils.models.firstChapter
+import com.ubadahj.qidianundergroud.utils.models.lastChapter
+import com.ubadahj.qidianundergroud.utils.models.total
 import kotlinx.coroutines.flow.Flow
 
 class ChapterGroupRepository(context: Context) {
@@ -27,16 +30,46 @@ class ChapterGroupRepository(context: Context) {
 
     fun getGroupByLink(link: String) = database.chapterGroupQueries.get(link).asFlow().mapToOne()
 
+    fun isDownloaded(group: ChapterGroup): Boolean =
+        database.chapterQueries
+            .getByGroupLink(group.link)
+            .executeAsList()
+            .size == group.total
+
+    fun updateLastRead(group: ChapterGroup, lastRead: Int) {
+        if (database.chapterGroupQueries.get(group.link).executeAsOneOrNull() == null)
+            throw IllegalArgumentException("$this chapter group does not exists")
+
+        database.chapterGroupQueries.updateLastRead(lastRead, group.link)
+    }
+
     suspend fun getGroups(book: Book, refresh: Boolean = false): Flow<List<ChapterGroup>> {
         val dbGroups = database.bookQueries.chapters(book.id).executeAsList()
         if (refresh || dbGroups.isEmpty()) {
-            val groups = Api(proxy = true).getChapters(book.id)
+            val remoteGroups = Api(proxy = true)
+                .getChapters(book.id)
                 .map { it.toGroup(book) }
-            database.chapterGroupQueries.transaction {
-                for (group in dbGroups.filter { it !in groups })
-                    database.chapterGroupQueries.deleteByLink(group.link)
 
-                for (group in groups)
+            val remoteChapters = remoteGroups.associateBy { it.firstChapter }
+            val dbGroupsToUpdate = dbGroups
+                .filter { it.firstChapter in remoteChapters.keys }
+                .filter { it.lastChapter != remoteChapters[it.firstChapter]?.lastChapter }
+
+            database.chapterGroupQueries.transaction {
+                for (group in dbGroupsToUpdate) {
+                    val remoteGroup = remoteChapters[group.firstChapter]!!
+                    // We need to delete all the previous chapters to make sure foreign key
+                    // doesn't fail
+                    database.chapterQueries.deleteByGroupLink(group.link);
+                    database.chapterGroupQueries.update(
+                        link = group.link,
+                        updatedText = remoteGroup.text,
+                        updatedLink = remoteGroup.link
+                    )
+                }
+
+                // Due to INSERT OR IGNORE, we can ignore same entries
+                for (group in remoteGroups)
                     database.chapterGroupQueries.insert(group)
             }
         }
@@ -44,6 +77,6 @@ class ChapterGroupRepository(context: Context) {
         return database.bookQueries.chapters(book.id).asFlow().mapToList()
     }
 
-    private fun ChapterGroupJson.toGroup(book: Book) = ChapterGroup(book.id, text, link)
+    private fun ChapterGroupJson.toGroup(book: Book) = ChapterGroup(book.id, text, link, 0)
 
 }
