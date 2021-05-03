@@ -41,7 +41,7 @@ UPDATE ChapterGroup
 SET text = :updatedText,
     link = :updatedLink
 WHERE
-    link = ?;
+    link = :link;
 
 deleteByLink:
 DELETE

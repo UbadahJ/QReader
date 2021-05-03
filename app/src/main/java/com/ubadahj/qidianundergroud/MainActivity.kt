@@ -37,10 +37,12 @@ class MainActivity : AppCompatActivity() {
         lifecycleScope.launch {
             val bookRepo = BookRepository(baseContext)
             val groupRepo = ChapterGroupRepository(baseContext)
-            val book = (intent.extras?.get("book") as String?)?.apply {
+
+            val book = intent.extras?.getString("book")?.apply {
                 viewModel.selectedBook.value = bookRepo.getBookById(this).first()
+                viewModel.selectedChapter.value = null
             }
-            val groups = (intent.extras?.get("chapters") as String?)?.apply {
+            val groups = intent.extras?.getString("chapters")?.apply {
                 viewModel.selectedGroup.value = groupRepo.getGroupByLink(this).first()
             }
 
