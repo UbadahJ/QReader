@@ -16,8 +16,7 @@ import com.ubadahj.qidianundergroud.utils.models.lastChapter
 import com.ubadahj.qidianundergroud.utils.repositories.updateLastRead
 
 class GroupDetailsDialog(
-    private val group: ChapterGroup,
-    private val onChange: () -> Unit
+    private val group: ChapterGroup
 ) : BottomSheetDialogFragment() {
 
     private var binding: GroupInfoMenuBinding? = null

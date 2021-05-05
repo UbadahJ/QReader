@@ -58,7 +58,7 @@ class BookFragment : Fragment() {
                     BookFragmentDirections.actionBookFragmentToChapterFragment()
                 )
             }) {
-                GroupDetailsDialog(it) { loadGroups(book) }
+                GroupDetailsDialog(it)
                     .show(requireActivity().supportFragmentManager, null)
             }
 
