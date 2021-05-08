@@ -1,0 +1,33 @@
+CREATE TABLE Metadata
+(
+    id          TEXT NOT NULL,
+    bookId      TEXT NOT NULL,
+    link        TEXT NOT NULL,
+    author      TEXT NOT NULL,
+    coverPath   TEXT NOT NULL,
+    category    TEXT NOT NULL,
+    description TEXT NOT NULL,
+    PRIMARY KEY (id),
+    CONSTRAINT metadata_ibfk
+        FOREIGN KEY (bookId)
+            REFERENCES Book (id)
+            ON DELETE CASCADE
+);
+
+-- insert:
+INSERT OR REPLACE INTO Metadata
+VALUES ?;
+
+-- insertByValues:
+INSERT OR REPLACE INTO Metadata(id, bookId, link, author, coverPath, category, description)
+VALUES (?, ?, ?, ?, ?, ?, ?);
+
+-- select
+SELECT *
+FROM Metadata
+WHERE bookId = ?;
+
+-- delete
+DELETE
+FROM Metadata
+WHERE bookId = ?;

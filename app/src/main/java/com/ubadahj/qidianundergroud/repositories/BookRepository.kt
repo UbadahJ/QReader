@@ -6,7 +6,7 @@ import com.squareup.sqldelight.runtime.coroutines.asFlow
 import com.squareup.sqldelight.runtime.coroutines.mapToList
 import com.squareup.sqldelight.runtime.coroutines.mapToOne
 import com.ubadahj.qidianundergroud.api.Api
-import com.ubadahj.qidianundergroud.api.models.BookJson
+import com.ubadahj.qidianundergroud.api.models.undeground.BookJson
 import com.ubadahj.qidianundergroud.database.BookDatabase
 import com.ubadahj.qidianundergroud.models.Book
 import kotlinx.coroutines.flow.Flow

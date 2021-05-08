@@ -1,4 +1,4 @@
-package com.ubadahj.qidianundergroud.api.models
+package com.ubadahj.qidianundergroud.api.models.undeground
 
 import android.os.Parcelable
 import com.squareup.moshi.Json

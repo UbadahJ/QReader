@@ -6,6 +6,13 @@ apply plugin: 'androidx.navigation.safeargs.kotlin'
 apply plugin: 'com.mikepenz.aboutlibraries.plugin'
 apply plugin: 'com.squareup.sqldelight'
 
+apply plugin: 'idea'
+idea {
+    module {
+        downloadJavadoc = true
+    }
+}
+
 android {
     compileSdkVersion 30
     buildToolsVersion "29.0.3"
@@ -112,5 +119,7 @@ dependencies {
     // Database support
     implementation "com.squareup.sqldelight:android-driver:$sqldelight_version"
     implementation "com.squareup.sqldelight:coroutines-extensions-jvm:$sqldelight_version"
+
+    implementation 'org.jsoup:jsoup:1.13.1'
 
 }
