@@ -26,6 +26,7 @@ import com.ubadahj.qidianundergroud.ui.adapters.MenuAdapter
 import com.ubadahj.qidianundergroud.ui.dialog.GroupDetailsDialog
 import com.ubadahj.qidianundergroud.ui.dialog.MenuDialog
 import com.ubadahj.qidianundergroud.ui.models.MenuDialogItem
+import com.ubadahj.qidianundergroud.utils.models.markAsRead
 import com.ubadahj.qidianundergroud.utils.models.setNotifications
 import com.ubadahj.qidianundergroud.utils.repositories.addToLibrary
 import com.ubadahj.qidianundergroud.utils.repositories.removeFromLibrary
@@ -136,9 +137,30 @@ class BookFragment : Fragment() {
 
     private fun configureMenu(book: Book, metadata: Metadata? = null) {
         val menuItems: MutableList<MenuDialogItem> = mutableListOf(
+            MenuDialogItem("Check for updates", R.drawable.refresh) {
+                lifecycleScope.launchWhenResumed {
+                    loadGroups(book, true)
+                }
+            },
+            MenuDialogItem("Reload book data", R.drawable.cloud_download) {
+                lifecycleScope.launchWhenResumed {
+                    viewModel.getMetadata(requireContext(), book, true)
+                        .observe(viewLifecycleOwner) {
+                            it.data?.apply {
+                                binding?.bookImage?.load(coverPath)
+                                binding?.bookAuthor?.text = author
+                                binding?.bookDesc?.text = description
+                                binding?.bookGenre?.text = category
+                                binding?.bookGenre?.visible = true
+
+                                configureMenu(book, this)
+                            }
+                        }
+                }
+            },
             MenuDialogItem("Mark all chapters as read", R.drawable.check) {
                 lifecycleScope.launchWhenResumed {
-                    BookRepository(requireContext()).markAllRead(book)
+                    book.markAsRead(requireContext())
                 }
             }
         )
@@ -157,18 +179,19 @@ class BookFragment : Fragment() {
         menuAdapter.submitList(menuItems)
     }
 
-    private fun loadGroups(book: Book) {
-        viewModel.getChapters(requireContext(), book).observe(viewLifecycleOwner) { resource ->
-            binding?.apply {
-                when (resource) {
-                    is Resource.Success -> {
-                        materialCardView.visibility = View.VISIBLE
-                        loadingProgress.visibility = View.GONE
-                        (chapterListView.adapter as? GroupAdapter)
-                            ?.submitList(resource.data!!)
-                    }
-                    is Resource.Loading -> {
-                        loadingProgress.visibility = View.VISIBLE
+    private fun loadGroups(book: Book, refresh: Boolean = false) {
+        viewModel.getChapters(requireContext(), book, refresh)
+            .observe(viewLifecycleOwner) { resource ->
+                binding?.apply {
+                    when (resource) {
+                        is Resource.Success -> {
+                            materialCardView.visibility = View.VISIBLE
+                            loadingProgress.visibility = View.GONE
+                            (chapterListView.adapter as? GroupAdapter)
+                                ?.submitList(resource.data!!)
+                        }
+                        is Resource.Loading -> {
+                            loadingProgress.visibility = View.VISIBLE
                         materialCardView.visibility = View.GONE
                     }
                     is Resource.Error -> {
