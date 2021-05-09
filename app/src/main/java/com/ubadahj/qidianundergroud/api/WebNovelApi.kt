@@ -111,8 +111,9 @@ object WebNovelApi {
             ?.text()
             ?: ""
 
-        val description = document.selectFirst(".j_synopsis")
-            ?.text()
+        val description = document.selectFirst(".j_synopsis > p")
+            ?.html()
+            ?.replace("<br>", "\n\n")
             ?: ""
 
         return WNBookRemote(
