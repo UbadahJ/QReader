@@ -53,6 +53,7 @@ class BookFragment : Fragment() {
         binding?.apply {
             bookTitle.text = book.name
 
+            bookImage.load(R.drawable.placeholder_600_800)
             chapterListView.adapter = GroupAdapter(listOf(), {
                 viewModel.selectedGroup.value = it
                 findNavController().navigate(
