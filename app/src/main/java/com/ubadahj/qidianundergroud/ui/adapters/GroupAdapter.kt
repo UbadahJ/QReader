@@ -110,9 +110,11 @@ class GroupAdapter(
     class ViewHolder(val binding: GroupItemBinding, onClick: (Int) -> Unit) :
         RecyclerView.ViewHolder(binding.root) {
         init {
-            binding.root.children.iterator().forEach {
-                it.setOnClickListener { onClick(bindingAdapterPosition) }
-            }
+            binding.root.children.toMutableList()
+                .apply { add(binding.root) }
+                .forEach {
+                    it.setOnClickListener { onClick(bindingAdapterPosition) }
+                }
         }
     }
 

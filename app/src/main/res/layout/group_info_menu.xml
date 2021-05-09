@@ -16,7 +16,8 @@
             android:layout_height="wrap_content"
             android:layout_marginTop="16dp"
             android:text="Group details"
-            android:textAppearance="@style/TextAppearance.MaterialComponents.Headline4"
+            android:textAppearance="@style/TextAppearance.MyTheme.Headline4"
+            android:textColor="?android:attr/textColorPrimary"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent" />
@@ -35,7 +36,7 @@
             android:layout_marginStart="8dp"
             android:layout_marginTop="16dp"
             android:layout_marginEnd="8dp"
-            android:textAppearance="@style/TextAppearance.MaterialComponents.Subtitle2"
+            android:textAppearance="@style/TextAppearance.MyTheme.Subtitle2"
             app:layout_constraintEnd_toStartOf="@+id/v_guideline_50"
             app:layout_constraintHorizontal_bias="1.0"
             app:layout_constraintStart_toStartOf="parent"
@@ -49,7 +50,7 @@
             android:layout_marginStart="8dp"
             android:layout_marginTop="16dp"
             android:layout_marginEnd="8dp"
-            android:textAppearance="@style/TextAppearance.MaterialComponents.Subtitle2"
+            android:textAppearance="@style/TextAppearance.MyTheme.Subtitle2"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintHorizontal_bias="0.0"
             app:layout_constraintStart_toStartOf="@+id/v_guideline_50"
@@ -80,7 +81,7 @@
             android:layout_marginStart="16dp"
             android:layout_marginTop="24dp"
             android:text="Read status"
-            android:textAppearance="@style/TextAppearance.MaterialComponents.Headline6"
+            android:textAppearance="@style/TextAppearance.MyTheme.Headline6"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@+id/group_start_chapter" />
 
@@ -89,7 +90,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginTop="12dp"
-            android:textAppearance="@style/TextAppearance.MaterialComponents.Body2"
+            android:textAppearance="@style/TextAppearance.MyTheme.Body2"
             app:layout_constraintStart_toStartOf="@+id/read_status_label"
             app:layout_constraintTop_toBottomOf="@+id/read_status_label"
             tools:text="Currently reading chapter 113" />
@@ -102,7 +103,7 @@
             android:layout_marginStart="16dp"
             android:layout_marginTop="16dp"
             android:text="Download status"
-            android:textAppearance="@style/TextAppearance.MaterialComponents.Headline6"
+            android:textAppearance="@style/TextAppearance.MyTheme.Headline6"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@+id/read_status_text" />
 
@@ -111,7 +112,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginTop="12dp"
-            android:textAppearance="@style/TextAppearance.MaterialComponents.Body2"
+            android:textAppearance="@style/TextAppearance.MyTheme.Body2"
             app:layout_constraintStart_toStartOf="@+id/download_status_label"
             app:layout_constraintTop_toBottomOf="@+id/download_status_label"
             tools:text="This group is downloaded" />

@@ -64,10 +64,13 @@ class BookFragment : Fragment() {
             }
 
             libraryButton.setOnClickListener {
-                book.addToLibrary(requireContext())
-                Snackbar.make(root, "Added book to the library", Snackbar.LENGTH_SHORT).show()
-                libraryButton.visibility = View.GONE
+                if (!book.inLibrary) {
+                    book.addToLibrary(requireContext())
+                    Snackbar.make(root, "Added book to the library", Snackbar.LENGTH_SHORT).show()
+                    libraryLabel.text = "In library"
+                }
             }
+
             if (book.inLibrary) {
                 libraryLabel.text = "In library"
             }
