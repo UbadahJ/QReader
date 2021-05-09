@@ -10,6 +10,7 @@ import org.jsoup.Jsoup
 import org.jsoup.nodes.Element
 import retrofit2.Response
 import retrofit2.http.GET
+import retrofit2.http.Path
 import retrofit2.http.Query
 
 object WebNovelApi {
@@ -21,7 +22,7 @@ object WebNovelApi {
             .create(IWebNovelApi::class.java)
     }
 
-    fun getBook(book: Book): WNBookRemote? {
+    suspend fun getBook(book: Book): WNBookRemote? {
         val searchPage = webNovelApi.searchBooks(book.name)
         val searchResult = searchPage.body()
             ?.parseSearchPage()
@@ -129,13 +130,16 @@ object WebNovelApi {
 private interface IWebNovelApi {
 
     @GET("search")
-    fun searchBooks(@Query("keywords") query: String): Response<ResponseBody>
+    suspend fun searchBooks(@Query("keywords") query: String): Response<ResponseBody>
 
     @GET("book/{bookName}_{bookId}")
-    fun getBook(bookName: String, bookId: String): Response<ResponseBody>
+    suspend fun getBook(
+        @Path("bookName") bookName: String,
+        @Path("bookId") bookId: String
+    ): Response<ResponseBody>
 
     @GET("apiajax/chapter/GetChapterList")
-    fun getChaptersLinks(
+    suspend fun getChaptersLinks(
         @Query("_csrfToken") csrfToken: String,
         @Query("bookId") bookId: String
     ): Response<WNRawChapterLinksRemote>
