@@ -14,20 +14,20 @@ CREATE TABLE Metadata
             ON DELETE CASCADE
 );
 
--- insert:
+insert:
 INSERT OR REPLACE INTO Metadata
 VALUES ?;
 
--- insertByValues:
+insertByValues:
 INSERT OR REPLACE INTO Metadata(id, bookId, link, author, coverPath, category, description)
 VALUES (?, ?, ?, ?, ?, ?, ?);
 
--- select
+select:
 SELECT *
 FROM Metadata
 WHERE bookId = ?;
 
--- delete
+delete:
 DELETE
 FROM Metadata
 WHERE bookId = ?;
