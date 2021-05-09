@@ -8,12 +8,12 @@ import androidx.core.widget.addTextChangedListener
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import androidx.navigation.fragment.findNavController
-import androidx.recyclerview.widget.LinearLayoutManager
+import androidx.recyclerview.widget.GridLayoutManager
 import com.google.android.material.snackbar.Snackbar
 import com.ubadahj.qidianundergroud.R
 import com.ubadahj.qidianundergroud.databinding.BookListFragmentBinding
 import com.ubadahj.qidianundergroud.models.Resource
-import com.ubadahj.qidianundergroud.ui.adapters.BookAdapter
+import com.ubadahj.qidianundergroud.ui.adapters.LibraryAdapter
 import com.ubadahj.qidianundergroud.ui.adapters.MenuAdapter
 import com.ubadahj.qidianundergroud.ui.dialog.MenuDialog
 import com.ubadahj.qidianundergroud.ui.models.MenuDialogItem
@@ -21,7 +21,7 @@ import com.ubadahj.qidianundergroud.ui.models.MenuDialogItem
 class LibraryFragment : Fragment() {
 
     private val viewModel: MainViewModel by activityViewModels()
-    private val adapter: BookAdapter = BookAdapter(listOf()) {
+    private val adapter: LibraryAdapter = LibraryAdapter(listOf()) {
         viewModel.selectedBook.value = it
         findNavController().navigate(
             LibraryFragmentDirections.actionLibraryFragmentToBookFragment()
@@ -71,8 +71,10 @@ class LibraryFragment : Fragment() {
                     LibraryFragmentDirections.actionLibraryFragmentToBrowseFragment()
                 )
             }
-            bookListingView.layoutManager = LinearLayoutManager(requireContext())
+
             bookListingView.adapter = adapter
+            bookListingView.layoutManager = GridLayoutManager(requireContext(), 2)
+
             searchBar.searchEditText.addTextChangedListener { text: Editable? ->
                 adapter.filter.filter((text))
             }
