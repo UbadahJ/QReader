@@ -56,7 +56,6 @@ class NotificationWorker(context: Context, params: WorkerParameters) :
         }
         val books = bookRepo.getLibraryBooks().first()
             .associateWith { metaRepo.getBook(it).first() }
-            .filterValues { it?.enableNotification == true }
 
         NotificationManagerCompat.from(applicationContext).apply {
             builder.setProgress(books.size, 0, false)
@@ -71,7 +70,7 @@ class NotificationWorker(context: Context, params: WorkerParameters) :
                     builder.setContentText(book.name)
                     builder.setProgress(books.size, ++counter, false)
                     notify(notificationId, builder.build())
-                    if (updateCount > 0)
+                    if (updateCount > 0 && metadata?.enableNotification == true)
                         emit(
                             BookNotification(
                                 applicationContext,
