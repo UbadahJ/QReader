@@ -10,8 +10,8 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         tools:context=".ui.main.BookFragment"
-        tools:layout_editor_absoluteX="-167dp"
-        tools:layout_editor_absoluteY="-16dp">
+        tools:layout_editor_absoluteX="0dp"
+        tools:layout_editor_absoluteY="16dp">
 
         <androidx.constraintlayout.widget.ConstraintLayout
             android:layout_width="match_parent"
@@ -67,24 +67,26 @@
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_marginStart="16dp"
-                android:layout_marginTop="16dp"
+                android:layout_marginTop="8dp"
                 android:layout_marginEnd="16dp"
                 android:fontFamily="@font/yantramanav"
                 android:textAlignment="center"
                 android:textColor="?attr/colorSurface"
+                android:visibility="gone"
                 app:chipBackgroundColor="?android:attr/textColorPrimary"
                 app:layout_constraintEnd_toStartOf="@+id/v_guideline_90"
                 app:layout_constraintStart_toEndOf="@+id/book_image"
-                app:layout_constraintTop_toBottomOf="@+id/download_label"
-                android:visibility="gone"
-                tools:text="Fantasy" />
+                app:layout_constraintTop_toBottomOf="@+id/menu_image_view"
+                tools:text="Fantasy"
+                tools:visibility="visible" />
 
             <androidx.constraintlayout.widget.Barrier
                 android:id="@+id/simple_barrier"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 app:barrierDirection="bottom"
-                app:constraint_referenced_ids="book_title,book_genre,book_image,book_desc" />
+                app:constraint_referenced_ids="book_title,book_genre,book_image,book_desc"
+                tools:layout_editor_absoluteY="425dp" />
 
             <com.google.android.material.textview.MaterialTextView
                 android:id="@+id/library_label"
@@ -122,6 +124,22 @@
                 app:layout_constraintEnd_toEndOf="@+id/download_image_view"
                 app:layout_constraintStart_toStartOf="@+id/download_image_view"
                 app:layout_constraintTop_toBottomOf="@+id/download_image_view" />
+
+            <ImageView
+                android:id="@+id/menu_image_view"
+                android:layout_width="40dp"
+                android:layout_height="40dp"
+                android:layout_marginTop="16dp"
+                android:contentDescription="Download Chapters"
+                android:fontFamily="@font/yantramanav"
+                android:padding="10dp"
+                android:src="@drawable/menu_dots"
+                android:tooltipText="Download Chapters"
+                app:layout_constraintEnd_toStartOf="@+id/v_guideline_90"
+                app:layout_constraintStart_toEndOf="@+id/book_image"
+                app:layout_constraintTop_toBottomOf="@+id/download_label"
+                app:tint="?android:attr/textColorPrimary" />
+
 
             <androidx.constraintlayout.widget.Guideline
                 android:id="@+id/v_guideline_10"
@@ -174,9 +192,9 @@
                         android:id="@+id/chapter_text"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
+                        android:fontFamily="@font/anton"
                         android:padding="8dp"
                         android:text="Chapters"
-                        android:fontFamily="@font/anton"
                         android:textAppearance="@style/TextAppearance.MaterialComponents.Headline5" />
 
                     <androidx.recyclerview.widget.RecyclerView

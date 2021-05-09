@@ -10,8 +10,7 @@ import com.ubadahj.qidianundergroud.databinding.MenuItemBinding
 import com.ubadahj.qidianundergroud.ui.models.MenuDialogItem
 
 class MenuAdapter(
-    items: List<MenuDialogItem>,
-    val onClick: (MenuDialogItem, Int) -> Unit = { _, _ -> }
+    items: List<MenuDialogItem>
 ) : ListAdapter<MenuDialogItem, MenuAdapter.MenuViewHolder>(DiffCallback()) {
 
     var postOnClick: (() -> Unit)? = null
@@ -28,7 +27,7 @@ class MenuAdapter(
                 false
             )
         ) {
-            onClick(currentList[it], it)
+            getItem(it).onClick?.invoke()
             postOnClick?.invoke()
         }
     }

@@ -24,11 +24,15 @@ class BrowseFragment : Fragment() {
 
     private val viewModel: MainViewModel by activityViewModels()
     private val menu = MenuDialog(
-        MenuAdapter(listOf(MenuDialogItem("Refresh", R.drawable.refresh))) { _, i ->
-            if (i == 0) viewModel
-                .getBooks(requireContext(), refresh = true)
-                .observe(viewLifecycleOwner, this@BrowseFragment::getBooks)
-        }
+        MenuAdapter(
+            listOf(
+                MenuDialogItem("Refresh", R.drawable.refresh) {
+                    viewModel
+                        .getBooks(requireContext(), refresh = true)
+                        .observe(viewLifecycleOwner, this@BrowseFragment::getBooks)
+                }
+            )
+        )
     )
 
     private var binding: BookListFragmentBinding? = null

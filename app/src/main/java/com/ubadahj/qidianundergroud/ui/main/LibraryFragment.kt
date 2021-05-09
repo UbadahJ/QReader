@@ -32,19 +32,11 @@ class LibraryFragment : Fragment() {
             listOf(
                 MenuDialogItem("History", R.drawable.archive),
                 MenuDialogItem("Settings", R.drawable.settings),
-                MenuDialogItem("About", R.drawable.info)
-            )
-        ) { _, i ->
-            when (i) {
-                0 -> {
-                }
-                1 -> {
-                }
-                2 -> {
+                MenuDialogItem("About", R.drawable.info) {
                     com.mikepenz.aboutlibraries.LibsBuilder().start(requireContext())
                 }
-            }
-        }
+            )
+        )
     )
 
     private

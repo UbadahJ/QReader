@@ -44,11 +44,11 @@ class GroupDetailsDialog(
             downloadStatusText.text = downloaded
 
             recyclerView.adapter = MenuAdapter(
-                listOf(MenuDialogItem("Mark as read", R.drawable.check))
-            ) { _, _ ->
-                group.updateLastRead(requireContext(), group.lastChapter)
-                dismiss()
-            }
+                listOf(MenuDialogItem("Mark as read", R.drawable.check) {
+                    group.updateLastRead(requireContext(), group.lastChapter)
+                    dismiss()
+                })
+            )
         }.root
     }
 
