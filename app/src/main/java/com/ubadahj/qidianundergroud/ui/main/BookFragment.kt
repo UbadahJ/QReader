@@ -6,16 +6,19 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
+import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
 import androidx.work.Data
 import androidx.work.ExistingWorkPolicy
 import androidx.work.OneTimeWorkRequestBuilder
 import androidx.work.WorkManager
+import coil.load
 import com.google.android.material.snackbar.Snackbar
 import com.ubadahj.qidianundergroud.R
 import com.ubadahj.qidianundergroud.databinding.BookFragmentBinding
 import com.ubadahj.qidianundergroud.models.Book
 import com.ubadahj.qidianundergroud.models.Resource
+import com.ubadahj.qidianundergroud.repositories.MetadataRepository
 import com.ubadahj.qidianundergroud.services.DownloadService
 import com.ubadahj.qidianundergroud.ui.adapters.GroupAdapter
 import com.ubadahj.qidianundergroud.ui.dialog.GroupDetailsDialog
@@ -49,8 +52,7 @@ class BookFragment : Fragment() {
 
     private fun init(book: Book) {
         binding?.apply {
-            header.text = book.name
-            lastUpdated.text = if (book.completed) "Completed" else book.lastUpdated
+            bookTitle.text = book.name
 
             chapterListView.adapter = GroupAdapter(listOf(), {
                 viewModel.selectedGroup.value = it
@@ -67,8 +69,9 @@ class BookFragment : Fragment() {
                 Snackbar.make(root, "Added book to the library", Snackbar.LENGTH_SHORT).show()
                 libraryButton.visibility = View.GONE
             }
-            if (book.inLibrary)
-                libraryButton.visibility = View.GONE
+            if (book.inLibrary) {
+                libraryLabel.text = "In library"
+            }
 
             downloadImageView.setOnClickListener {
                 val work = OneTimeWorkRequestBuilder<DownloadService>().apply {
@@ -79,6 +82,16 @@ class BookFragment : Fragment() {
                 WorkManager.getInstance(requireContext()).enqueueUniqueWork(
                     "download-service", ExistingWorkPolicy.KEEP, work
                 )
+            }
+
+            lifecycleScope.launchWhenResumed {
+                val metadata = MetadataRepository(requireContext()).getBook(book)
+                metadata?.apply {
+                    bookImage.load(metadata.coverPath)
+                    bookAuthor.text = metadata.author
+                    bookDesc.text = metadata.description
+                    bookGenre.text = metadata.category
+                }
             }
         }
 

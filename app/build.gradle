@@ -120,6 +120,5 @@ dependencies {
     implementation "com.squareup.sqldelight:android-driver:$sqldelight_version"
     implementation "com.squareup.sqldelight:coroutines-extensions-jvm:$sqldelight_version"
 
-    implementation 'org.jsoup:jsoup:1.13.1'
-
+    implementation "io.coil-kt:coil:1.2.1"
 }
