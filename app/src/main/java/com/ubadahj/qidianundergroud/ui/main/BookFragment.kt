@@ -6,7 +6,6 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
-import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
 import androidx.work.Data
 import androidx.work.ExistingWorkPolicy
@@ -18,11 +17,11 @@ import com.ubadahj.qidianundergroud.R
 import com.ubadahj.qidianundergroud.databinding.BookFragmentBinding
 import com.ubadahj.qidianundergroud.models.Book
 import com.ubadahj.qidianundergroud.models.Resource
-import com.ubadahj.qidianundergroud.repositories.MetadataRepository
 import com.ubadahj.qidianundergroud.services.DownloadService
 import com.ubadahj.qidianundergroud.ui.adapters.GroupAdapter
 import com.ubadahj.qidianundergroud.ui.dialog.GroupDetailsDialog
 import com.ubadahj.qidianundergroud.utils.repositories.addToLibrary
+import com.ubadahj.qidianundergroud.utils.ui.visible
 
 class BookFragment : Fragment() {
 
@@ -84,13 +83,13 @@ class BookFragment : Fragment() {
                 )
             }
 
-            lifecycleScope.launchWhenResumed {
-                val metadata = MetadataRepository(requireContext()).getBook(book)
-                metadata?.apply {
-                    bookImage.load(metadata.coverPath)
-                    bookAuthor.text = metadata.author
-                    bookDesc.text = metadata.description
-                    bookGenre.text = metadata.category
+            viewModel.getMetadata(requireContext(), book).observe(viewLifecycleOwner) {
+                it.data?.apply {
+                    bookImage.load(coverPath)
+                    bookAuthor.text = author
+                    bookDesc.text = description
+                    bookGenre.text = category
+                    bookGenre.visible = true
                 }
             }
         }
