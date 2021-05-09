@@ -9,9 +9,11 @@ import com.ubadahj.qidianundergroud.api.Api
 import com.ubadahj.qidianundergroud.api.models.undeground.BookJson
 import com.ubadahj.qidianundergroud.database.BookDatabase
 import com.ubadahj.qidianundergroud.models.Book
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.flow
+import kotlinx.coroutines.withContext
 
 class BookRepository(val context: Context) {
 
@@ -43,11 +45,22 @@ class BookRepository(val context: Context) {
     fun getGroups(book: Book) =
         database.bookQueries.chapters(book.id).asFlow().mapToList()
 
-    fun addToLibrary(book: Book) {
+    suspend fun addToLibrary(book: Book) = withContext(Dispatchers.IO) {
         if (database.bookQueries.getById(book.id).executeAsOneOrNull() == null)
-            throw IllegalArgumentException("$this does not exists in library")
+            throw IllegalArgumentException("$book does not exists in library")
 
         database.bookQueries.addToLibrary(book.id)
+    }
+
+    suspend fun removeFromLibrary(book: Book) = withContext(Dispatchers.IO) {
+        if (!database.bookQueries.getById(book.id).executeAsOne().inLibrary)
+            throw IllegalArgumentException("$book already exists in library")
+
+        database.bookQueries.removeFromLibrary(book.id)
+    }
+
+    suspend fun markAllRead(book: Book) = withContext(Dispatchers.IO) {
+        database.bookQueries.markAllRead(book.id)
     }
 
     fun download(book: Book, factory: (Context) -> WebView, totalRetries: Int = 3) = flow {

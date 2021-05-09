@@ -8,9 +8,11 @@ import com.ubadahj.qidianundergroud.api.models.webnovel.WNBookRemote
 import com.ubadahj.qidianundergroud.database.BookDatabase
 import com.ubadahj.qidianundergroud.models.Book
 import com.ubadahj.qidianundergroud.models.Metadata
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.withContext
 
-class MetadataRepository(private val context: Context) {
+class MetadataRepository(context: Context) {
 
     private val database = BookDatabase.getInstance(context)
 
@@ -25,7 +27,11 @@ class MetadataRepository(private val context: Context) {
         return database.metadataQueries.select(book.id).asFlow().mapToOneNotNull()
     }
 
+    suspend fun setNotifications(book: Book, enable: Boolean) = withContext(Dispatchers.IO) {
+        database.metadataQueries.updateNotify(enable, book.id)
+    }
+
     private fun WNBookRemote.toMetadata(book: Book): Metadata =
-        Metadata(id, book.id, link, author, coverLink, category, description)
+        Metadata(id, book.id, link, author, coverLink, category, description, true)
 
 }

@@ -15,6 +15,7 @@ import com.ubadahj.qidianundergroud.models.Book
 import com.ubadahj.qidianundergroud.models.ChapterGroup
 import com.ubadahj.qidianundergroud.repositories.BookRepository
 import com.ubadahj.qidianundergroud.repositories.ChapterGroupRepository
+import com.ubadahj.qidianundergroud.repositories.MetadataRepository
 import com.ubadahj.qidianundergroud.utils.models.lastChapter
 import com.ubadahj.qidianundergroud.utils.repositories.getChapters
 import kotlinx.coroutines.Dispatchers
@@ -28,6 +29,7 @@ class NotificationWorker(context: Context, params: WorkerParameters) :
 
     private val bookRepo = BookRepository(context)
     private val groupRepo = ChapterGroupRepository(context)
+    private val metaRepo = MetadataRepository(context)
     private val notificationId = 42069
 
     override suspend fun doWork(): Result {
@@ -48,6 +50,8 @@ class NotificationWorker(context: Context, params: WorkerParameters) :
             priority = NotificationCompat.PRIORITY_LOW
         }
         val books = bookRepo.getLibraryBooks().first()
+            .filter { metaRepo.getBook(it).first()?.enableNotification == true }
+
         NotificationManagerCompat.from(applicationContext).apply {
             builder.setProgress(books.size, 0, false)
             notify(notificationId, builder.build())

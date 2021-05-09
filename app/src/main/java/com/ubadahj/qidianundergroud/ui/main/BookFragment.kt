@@ -6,6 +6,7 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
+import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
 import androidx.work.Data
 import androidx.work.ExistingWorkPolicy
@@ -16,17 +17,26 @@ import com.google.android.material.snackbar.Snackbar
 import com.ubadahj.qidianundergroud.R
 import com.ubadahj.qidianundergroud.databinding.BookFragmentBinding
 import com.ubadahj.qidianundergroud.models.Book
+import com.ubadahj.qidianundergroud.models.Metadata
 import com.ubadahj.qidianundergroud.models.Resource
+import com.ubadahj.qidianundergroud.repositories.BookRepository
 import com.ubadahj.qidianundergroud.services.DownloadService
 import com.ubadahj.qidianundergroud.ui.adapters.GroupAdapter
+import com.ubadahj.qidianundergroud.ui.adapters.MenuAdapter
 import com.ubadahj.qidianundergroud.ui.dialog.GroupDetailsDialog
+import com.ubadahj.qidianundergroud.ui.dialog.MenuDialog
+import com.ubadahj.qidianundergroud.ui.models.MenuDialogItem
+import com.ubadahj.qidianundergroud.utils.models.setNotifications
 import com.ubadahj.qidianundergroud.utils.repositories.addToLibrary
+import com.ubadahj.qidianundergroud.utils.repositories.removeFromLibrary
 import com.ubadahj.qidianundergroud.utils.ui.visible
+import kotlinx.coroutines.flow.collect
 
 class BookFragment : Fragment() {
 
     private val viewModel: MainViewModel by activityViewModels()
     private var binding: BookFragmentBinding? = null
+    private var menuAdapter = MenuAdapter(listOf())
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -39,7 +49,9 @@ class BookFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         viewModel.selectedBook.observe(viewLifecycleOwner, { value ->
-            value?.apply { init(this) }
+            lifecycleScope.launchWhenResumed {
+                value?.apply { init(this) }
+            }
         })
     }
 
@@ -50,6 +62,7 @@ class BookFragment : Fragment() {
     }
 
     private fun init(book: Book) {
+        configureMenu(book)
         binding?.apply {
             bookTitle.text = book.name
 
@@ -65,15 +78,33 @@ class BookFragment : Fragment() {
             }
 
             libraryButton.setOnClickListener {
-                if (!book.inLibrary) {
-                    book.addToLibrary(requireContext())
-                    Snackbar.make(root, "Added book to the library", Snackbar.LENGTH_SHORT).show()
-                    libraryLabel.text = "In library"
+                lifecycleScope.launchWhenResumed {
+                    if (book.inLibrary) {
+                        book.removeFromLibrary(requireContext())
+                        Snackbar.make(root, "Removed book to the library", Snackbar.LENGTH_SHORT)
+                            .show()
+                    } else {
+                        book.addToLibrary(requireContext())
+                        Snackbar.make(root, "Added book to the library", Snackbar.LENGTH_SHORT)
+                            .show()
+                    }
+
+                    BookRepository(requireContext())
+                        .getBookById(book.id)
+                        .collect { viewModel.selectedBook.postValue(it) }
                 }
             }
 
+            menuImageView.setOnClickListener {
+                MenuDialog(menuAdapter).show(requireActivity().supportFragmentManager, null)
+            }
+
             if (book.inLibrary) {
+                libraryButton.load(R.drawable.heart_filled)
                 libraryLabel.text = "In library"
+            } else {
+                libraryButton.load(R.drawable.heart)
+                libraryLabel.text = "Add to library"
             }
 
             downloadImageView.setOnClickListener {
@@ -94,11 +125,36 @@ class BookFragment : Fragment() {
                     bookDesc.text = description
                     bookGenre.text = category
                     bookGenre.visible = true
+
+                    configureMenu(book, this)
                 }
             }
         }
 
         loadGroups(book)
+    }
+
+    private fun configureMenu(book: Book, metadata: Metadata? = null) {
+        val menuItems: MutableList<MenuDialogItem> = mutableListOf(
+            MenuDialogItem("Mark all chapters as read", R.drawable.check) {
+                lifecycleScope.launchWhenResumed {
+                    BookRepository(requireContext()).markAllRead(book)
+                }
+            }
+        )
+
+        if (metadata != null) {
+            val notifyOp = if (metadata.enableNotification) "Disable" else "Enable"
+            menuItems.add(
+                MenuDialogItem("$notifyOp notifications for this book", R.drawable.bell) {
+                    lifecycleScope.launchWhenResumed {
+                        book.setNotifications(requireContext(), !metadata.enableNotification)
+                    }
+                }
+            )
+        }
+
+        menuAdapter.submitList(menuItems)
     }
 
     private fun loadGroups(book: Book) {

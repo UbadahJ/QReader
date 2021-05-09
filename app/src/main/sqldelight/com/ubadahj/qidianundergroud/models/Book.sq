@@ -70,8 +70,18 @@ UPDATE Book
 SET inLibrary = 1
 WHERE id = ?;
 
+removeFromLibrary:
+UPDATE Book
+SET inLibrary = 0
+WHERE id = ?;
+
 chapters:
 SELECT *
 FROM ChapterGroup
 WHERE bookId = ?
 ORDER BY CAST(TRIM(SUBSTR(text, 1, INSTR(text, '-') - 1)) AS INTEGER);
+
+markAllRead:
+UPDATE ChapterGroup
+SET lastRead = CAST(TRIM(SUBSTR(text, INSTR(text, '-') + 1)) AS INTEGER)
+WHERE bookId = ?;

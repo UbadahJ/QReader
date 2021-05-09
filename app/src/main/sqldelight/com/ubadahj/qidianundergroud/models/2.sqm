@@ -1,4 +1,6 @@
+BEGIN TRANSACTION;
 
+ALTER TABLE Metadata RENAME TO _Metadata_old;
 
 CREATE TABLE Metadata
 (
@@ -17,25 +19,10 @@ CREATE TABLE Metadata
             ON DELETE CASCADE
 );
 
-insert:
-INSERT OR REPLACE INTO Metadata
-VALUES ?;
+INSERT INTO Metadata(id, bookId, link, author, coverPath, category, description)
+  SELECT id, bookId, link, author, coverPath, category, description
+  FROM _Metadata_old;
 
-insertByValues:
-INSERT OR REPLACE INTO Metadata(id, bookId, link, author, coverPath, category, description)
-VALUES (?, ?, ?, ?, ?, ?, ?);
+DROP TABLE _Metadata_old;
 
-select:
-SELECT *
-FROM Metadata
-WHERE bookId = ?;
-
-delete:
-DELETE
-FROM Metadata
-WHERE bookId = ?;
-
-updateNotify:
-UPDATE Metadata
-SET enableNotification = ?
-WHERE bookId = ?;
+COMMIT;
