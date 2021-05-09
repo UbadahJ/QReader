@@ -9,7 +9,7 @@ CREATE TABLE Metadata
     coverPath           TEXT               NOT NULL,
     category            TEXT               NOT NULL,
     description         TEXT               NOT NULL,
-    enableNotification INTEGER AS Boolean NOT NULL DEFAULT 0,
+    enableNotification INTEGER AS Boolean NOT NULL DEFAULT 1,
     PRIMARY KEY (id),
     CONSTRAINT metadata_ibfk
         FOREIGN KEY (bookId)
