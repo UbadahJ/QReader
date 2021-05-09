@@ -38,80 +38,80 @@
     <!--applied globally across your app.-->
 
     <style name="TextAppearance.MyTheme.Headline1" parent="TextAppearance.MaterialComponents.Headline1">
-        <item name="fontFamily">@font/dosis</item>
-        <item name="android:fontFamily">@font/dosis</item>
+        <item name="fontFamily">@font/anton</item>
+        <item name="android:fontFamily">@font/anton</item>
         <item name="android:textSize">98sp</item>
     </style>
 
     <style name="TextAppearance.MyTheme.Headline2" parent="TextAppearance.MaterialComponents.Headline2">
-        <item name="fontFamily">@font/dosis</item>
-        <item name="android:fontFamily">@font/dosis</item>
+        <item name="fontFamily">@font/anton</item>
+        <item name="android:fontFamily">@font/anton</item>
         <item name="android:textSize">61sp</item>
     </style>
 
     <style name="TextAppearance.MyTheme.Headline3" parent="TextAppearance.MaterialComponents.Headline3">
-        <item name="fontFamily">@font/dosis</item>
-        <item name="android:fontFamily">@font/dosis</item>
+        <item name="fontFamily">@font/anton</item>
+        <item name="android:fontFamily">@font/anton</item>
         <item name="android:textSize">49sp</item>
     </style>
 
     <style name="TextAppearance.MyTheme.Headline4" parent="TextAppearance.MaterialComponents.Headline4">
-        <item name="fontFamily">@font/dosis</item>
-        <item name="android:fontFamily">@font/dosis</item>
+        <item name="fontFamily">@font/anton</item>
+        <item name="android:fontFamily">@font/anton</item>
         <item name="android:textSize">35sp</item>
     </style>
 
     <style name="TextAppearance.MyTheme.Headline5" parent="TextAppearance.MaterialComponents.Headline5">
-        <item name="fontFamily">@font/dosis</item>
-        <item name="android:fontFamily">@font/dosis</item>
+        <item name="fontFamily">@font/anton</item>
+        <item name="android:fontFamily">@font/anton</item>
         <item name="android:textSize">24sp</item>
     </style>
 
     <style name="TextAppearance.MyTheme.Headline6" parent="TextAppearance.MaterialComponents.Headline6">
-        <item name="fontFamily">@font/dosis</item>
-        <item name="android:fontFamily">@font/dosis</item>
+        <item name="fontFamily">@font/jaldi</item>
+        <item name="android:fontFamily">@font/jaldi</item>
         <item name="android:textSize">20sp</item>
     </style>
 
     <style name="TextAppearance.MyTheme.Subtitle1" parent="TextAppearance.MaterialComponents.Subtitle1">
-        <item name="fontFamily">@font/dosis</item>
-        <item name="android:fontFamily">@font/dosis</item>
+        <item name="fontFamily">@font/jaldi</item>
+        <item name="android:fontFamily">@font/jaldi</item>
         <item name="android:textSize">16sp</item>
     </style>
 
     <style name="TextAppearance.MyTheme.Subtitle2" parent="TextAppearance.MaterialComponents.Subtitle2">
-        <item name="fontFamily">@font/dosis</item>
-        <item name="android:fontFamily">@font/dosis</item>
+        <item name="fontFamily">@font/jaldi</item>
+        <item name="android:fontFamily">@font/jaldi</item>
         <item name="android:textSize">14sp</item>
     </style>
 
     <style name="TextAppearance.MyTheme.Body1" parent="TextAppearance.MaterialComponents.Body1">
-        <item name="fontFamily">@font/ubuntu</item>
-        <item name="android:fontFamily">@font/ubuntu</item>
+        <item name="fontFamily">@font/yantramanav</item>
+        <item name="android:fontFamily">@font/yantramanav</item>
         <item name="android:textSize">16sp</item>
     </style>
 
     <style name="TextAppearance.MyTheme.Body2" parent="TextAppearance.MaterialComponents.Body2">
-        <item name="fontFamily">@font/ubuntu</item>
-        <item name="android:fontFamily">@font/ubuntu</item>
+        <item name="fontFamily">@font/yantramanav</item>
+        <item name="android:fontFamily">@font/yantramanav</item>
         <item name="android:textSize">14sp</item>
     </style>
 
     <style name="TextAppearance.MyTheme.Button" parent="TextAppearance.MaterialComponents.Button">
-        <item name="fontFamily">@font/ubuntu</item>
-        <item name="android:fontFamily">@font/ubuntu</item>
+        <item name="fontFamily">@font/yantramanav</item>
+        <item name="android:fontFamily">@font/yantramanav</item>
         <item name="android:textSize">14sp</item>
     </style>
 
     <style name="TextAppearance.MyTheme.Caption" parent="TextAppearance.MaterialComponents.Caption">
-        <item name="fontFamily">@font/ubuntu</item>
-        <item name="android:fontFamily">@font/ubuntu</item>
+        <item name="fontFamily">@font/anton</item>
+        <item name="android:fontFamily">@font/anton</item>
         <item name="android:textSize">12sp</item>
     </style>
 
     <style name="TextAppearance.MyTheme.Overline" parent="TextAppearance.MaterialComponents.Overline">
-        <item name="fontFamily">@font/ubuntu</item>
-        <item name="android:fontFamily">@font/ubuntu</item>
+        <item name="fontFamily">@font/yantramanav</item>
+        <item name="android:fontFamily">@font/yantramanav</item>
         <item name="android:textSize">10sp</item>
     </style>
 
