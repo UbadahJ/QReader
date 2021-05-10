@@ -54,7 +54,8 @@ class NotificationWorker(context: Context, params: WorkerParameters) :
             setOnlyAlertOnce(true)
             priority = NotificationCompat.PRIORITY_LOW
         }
-        val books = bookRepo.getLibraryBooks().first()
+        val books = bookRepo.getBooks(true).first()
+            .filter { it.inLibrary }
             .associateWith { metaRepo.getBook(it).first() }
 
         NotificationManagerCompat.from(applicationContext).apply {
