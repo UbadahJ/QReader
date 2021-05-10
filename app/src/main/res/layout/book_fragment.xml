@@ -52,6 +52,30 @@
                 app:layout_constraintTop_toBottomOf="@+id/book_author"
                 tools:text="My House of Horrors" />
 
+            <androidx.appcompat.widget.AppCompatRatingBar
+                android:id="@+id/book_rating_bar"
+                style="@style/Widget.AppCompat.RatingBar.Small"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:isIndicator="true"
+                android:stepSize="0.1"
+                app:layout_constraintStart_toStartOf="@+id/book_title"
+                app:layout_constraintTop_toBottomOf="@+id/book_title"
+                tools:rating="5" />
+
+
+            <com.google.android.material.textview.MaterialTextView
+                android:id="@+id/book_rating"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="8dp"
+                android:fontFamily="@font/yantramanav"
+                android:textAppearance="@style/TextAppearance.MyTheme.Body2"
+                app:layout_constraintBottom_toBottomOf="@+id/book_rating_bar"
+                app:layout_constraintEnd_toStartOf="@+id/v_guideline_90"
+                app:layout_constraintStart_toEndOf="@+id/book_rating_bar"
+                app:layout_constraintTop_toTopOf="@+id/book_rating_bar" />
+
             <com.google.android.material.textview.MaterialTextView
                 android:id="@+id/book_desc"
                 android:layout_width="0dp"
@@ -59,8 +83,8 @@
                 android:layout_marginTop="16dp"
                 android:fontFamily="@font/yantramanav"
                 app:layout_constraintEnd_toStartOf="@+id/v_guideline_90"
-                app:layout_constraintStart_toStartOf="@+id/book_title"
-                app:layout_constraintTop_toBottomOf="@+id/book_title" />
+                app:layout_constraintStart_toStartOf="@+id/book_rating_bar"
+                app:layout_constraintTop_toBottomOf="@+id/book_rating_bar" />
 
             <com.google.android.material.chip.Chip
                 android:id="@+id/book_genre"

@@ -32,6 +32,6 @@ class MetadataRepository(context: Context) {
     }
 
     private fun WNBookRemote.toMetadata(book: Book): Metadata =
-        Metadata(id, book.id, link, author, coverLink, category, description, true)
+        Metadata(id, book.id, link, author, coverLink, category, description, rating, true)
 
 }

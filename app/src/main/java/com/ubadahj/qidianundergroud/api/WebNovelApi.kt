@@ -72,8 +72,7 @@ object WebNovelApi {
 
     private fun parseRating(element: Element): Float =
         try {
-            element.selectFirst(".g_star_num")
-                ?.selectFirst(".small")
+            element.selectFirst(".g_star_num > small")
                 ?.text()
                 ?.toFloat()
                 ?: 0f
@@ -121,6 +120,7 @@ object WebNovelApi {
             id = searchResult.id,
             link = searchResult.link,
             name = searchResult.name,
+            rating = searchResult.rating,
             author = author,
             coverLink = coverLink,
             category = category,

@@ -160,6 +160,8 @@ class BookFragment : Fragment() {
                     bookImage.load(coverPath)
                     bookAuthor.text = author
                     bookDesc.text = description
+                    bookRatingBar.rating = rating
+                    bookRating.text = rating.toString()
                     bookGenre.text = category
                     bookGenre.visible = true
 
