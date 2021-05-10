@@ -22,7 +22,7 @@ import com.ubadahj.qidianundergroud.repositories.BookRepository
 import com.ubadahj.qidianundergroud.repositories.ChapterGroupRepository
 import com.ubadahj.qidianundergroud.repositories.MetadataRepository
 import com.ubadahj.qidianundergroud.utils.models.lastChapter
-import com.ubadahj.qidianundergroud.utils.repositories.getChapters
+import com.ubadahj.qidianundergroud.utils.repositories.getGroups
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.flow.first
@@ -64,7 +64,7 @@ class NotificationWorker(context: Context, params: WorkerParameters) :
             var counter = 0
             for ((book, metadata) in books) {
                 try {
-                    val lastGroup = book.getChapters(applicationContext).first()
+                    val lastGroup = book.getGroups(applicationContext).first()
                     val refreshedGroups = groupRepo.getGroups(book, true).first()
                     val updateCount = refreshedGroups.lastChapter() - lastGroup.lastChapter()
                     builder.setContentText(book.name)

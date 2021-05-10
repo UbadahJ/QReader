@@ -4,6 +4,7 @@ import android.view.LayoutInflater
 import android.view.ViewGroup
 import android.widget.Filter
 import android.widget.Filterable
+import androidx.lifecycle.LifecycleCoroutineScope
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
@@ -12,13 +13,14 @@ import com.github.ajalt.timberkt.Timber
 import com.ubadahj.qidianundergroud.databinding.LibraryBookItemBinding
 import com.ubadahj.qidianundergroud.models.Book
 import com.ubadahj.qidianundergroud.repositories.MetadataRepository
-import kotlinx.coroutines.GlobalScope
-
+import com.ubadahj.qidianundergroud.utils.models.isRead
+import com.ubadahj.qidianundergroud.utils.repositories.getGroups
+import com.ubadahj.qidianundergroud.utils.ui.visible
 import kotlinx.coroutines.flow.collect
-import kotlinx.coroutines.launch
 
 class LibraryAdapter(
     private var books: List<Book>,
+    private val lifecycleScope: LifecycleCoroutineScope,
     private val onClick: (Book) -> Unit
 ) : ListAdapter<Book, LibraryAdapter.ViewHolder>(DiffCallback()), Filterable {
 
@@ -35,13 +37,28 @@ class LibraryAdapter(
     }
 
     override fun onBindViewHolder(holder: ViewHolder, position: Int) {
+        val context = holder.binding.bookCover.context
         val book = getItem(position)
         holder.binding.bookTitle.text = book.name
-        GlobalScope.launch {
-            MetadataRepository(holder.binding.bookCover.context)
+        lifecycleScope.launchWhenResumed {
+            MetadataRepository(context)
                 .getBook(book)
                 .collect { meta ->
                     meta?.coverPath?.let { holder.binding.bookCover.load(it) }
+                }
+        }
+        lifecycleScope.launchWhenResumed {
+            book.getGroups(context)
+                .collect { group ->
+                    val unreadCount = group.filter { !it.isRead() }.size
+                    holder.binding.unreadCount.apply {
+                        if (unreadCount > 0) {
+                            visible = true
+                            text = unreadCount.toString()
+                        } else {
+                            visible = false
+                        }
+                    }
                 }
         }
     }

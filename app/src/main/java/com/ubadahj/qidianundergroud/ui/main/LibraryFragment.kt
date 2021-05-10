@@ -7,6 +7,7 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.core.widget.addTextChangedListener
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
+import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.GridLayoutManager
 import com.google.android.material.snackbar.Snackbar
@@ -23,7 +24,7 @@ import com.ubadahj.qidianundergroud.utils.ui.toDp
 class LibraryFragment : Fragment() {
 
     private val viewModel: MainViewModel by activityViewModels()
-    private val adapter: LibraryAdapter = LibraryAdapter(listOf()) {
+    private val adapter: LibraryAdapter = LibraryAdapter(listOf(), lifecycleScope) {
         viewModel.selectedBook.value = it
         findNavController().navigate(
             LibraryFragmentDirections.actionLibraryFragmentToBookFragment()

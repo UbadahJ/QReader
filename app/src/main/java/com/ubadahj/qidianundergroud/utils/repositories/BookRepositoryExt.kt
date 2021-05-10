@@ -10,5 +10,5 @@ suspend fun Book.addToLibrary(context: Context) =
 suspend fun Book.removeFromLibrary(context: Context) =
     BookRepository(context).removeFromLibrary(this)
 
-fun Book.getChapters(context: Context) =
+fun Book.getGroups(context: Context) =
     BookRepository(context).getGroups(this)
