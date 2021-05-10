@@ -6,6 +6,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
+import com.google.android.material.snackbar.Snackbar
 
 fun RecyclerView.addOnScrollStateListener(listener: (RecyclerView, Int) -> Unit) {
     addOnScrollListener(object : RecyclerView.OnScrollListener() {
@@ -31,3 +32,6 @@ fun Number.toDp(context: Context): Number =
         this.toFloat(),
         context.resources.displayMetrics
     )
+
+fun View.snackBar(text: String, length: Int = Snackbar.LENGTH_SHORT) =
+    Snackbar.make(this, text, length).show()

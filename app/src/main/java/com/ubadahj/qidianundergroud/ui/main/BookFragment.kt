@@ -30,6 +30,7 @@ import com.ubadahj.qidianundergroud.utils.models.markAsRead
 import com.ubadahj.qidianundergroud.utils.models.setNotifications
 import com.ubadahj.qidianundergroud.utils.repositories.addToLibrary
 import com.ubadahj.qidianundergroud.utils.repositories.removeFromLibrary
+import com.ubadahj.qidianundergroud.utils.ui.snackBar
 import com.ubadahj.qidianundergroud.utils.ui.visible
 import kotlinx.coroutines.flow.collect
 
@@ -66,60 +67,95 @@ class BookFragment : Fragment() {
         configureMenu(book)
         binding?.apply {
             bookTitle.text = book.name
-
             bookImage.load(R.drawable.placeholder_600_800)
-            chapterListView.adapter = GroupAdapter(listOf(), {
-                viewModel.selectedGroup.value = it
-                findNavController().navigate(
-                    BookFragmentDirections.actionBookFragmentToChapterFragment()
-                )
-            }) {
-                GroupDetailsDialog(it)
-                    .show(requireActivity().supportFragmentManager, null)
-            }
 
-            libraryButton.setOnClickListener {
-                lifecycleScope.launchWhenResumed {
-                    if (book.inLibrary) {
-                        book.removeFromLibrary(requireContext())
-                        Snackbar.make(root, "Removed book to the library", Snackbar.LENGTH_SHORT)
-                            .show()
-                    } else {
-                        book.addToLibrary(requireContext())
-                        Snackbar.make(root, "Added book to the library", Snackbar.LENGTH_SHORT)
-                            .show()
-                    }
+            configureLibraryButton(book)
+            configureDownloadButton(book)
+            configureMenuButton()
 
-                    BookRepository(requireContext())
-                        .getBookById(book.id)
-                        .collect { viewModel.selectedBook.postValue(it) }
+            configureGroupAdapter()
+
+            lifecycleScope.launchWhenResumed {
+                viewModel.getMetadata(requireContext(), book).observe(viewLifecycleOwner) {
+                    configureMetadata(it, book)
                 }
             }
+        }
 
-            menuImageView.setOnClickListener {
-                MenuDialog(menuAdapter).show(requireActivity().supportFragmentManager, null)
+        loadGroups(book)
+    }
+
+    private fun BookFragmentBinding.configureLibraryButton(book: Book) {
+        if (book.inLibrary) {
+            libraryButton.load(R.drawable.heart_filled)
+            libraryLabel.text = "In library"
+        } else {
+            libraryButton.load(R.drawable.heart)
+            libraryLabel.text = "Add to library"
+        }
+
+        libraryButton.setOnClickListener {
+            lifecycleScope.launchWhenResumed {
+                if (book.inLibrary) {
+                    book.removeFromLibrary(requireContext())
+                    Snackbar.make(root, "Removed book to the library", Snackbar.LENGTH_SHORT)
+                        .show()
+                } else {
+                    book.addToLibrary(requireContext())
+                    Snackbar.make(root, "Added book to the library", Snackbar.LENGTH_SHORT)
+                        .show()
+                }
+
+                BookRepository(requireContext())
+                    .getBookById(book.id)
+                    .collect { viewModel.selectedBook.postValue(it) }
             }
+        }
+    }
 
-            if (book.inLibrary) {
-                libraryButton.load(R.drawable.heart_filled)
-                libraryLabel.text = "In library"
-            } else {
-                libraryButton.load(R.drawable.heart)
-                libraryLabel.text = "Add to library"
+    private fun BookFragmentBinding.configureDownloadButton(
+        book: Book
+    ) {
+        downloadImageView.setOnClickListener {
+            val work = OneTimeWorkRequestBuilder<DownloadService>().apply {
+                setInputData(Data.Builder().apply {
+                    putString("book_id", book.id)
+                }.build())
+            }.build()
+            WorkManager.getInstance(requireContext()).enqueueUniqueWork(
+                "download-service", ExistingWorkPolicy.KEEP, work
+            )
+        }
+    }
+
+    private fun BookFragmentBinding.configureMenuButton() {
+        menuImageView.setOnClickListener {
+            MenuDialog(menuAdapter).show(requireActivity().supportFragmentManager, null)
+        }
+    }
+
+    private fun BookFragmentBinding.configureGroupAdapter() {
+        chapterListView.adapter = GroupAdapter(listOf(), {
+            viewModel.selectedGroup.value = it
+            findNavController().navigate(
+                BookFragmentDirections.actionBookFragmentToChapterFragment()
+            )
+        }) {
+            GroupDetailsDialog(it)
+                .show(requireActivity().supportFragmentManager, null)
+        }
+    }
+
+    private fun BookFragmentBinding.configureMetadata(
+        it: Resource<Metadata?>,
+        book: Book
+    ) {
+        when (it) {
+            is Resource.Loading -> {
+                metaProgress.visible = true
             }
-
-            downloadImageView.setOnClickListener {
-                val work = OneTimeWorkRequestBuilder<DownloadService>().apply {
-                    setInputData(Data.Builder().apply {
-                        putString("book_id", book.id)
-                    }.build())
-                }.build()
-                WorkManager.getInstance(requireContext()).enqueueUniqueWork(
-                    "download-service", ExistingWorkPolicy.KEEP, work
-                )
-            }
-
-            viewModel.getMetadata(requireContext(), book).observe(viewLifecycleOwner) {
+            is Resource.Success -> {
+                metaProgress.visible = false
                 it.data?.apply {
                     bookImage.load(coverPath)
                     bookAuthor.text = author
@@ -130,9 +166,11 @@ class BookFragment : Fragment() {
                     configureMenu(book, this)
                 }
             }
+            is Resource.Error -> {
+                metaProgress.visible = false
+                root.snackBar("Failed to load metadata")
+            }
         }
-
-        loadGroups(book)
     }
 
     private fun configureMenu(book: Book, metadata: Metadata? = null) {
@@ -146,13 +184,8 @@ class BookFragment : Fragment() {
                 lifecycleScope.launchWhenResumed {
                     viewModel.getMetadata(requireContext(), book, true)
                         .observe(viewLifecycleOwner) {
+                            binding?.configureMetadata(it, book)
                             it.data?.apply {
-                                binding?.bookImage?.load(coverPath)
-                                binding?.bookAuthor?.text = author
-                                binding?.bookDesc?.text = description
-                                binding?.bookGenre?.text = category
-                                binding?.bookGenre?.visible = true
-
                                 configureMenu(book, this)
                             }
                         }

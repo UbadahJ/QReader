@@ -209,6 +209,15 @@
 
             </com.google.android.material.card.MaterialCardView>
 
+            <ProgressBar
+                android:id="@+id/meta_progress"
+                style="?android:attr/progressBarStyle"
+                android:layout_width="24dp"
+                android:layout_height="24dp"
+                android:layout_marginTop="16dp"
+                app:layout_constraintEnd_toStartOf="@+id/v_guideline_90"
+                app:layout_constraintTop_toBottomOf="@+id/book_image" />
+
         </androidx.constraintlayout.widget.ConstraintLayout>
     </androidx.core.widget.NestedScrollView>
 
