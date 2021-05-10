@@ -1,5 +1,7 @@
 package com.ubadahj.qidianundergroud.utils.ui
 
+import android.content.Context
+import android.util.TypedValue
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -22,3 +24,10 @@ var View.visible: Boolean
 
 val ViewGroup.inflater: LayoutInflater
     get() = LayoutInflater.from(context)
+
+fun Number.toDp(context: Context): Number =
+    TypedValue.applyDimension(
+        TypedValue.COMPLEX_UNIT_DIP,
+        this.toFloat(),
+        context.resources.displayMetrics
+    )

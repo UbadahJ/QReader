@@ -15,8 +15,10 @@ import com.ubadahj.qidianundergroud.databinding.BookListFragmentBinding
 import com.ubadahj.qidianundergroud.models.Resource
 import com.ubadahj.qidianundergroud.ui.adapters.LibraryAdapter
 import com.ubadahj.qidianundergroud.ui.adapters.MenuAdapter
+import com.ubadahj.qidianundergroud.ui.adapters.decorations.GridItemOffsetDecoration
 import com.ubadahj.qidianundergroud.ui.dialog.MenuDialog
 import com.ubadahj.qidianundergroud.ui.models.MenuDialogItem
+import com.ubadahj.qidianundergroud.utils.ui.toDp
 
 class LibraryFragment : Fragment() {
 
@@ -66,6 +68,11 @@ class LibraryFragment : Fragment() {
 
             bookListingView.adapter = adapter
             bookListingView.layoutManager = GridLayoutManager(requireContext(), 2)
+            bookListingView.addItemDecoration(
+                GridItemOffsetDecoration(
+                    2, 8.toDp(requireContext()).toInt()
+                )
+            )
 
             searchBar.searchEditText.addTextChangedListener { text: Editable? ->
                 adapter.filter.filter((text))
