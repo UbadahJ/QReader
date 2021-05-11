@@ -71,7 +71,7 @@ class LibraryFragment : Fragment() {
             bookListingView.layoutManager = GridLayoutManager(requireContext(), 2)
             bookListingView.addItemDecoration(
                 GridItemOffsetDecoration(
-                    2, 8.toDp(requireContext()).toInt()
+                    2, 12.toDp(requireContext()).toInt()
                 )
             )
 

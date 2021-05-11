@@ -6,14 +6,14 @@
     android:layout_height="wrap_content"
     android:orientation="vertical">
 
-    <com.google.android.material.imageview.ShapeableImageView
+    <ImageView
         android:id="@+id/book_cover"
         android:layout_width="match_parent"
         android:layout_height="220dp"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
-        tools:srcCompat="@tools:sample/avatars" />
+        tools:srcCompat="@drawable/browse_background" />
 
     <com.google.android.material.textview.MaterialTextView
         android:id="@+id/book_title"

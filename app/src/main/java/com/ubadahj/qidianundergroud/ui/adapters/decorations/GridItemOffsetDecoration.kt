@@ -16,7 +16,6 @@ class GridItemOffsetDecoration(
         state: RecyclerView.State
     ) {
         val position = parent.getChildAdapterPosition(view)
-
         when {
             position < spanCount -> {
                 // left grid
@@ -28,7 +27,7 @@ class GridItemOffsetDecoration(
             }
             // left grid
             position % 2 == 0 ->
-                rect.set(0, itemOffset / 2, itemOffset, itemOffset / 2)
+                rect.set(0, itemOffset / 2, itemOffset / 2, itemOffset / 2)
             // right grid
             position % 2 == 1 ->
                 rect.set(itemOffset / 2, itemOffset / 2, 0, itemOffset / 2)

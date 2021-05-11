@@ -6,11 +6,13 @@ import androidx.lifecycle.LifecycleCoroutineScope
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.RecyclerView
 import coil.load
+import coil.transform.RoundedCornersTransformation
 import com.ubadahj.qidianundergroud.databinding.LibraryBookItemBinding
 import com.ubadahj.qidianundergroud.models.Book
 import com.ubadahj.qidianundergroud.repositories.MetadataRepository
 import com.ubadahj.qidianundergroud.utils.models.isRead
 import com.ubadahj.qidianundergroud.utils.repositories.getGroups
+import com.ubadahj.qidianundergroud.utils.ui.toDp
 import com.ubadahj.qidianundergroud.utils.ui.visible
 import kotlinx.coroutines.flow.collect
 
@@ -43,7 +45,11 @@ class LibraryAdapter(
             MetadataRepository(context)
                 .getBook(book)
                 .collect { meta ->
-                    meta?.coverPath?.let { holder.binding.bookCover.load(it) }
+                    meta?.coverPath?.let {
+                        holder.binding.bookCover.load(it) {
+                            transformations(RoundedCornersTransformation(4.toDp(context).toFloat()))
+                        }
+                    }
                 }
         }
         lifecycleScope.launchWhenResumed {
