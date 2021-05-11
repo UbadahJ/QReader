@@ -95,15 +95,13 @@ class BookFragment : Fragment() {
         }
 
         libraryButton.setOnClickListener {
-            lifecycleScope.launchWhenResumed {
+            lifecycleScope.launchWhenCreated {
                 if (book.inLibrary) {
                     book.removeFromLibrary(requireContext())
-                    Snackbar.make(root, "Removed book to the library", Snackbar.LENGTH_SHORT)
-                        .show()
+                    root.snackBar("Removed book to the library")
                 } else {
                     book.addToLibrary(requireContext())
-                    Snackbar.make(root, "Added book to the library", Snackbar.LENGTH_SHORT)
-                        .show()
+                    root.snackBar("Added book to the library")
                 }
 
                 BookRepository(requireContext())
