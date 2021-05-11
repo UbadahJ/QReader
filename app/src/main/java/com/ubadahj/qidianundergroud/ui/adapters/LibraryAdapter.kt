@@ -2,14 +2,10 @@ package com.ubadahj.qidianundergroud.ui.adapters
 
 import android.view.LayoutInflater
 import android.view.ViewGroup
-import android.widget.Filter
-import android.widget.Filterable
 import androidx.lifecycle.LifecycleCoroutineScope
 import androidx.recyclerview.widget.DiffUtil
-import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
 import coil.load
-import com.github.ajalt.timberkt.Timber
 import com.ubadahj.qidianundergroud.databinding.LibraryBookItemBinding
 import com.ubadahj.qidianundergroud.models.Book
 import com.ubadahj.qidianundergroud.repositories.MetadataRepository
@@ -19,13 +15,16 @@ import com.ubadahj.qidianundergroud.utils.ui.visible
 import kotlinx.coroutines.flow.collect
 
 class LibraryAdapter(
-    private var books: List<Book>,
+    books: List<Book>,
     private val lifecycleScope: LifecycleCoroutineScope,
     private val onClick: (Book) -> Unit
-) : ListAdapter<Book, LibraryAdapter.ViewHolder>(DiffCallback()), Filterable {
+) : FilterableListAdapter<Book, LibraryAdapter.ViewHolder>(DiffCallback()) {
 
     init {
         submitList(books)
+        filterPredicate = { list, constraint ->
+            list.filter { it.name.contains(constraint, true) }
+        }
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
@@ -61,42 +60,6 @@ class LibraryAdapter(
                     }
                 }
         }
-    }
-
-    override fun getFilter(): Filter {
-        return object : Filter() {
-            override fun performFiltering(p0: CharSequence?): FilterResults =
-                FilterResults().apply {
-                    Timber.d { "getFilter: $books" }
-                    values = if (p0.isNullOrEmpty())
-                        books
-                    else
-                        books.filter { it.name.contains(p0, true) }
-                }
-
-            @Suppress("UNCHECKED_CAST")
-            override fun publishResults(p0: CharSequence?, p1: FilterResults?) {
-                submitList(p1?.values as? MutableList<Book>, true)
-            }
-
-        }
-    }
-
-    override fun submitList(list: List<Book>?) {
-        submitList(list, false)
-    }
-
-    private fun submitList(list: List<Book>?, filtered: Boolean) {
-        // This function is responsible for maintaining the
-        // actual contents for the list for filtering
-        // The submitList for parent class delegates false
-        // so that a new contents can be set
-        // While a filter pass true which make sure original list
-        // is maintained
-        if (!filtered)
-            books = list ?: listOf()
-
-        super.submitList(list)
     }
 
     class ViewHolder(val binding: LibraryBookItemBinding, onClick: (Int) -> Unit) :
