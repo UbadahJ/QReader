@@ -5,6 +5,7 @@ import android.util.TypedValue
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.annotation.StringRes
 import androidx.recyclerview.widget.RecyclerView
 import com.google.android.material.snackbar.Snackbar
 
@@ -34,4 +35,7 @@ fun Number.toDp(context: Context): Number =
     )
 
 fun View.snackBar(text: String, length: Int = Snackbar.LENGTH_SHORT) =
+    Snackbar.make(this, text, length).show()
+
+fun View.snackBar(@StringRes text: Int, length: Int = Snackbar.LENGTH_SHORT) =
     Snackbar.make(this, text, length).show()

@@ -22,18 +22,22 @@ class BookRepository(val context: Context) {
     fun getBookById(id: String) = database.bookQueries.getById(id).asFlow().mapToOne()
 
     suspend fun getBooks(refresh: Boolean = false): Flow<List<Book>> {
-        val dbBookIds = database.bookQueries.getAll().executeAsList().map { it.id }
-        if (refresh || dbBookIds.isEmpty()) {
+        val dbBooks = database.bookQueries.getAll().executeAsList()
+        val dbBookIds = dbBooks.map { it.id }
+
+        if (refresh || dbBooks.isEmpty()) {
             val books = Api(proxy = true).getBooks().map { it.toBook() }
+            val bookIds = books.map { it.id }
+
+            val (toUpdate, notAvailable) = dbBooks.partition { it.id in bookIds }
+            val toInsert = books.filter { it.id !in dbBookIds }
+
             database.bookQueries.transaction {
-                books.forEach { book ->
-                    database.bookQueries.upsert(
-                        book.name,
-                        book.lastUpdated,
-                        book.completed,
-                        book.id
-                    )
+                toUpdate.forEach {
+                    database.bookQueries.update(it.name, it.lastUpdated, it.completed, it.id)
                 }
+                notAvailable.forEach { database.bookQueries.setAvailable(false, it.id) }
+                toInsert.forEach { database.bookQueries.insert(it) }
             }
         }
 
@@ -81,6 +85,13 @@ class BookRepository(val context: Context) {
         }
     }
 
-    private fun BookJson.toBook() = Book(id, name, lastUpdated, completed, inLibrary)
+    private fun BookJson.toBook() = Book(
+        id = id,
+        name = name,
+        lastUpdated = lastUpdated,
+        completed = completed,
+        inLibrary = false,
+        isAvailable = true
+    )
 
 }
