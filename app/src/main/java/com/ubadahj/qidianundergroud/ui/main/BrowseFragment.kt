@@ -4,7 +4,6 @@ import android.os.Bundle
 import android.text.Editable
 import android.view.*
 import androidx.appcompat.app.AppCompatActivity
-import androidx.core.widget.addTextChangedListener
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import androidx.navigation.fragment.findNavController
@@ -90,8 +89,8 @@ class BrowseFragment : Fragment() {
         return when (item.itemId) {
             R.id.search -> {
                 binding?.apply {
-                    val searchBarVisible = bookListingView.y != searchBar.root.y
-                    bookListingView.animate()
+                    val searchBarVisible = bookListingViewContainer.y != searchBar.root.y
+                    bookListingViewContainer.animate()
                         .alpha(1f)
                         .translationY(if (!searchBarVisible) searchBar.root.height + 32f else 0f)
                         .start()
