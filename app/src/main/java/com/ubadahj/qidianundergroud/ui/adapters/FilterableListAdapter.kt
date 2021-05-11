@@ -5,27 +5,28 @@ import android.widget.Filterable
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
+import com.l4digital.fastscroll.FastScroller
 
 abstract class FilterableListAdapter<T, VH : RecyclerView.ViewHolder>(
     diffCallback: DiffUtil.ItemCallback<T>
-) : ListAdapter<T, VH>(diffCallback), Filterable {
+) : ListAdapter<T, VH>(diffCallback), Filterable, FastScroller.SectionIndexer {
 
     /**
      * Set the predicate by which the list will be filtered
      * */
-    var filterPredicate: ((list: List<T>, constraint: String) -> List<T>)? = null
+    abstract val filterPredicate: ((list: List<T>, constraint: String) -> List<T>)
+    protected open val bubbleText: ((T) -> String) = { "" }
 
     private var originalList: List<T> = currentList.toList()
 
     override fun getFilter(): Filter {
         return object : Filter() {
             override fun performFiltering(constraint: CharSequence?): FilterResults {
-                val shouldFilter = !(constraint.isNullOrEmpty() || filterPredicate == null)
                 return FilterResults().apply {
-                    values = if (shouldFilter)
-                        filterPredicate!!.invoke(originalList, constraint.toString())
-                    else
+                    values = if (constraint.isNullOrEmpty())
                         originalList
+                    else
+                        filterPredicate(originalList, constraint.toString())
                 }
             }
 
@@ -57,4 +58,5 @@ abstract class FilterableListAdapter<T, VH : RecyclerView.ViewHolder>(
         super.submitList(list)
     }
 
+    override fun getSectionText(position: Int): CharSequence = bubbleText(currentList[position])
 }

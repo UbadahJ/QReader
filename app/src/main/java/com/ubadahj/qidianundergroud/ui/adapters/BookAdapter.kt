@@ -12,18 +12,22 @@ class BookAdapter(
     private val onClick: (Book) -> Unit
 ) : FilterableListAdapter<Book, BookAdapter.ViewHolder>(DiffCallback()) {
 
+    override val filterPredicate: (List<Book>, String) -> List<Book> = { list, constraint ->
+        list.filter { it.name.contains(constraint, true) }
+    }
+
+    override val bubbleText: ((Book) -> String) = { it.name.first().toString() }
+
     init {
         submitList(books)
-        filterPredicate = { list, constraint ->
-            list.filter { it.name.contains(constraint, true) }
-        }
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
         return ViewHolder(
             BookItemBinding.inflate(
                 LayoutInflater.from(parent.context), parent, false
-        )) { onClick(getItem(it)) }
+            )
+        ) { onClick(getItem(it)) }
     }
 
     override fun onBindViewHolder(holder: ViewHolder, position: Int) {

@@ -24,11 +24,13 @@ class GroupAdapter(
     private val defaultColors: MutableMap<ChapterGroup, Int> = mutableMapOf()
     private var readColor: Int = 0
 
-    init {
-        submitList(groups)
-        filterPredicate = { list, constraint ->
+    override val filterPredicate: (List<ChapterGroup>, String) -> List<ChapterGroup> =
+        { list, constraint ->
             list.filter { it.contains(constraint.toIntOrNull() ?: -1) }
         }
+
+    init {
+        submitList(groups)
         stateRestorationPolicy = StateRestorationPolicy.PREVENT_WHEN_EMPTY
     }
 
