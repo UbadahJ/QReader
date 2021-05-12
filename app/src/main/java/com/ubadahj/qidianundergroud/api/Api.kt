@@ -1,7 +1,7 @@
 package com.ubadahj.qidianundergroud.api
 
-import com.ubadahj.qidianundergroud.api.models.BookJson
-import com.ubadahj.qidianundergroud.api.models.ChapterGroupJson
+import com.ubadahj.qidianundergroud.api.models.undeground.BookJson
+import com.ubadahj.qidianundergroud.api.models.undeground.ChapterGroupJson
 import com.ubadahj.qidianundergroud.database.moshi
 import okhttp3.OkHttpClient
 import okhttp3.logging.HttpLoggingInterceptor
@@ -11,30 +11,30 @@ import retrofit2.converter.moshi.MoshiConverterFactory
 class Api(private val proxy: Boolean = false) {
 
     companion object {
-        private val client: OkHttpClient = OkHttpClient.Builder().apply {
+        val client: OkHttpClient = OkHttpClient.Builder().apply {
             networkInterceptors().add(HttpLoggingInterceptor().apply {
                 setLevel(HttpLoggingInterceptor.Level.BASIC)
             })
             cookieJar(MemoryCookieJar())
         }.build()
 
-        private val api: UndergroundApi by lazy {
+        fun getRetrofit(url: String): Retrofit =
             Retrofit.Builder()
-                .baseUrl("https://toc.qidianunderground.org/api/v1/pages/")
+                .baseUrl(url)
                 .client(client)
                 .addConverterFactory(MoshiConverterFactory.create(moshi).asLenient())
                 .build()
+
+        private val api: UndergroundApi by lazy {
+            getRetrofit("https://toc.qidianunderground.org/api/v1/pages/")
                 .create(UndergroundApi::class.java)
         }
 
         private val proxyApi: ProxyApi by lazy {
-            Retrofit.Builder()
-                .baseUrl("http://us7.unblock-websites.com/")
-                .client(client)
-                .addConverterFactory(MoshiConverterFactory.create(moshi).asLenient())
-                .build()
+            getRetrofit("http://us7.unblock-websites.com/")
                 .create(ProxyApi::class.java)
         }
+
     }
 
     suspend fun getBooks(): List<BookJson> {

@@ -16,8 +16,7 @@ import com.ubadahj.qidianundergroud.utils.models.lastChapter
 import com.ubadahj.qidianundergroud.utils.repositories.updateLastRead
 
 class GroupDetailsDialog(
-    private val group: ChapterGroup,
-    private val onChange: () -> Unit
+    private val group: ChapterGroup
 ) : BottomSheetDialogFragment() {
 
     private var binding: GroupInfoMenuBinding? = null
@@ -45,11 +44,11 @@ class GroupDetailsDialog(
             downloadStatusText.text = downloaded
 
             recyclerView.adapter = MenuAdapter(
-                listOf(MenuDialogItem("Mark as read", R.drawable.check))
-            ) { _, _ ->
-                group.updateLastRead(requireContext(), group.lastChapter)
-                dismiss()
-            }
+                listOf(MenuDialogItem("Mark as read", R.drawable.check) {
+                    group.updateLastRead(requireContext(), group.lastChapter)
+                    dismiss()
+                })
+            )
         }.root
     }
 

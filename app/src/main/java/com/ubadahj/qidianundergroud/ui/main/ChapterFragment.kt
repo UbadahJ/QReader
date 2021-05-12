@@ -28,12 +28,7 @@ class ChapterFragment : Fragment() {
     private val viewModel: MainViewModel by activityViewModels()
     private var binding: ChapterFragmentBinding? = null
     private var menu: MenuDialog = MenuDialog(
-        MenuAdapter(listOf(MenuDialogItem("Loading", R.drawable.pulse))) { _, pos ->
-            binding?.apply {
-                viewModel.selectedChapter.value = adapter.currentList[pos]
-                chapterRecyclerView.linearScroll(pos)
-            }
-        }
+        MenuAdapter(listOf(MenuDialogItem("Loading", R.drawable.pulse)))
     )
     private var adapter: ChapterAdapter = ChapterAdapter(listOf())
 
@@ -98,7 +93,7 @@ class ChapterFragment : Fragment() {
     @SuppressLint("SetJavaScriptEnabled")
     private fun init(chapters: ChapterGroup) {
         binding?.apply {
-            errorButton.setOnClickListener { getChapterContents(chapters, true) }
+            errorGroup.errorButton.setOnClickListener { getChapterContents(chapters, true) }
         }
         getChapterContents(chapters)
     }
@@ -116,7 +111,7 @@ class ChapterFragment : Fragment() {
         when (resource) {
             is Resource.Error -> {
                 toolbar.appbar.title = "Error"
-                errorGroup.visibility = View.VISIBLE
+                errorGroup.root.visibility = View.VISIBLE
                 progressBar.visibility = View.GONE
 
                 menu.adapter.submitList(
@@ -126,11 +121,11 @@ class ChapterFragment : Fragment() {
             is Resource.Loading -> {
                 toolbar.appbar.title = "Loading"
                 progressBar.visibility = View.VISIBLE
-                errorGroup.visibility = View.GONE
+                errorGroup.root.visibility = View.GONE
             }
             is Resource.Success -> {
                 progressBar.visibility = View.GONE
-                errorGroup.visibility = View.GONE
+                errorGroup.root.visibility = View.GONE
             }
         }
     }
@@ -156,7 +151,14 @@ class ChapterFragment : Fragment() {
     }
 
     private fun updateMenu(items: List<Chapter>) {
-        menu.adapter.submitList(items.map { MenuDialogItem(it.title) })
+        menu.adapter.submitList(items.mapIndexed { i, it ->
+            MenuDialogItem(it.title) {
+                binding?.apply {
+                    viewModel.selectedChapter.value = it
+                    chapterRecyclerView.linearScroll(i)
+                }
+            }
+        })
     }
 
     private fun Chapter.getIndex(): Int {

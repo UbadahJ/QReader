@@ -7,10 +7,9 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.core.widget.addTextChangedListener
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
+import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
-import com.github.ajalt.timberkt.d
-import com.google.android.material.snackbar.Snackbar
 import com.ubadahj.qidianundergroud.R
 import com.ubadahj.qidianundergroud.databinding.BookListFragmentBinding
 import com.ubadahj.qidianundergroud.models.Book
@@ -19,16 +18,22 @@ import com.ubadahj.qidianundergroud.ui.adapters.BookAdapter
 import com.ubadahj.qidianundergroud.ui.adapters.MenuAdapter
 import com.ubadahj.qidianundergroud.ui.dialog.MenuDialog
 import com.ubadahj.qidianundergroud.ui.models.MenuDialogItem
+import com.ubadahj.qidianundergroud.utils.ui.snackBar
+import com.ubadahj.qidianundergroud.utils.ui.visible
 
 class BrowseFragment : Fragment() {
 
     private val viewModel: MainViewModel by activityViewModels()
     private val menu = MenuDialog(
-        MenuAdapter(listOf(MenuDialogItem("Refresh", R.drawable.refresh))) { _, i ->
-            if (i == 0) viewModel
-                .getBooks(requireContext(), refresh = true)
-                .observe(viewLifecycleOwner, this@BrowseFragment::getBooks)
-        }
+        MenuAdapter(
+            listOf(
+                MenuDialogItem("Refresh", R.drawable.refresh) {
+                    viewModel
+                        .getBooks(requireContext(), refresh = true)
+                        .observe(viewLifecycleOwner) { getBooks(it, true) }
+                }
+            )
+        )
     )
 
     private var binding: BookListFragmentBinding? = null
@@ -65,18 +70,29 @@ class BrowseFragment : Fragment() {
         }
     }
 
-    private fun getBooks(resource: Resource<List<Book>>) {
-        d { "getBooks(): resource = $resource" }
-        when (resource) {
-            is Resource.Success -> {
-                binding?.progressBar?.visibility = View.GONE
-                adapter.submitList(resource.data!!)
-            }
-            is Resource.Loading -> binding?.progressBar?.visibility = View.VISIBLE
-            is Resource.Error -> {
-                binding?.apply {
-                    progressBar.visibility = View.GONE
-                    Snackbar.make(root, R.string.error_refreshing, Snackbar.LENGTH_SHORT).show()
+    private fun getBooks(resource: Resource<List<Book>>, isRefresh: Boolean = false) {
+        lifecycleScope.launchWhenStarted {
+            when (resource) {
+                is Resource.Success -> {
+                    binding?.apply {
+                        progressBar.visible = false
+                        if (isRefresh) {
+                            val count = resource.data!!.size - adapter.currentList.size
+                            if (count == 0)
+                                root.snackBar("No new books found!")
+                            else
+                                root.snackBar("$count new books added")
+                        }
+                    }
+
+                    adapter.submitList(resource.data!!)
+                }
+                is Resource.Loading -> binding?.progressBar?.visible = true
+                is Resource.Error -> {
+                    binding?.apply {
+                        progressBar.visible = false
+                        root.snackBar(R.string.error_refreshing)
+                    }
                 }
             }
         }
@@ -86,8 +102,8 @@ class BrowseFragment : Fragment() {
         return when (item.itemId) {
             R.id.search -> {
                 binding?.apply {
-                    val searchBarVisible = bookListingView.y != searchBar.root.y
-                    bookListingView.animate()
+                    val searchBarVisible = bookListingViewContainer.y != searchBar.root.y
+                    bookListingViewContainer.animate()
                         .alpha(1f)
                         .translationY(if (!searchBarVisible) searchBar.root.height + 32f else 0f)
                         .start()

@@ -6,12 +6,14 @@ import com.squareup.sqldelight.runtime.coroutines.asFlow
 import com.squareup.sqldelight.runtime.coroutines.mapToList
 import com.squareup.sqldelight.runtime.coroutines.mapToOne
 import com.ubadahj.qidianundergroud.api.Api
-import com.ubadahj.qidianundergroud.api.models.BookJson
+import com.ubadahj.qidianundergroud.api.models.undeground.BookJson
 import com.ubadahj.qidianundergroud.database.BookDatabase
 import com.ubadahj.qidianundergroud.models.Book
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.flow
+import kotlinx.coroutines.withContext
 
 class BookRepository(val context: Context) {
 
@@ -20,18 +22,22 @@ class BookRepository(val context: Context) {
     fun getBookById(id: String) = database.bookQueries.getById(id).asFlow().mapToOne()
 
     suspend fun getBooks(refresh: Boolean = false): Flow<List<Book>> {
-        val dbBookIds = database.bookQueries.getAll().executeAsList().map { it.id }
-        if (refresh || dbBookIds.isEmpty()) {
+        val dbBooks = database.bookQueries.getAll().executeAsList()
+        val dbBookIds = dbBooks.map { it.id }
+
+        if (refresh || dbBooks.isEmpty()) {
             val books = Api(proxy = true).getBooks().map { it.toBook() }
+            val bookIds = books.map { it.id }
+
+            val (toUpdate, notAvailable) = dbBooks.partition { it.id in bookIds }
+            val toInsert = books.filter { it.id !in dbBookIds }
+
             database.bookQueries.transaction {
-                books.forEach { book ->
-                    database.bookQueries.upsert(
-                        book.name,
-                        book.lastUpdated,
-                        book.completed,
-                        book.id
-                    )
+                toUpdate.forEach {
+                    database.bookQueries.update(it.name, it.lastUpdated, it.completed, it.id)
                 }
+                notAvailable.forEach { database.bookQueries.setAvailable(false, it.id) }
+                toInsert.forEach { database.bookQueries.insert(it) }
             }
         }
 
@@ -43,11 +49,22 @@ class BookRepository(val context: Context) {
     fun getGroups(book: Book) =
         database.bookQueries.chapters(book.id).asFlow().mapToList()
 
-    fun addToLibrary(book: Book) {
+    suspend fun addToLibrary(book: Book) = withContext(Dispatchers.IO) {
         if (database.bookQueries.getById(book.id).executeAsOneOrNull() == null)
-            throw IllegalArgumentException("$this does not exists in library")
+            throw IllegalArgumentException("$book does not exists in library")
 
         database.bookQueries.addToLibrary(book.id)
+    }
+
+    suspend fun removeFromLibrary(book: Book) = withContext(Dispatchers.IO) {
+        if (!database.bookQueries.getById(book.id).executeAsOne().inLibrary)
+            throw IllegalArgumentException("$book already exists in library")
+
+        database.bookQueries.removeFromLibrary(book.id)
+    }
+
+    suspend fun markAllRead(book: Book) = withContext(Dispatchers.IO) {
+        database.bookQueries.markAllRead(book.id)
     }
 
     fun download(book: Book, factory: (Context) -> WebView, totalRetries: Int = 3) = flow {
@@ -68,6 +85,13 @@ class BookRepository(val context: Context) {
         }
     }
 
-    private fun BookJson.toBook() = Book(id, name, lastUpdated, completed, inLibrary)
+    private fun BookJson.toBook() = Book(
+        id = id,
+        name = name,
+        lastUpdated = lastUpdated,
+        completed = completed,
+        inLibrary = false,
+        isAvailable = true
+    )
 
 }

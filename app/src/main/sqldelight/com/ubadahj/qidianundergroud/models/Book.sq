@@ -4,11 +4,12 @@ import java.lang.Boolean;
 
 CREATE TABLE Book
 (
-    id          TEXT                         NOT NULL,
-    name        TEXT                         NOT NULL,
-    lastUpdated TEXT                         NOT NULL,
-    completed   INTEGER AS Boolean           NOT NULL,
+    id          TEXT               NOT NULL,
+    name        TEXT               NOT NULL,
+    lastUpdated TEXT               NOT NULL,
+    completed   INTEGER AS Boolean NOT NULL,
     inLibrary   INTEGER AS Boolean DEFAULT 0 NOT NULL,
+    isAvailable INTEGER AS Boolean DEFAULT 1 NOT NULL,
     PRIMARY KEY (id)
 );
 
@@ -34,7 +35,7 @@ FROM Book
 WHERE name LIKE ?;
 
 insert:
-INSERT OR IGNORE INTO Book(id, name, lastUpdated, completed, inLibrary)
+INSERT OR IGNORE INTO Book(id, name, lastUpdated, completed, inLibrary, isAvailable)
 VALUES ?;
 
 insertByValues:
@@ -44,6 +45,11 @@ VALUES (? , ?, ?, ?);
 update:
 UPDATE Book
 SET name = ?, lastUpdated = ?, completed = ?
+WHERE id = ?;
+
+setAvailable:
+UPDATE Book
+SET isAvailable = ?
 WHERE id = ?;
 
 overwrite:
@@ -70,8 +76,18 @@ UPDATE Book
 SET inLibrary = 1
 WHERE id = ?;
 
+removeFromLibrary:
+UPDATE Book
+SET inLibrary = 0
+WHERE id = ?;
+
 chapters:
 SELECT *
 FROM ChapterGroup
 WHERE bookId = ?
 ORDER BY CAST(TRIM(SUBSTR(text, 1, INSTR(text, '-') - 1)) AS INTEGER);
+
+markAllRead:
+UPDATE ChapterGroup
+SET lastRead = CAST(TRIM(SUBSTR(text, INSTR(text, '-') + 1)) AS INTEGER)
+WHERE bookId = ?;

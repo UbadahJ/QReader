@@ -22,29 +22,44 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/toolbar" />
 
-    <com.l4digital.fastscroll.FastScrollRecyclerView
-        android:id="@+id/book_listing_view"
+    <androidx.coordinatorlayout.widget.CoordinatorLayout
+        android:id="@+id/book_listing_view_container"
         android:layout_width="0dp"
         android:layout_height="0dp"
+        android:layout_marginStart="16dp"
+        android:layout_marginEnd="16dp"
         android:background="?android:attr/colorBackground"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/toolbar" />
+        app:layout_constraintTop_toBottomOf="@+id/toolbar">
 
-    <com.google.android.material.floatingactionbutton.ExtendedFloatingActionButton
-        android:id="@+id/floating_button"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginEnd="24dp"
-        android:layout_marginBottom="24dp"
-        android:clickable="true"
-        android:focusable="true"
-        android:text="@string/browse"
-        android:visibility="gone"
-        app:icon="@drawable/add"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent" />
+        <com.l4digital.fastscroll.FastScrollRecyclerView
+            android:id="@+id/book_listing_view"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            app:bubbleColor="?attr/colorAccent"
+            app:handleColor="?attr/colorAccent" />
+
+        <com.google.android.material.floatingactionbutton.ExtendedFloatingActionButton
+            android:id="@+id/floating_button"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="bottom|end"
+            android:layout_marginBottom="16dp"
+            android:clickable="true"
+            android:focusable="true"
+            android:text="@string/browse"
+            android:textAppearance="@style/TextAppearance.MyTheme.Body1"
+            android:textColor="@android:color/white"
+            android:visibility="gone"
+            app:icon="@drawable/browse"
+            app:iconTint="@android:color/white"
+            app:layout_behavior="com.google.android.material.behavior.HideBottomViewOnScrollBehavior"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent" />
+
+    </androidx.coordinatorlayout.widget.CoordinatorLayout>
 
     <ProgressBar
         android:id="@+id/progress_bar"

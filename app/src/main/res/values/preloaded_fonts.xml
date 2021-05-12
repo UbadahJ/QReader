@@ -1,7 +1,10 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <array name="preloaded_fonts" translatable="false">
+        <item>@font/anton</item>
         <item>@font/dosis</item>
+        <item>@font/jaldi</item>
         <item>@font/ubuntu</item>
+        <item>@font/yantramanav</item>
     </array>
 </resources>

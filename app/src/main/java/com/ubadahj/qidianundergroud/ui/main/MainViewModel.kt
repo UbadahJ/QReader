@@ -7,13 +7,11 @@ import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.asLiveData
 import androidx.lifecycle.liveData
-import com.ubadahj.qidianundergroud.models.Book
-import com.ubadahj.qidianundergroud.models.Chapter
-import com.ubadahj.qidianundergroud.models.ChapterGroup
-import com.ubadahj.qidianundergroud.models.Resource
+import com.ubadahj.qidianundergroud.models.*
 import com.ubadahj.qidianundergroud.repositories.BookRepository
 import com.ubadahj.qidianundergroud.repositories.ChapterGroupRepository
 import com.ubadahj.qidianundergroud.repositories.ChapterRepository
+import com.ubadahj.qidianundergroud.repositories.MetadataRepository
 import com.ubadahj.qidianundergroud.utils.models.firstChapter
 import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.map
@@ -49,6 +47,20 @@ class MainViewModel : ViewModel() {
             )
         } catch (e: Exception) {
             emit(Resource.Error<List<Book>>(e))
+        }
+    }
+
+    fun getMetadata(context: Context, book: Book, refresh: Boolean = false) = liveData {
+        emit(Resource.Loading())
+        try {
+            emitSource(
+                MetadataRepository(context).getBook(book, refresh)
+                    .catch { Resource.Error<Metadata?>(it) }
+                    .map { Resource.Success(it) }
+                    .asLiveData()
+            )
+        } catch (e: Exception) {
+            emit(Resource.Error<Metadata?>(e))
         }
     }
 

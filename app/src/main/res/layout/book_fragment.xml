@@ -10,8 +10,8 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         tools:context=".ui.main.BookFragment"
-        tools:layout_editor_absoluteX="-167dp"
-        tools:layout_editor_absoluteY="-16dp">
+        tools:layout_editor_absoluteX="0dp"
+        tools:layout_editor_absoluteY="16dp">
 
         <androidx.constraintlayout.widget.ConstraintLayout
             android:layout_width="match_parent"
@@ -19,40 +19,215 @@
 
             <ImageView
                 android:id="@+id/book_image"
-                android:layout_width="64dp"
-                android:layout_height="64dp"
+                android:layout_width="206.25dp"
+                android:layout_height="275dp"
                 android:layout_marginStart="12dp"
                 android:layout_marginTop="24dp"
-                android:src="@drawable/book"
                 app:layout_constraintStart_toStartOf="@+id/v_guideline_10"
-                app:layout_constraintTop_toTopOf="parent"
-                app:tint="?android:attr/textColorPrimary" />
+                app:layout_constraintTop_toTopOf="parent" />
 
-            <TextView
-                android:id="@+id/header"
+            <com.google.android.material.textview.MaterialTextView
+                android:id="@+id/book_author"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
-                android:layout_marginStart="24dp"
-                android:layout_marginEnd="12dp"
-                android:textAlignment="viewStart"
-                android:textAppearance="@style/TextAppearance.MaterialComponents.Headline5"
-                app:layout_constraintBottom_toBottomOf="@+id/book_image"
+                android:layout_marginTop="16dp"
+                android:fontFamily="@font/jaldi"
+                android:textSize="16sp"
                 app:layout_constraintEnd_toStartOf="@+id/v_guideline_90"
                 app:layout_constraintHorizontal_bias="0.0"
-                app:layout_constraintStart_toEndOf="@+id/book_image"
-                app:layout_constraintTop_toTopOf="@+id/book_image"
+                app:layout_constraintStart_toStartOf="@+id/book_image"
+                app:layout_constraintTop_toBottomOf="@+id/book_image"
+                tools:text="I Fix Air-Conditioner" />
+
+            <com.google.android.material.textview.MaterialTextView
+                android:id="@+id/book_title"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:fontFamily="@font/anton"
+                android:textAlignment="viewStart"
+                android:textColor="?android:attr/textColorPrimary"
+                android:textSize="28sp"
+                app:layout_constraintEnd_toStartOf="@+id/v_guideline_90"
+                app:layout_constraintStart_toStartOf="@+id/book_author"
+                app:layout_constraintTop_toBottomOf="@+id/book_author"
                 tools:text="My House of Horrors" />
 
+            <androidx.appcompat.widget.AppCompatRatingBar
+                android:id="@+id/book_rating_bar"
+                style="@style/Widget.AppCompat.RatingBar.Small"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:isIndicator="true"
+                android:stepSize="0.1"
+                app:layout_constraintStart_toStartOf="@+id/book_title"
+                app:layout_constraintTop_toBottomOf="@+id/book_title"
+                tools:rating="5" />
+
+
+            <com.google.android.material.textview.MaterialTextView
+                android:id="@+id/book_rating"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="8dp"
+                android:fontFamily="@font/yantramanav"
+                android:textAppearance="@style/TextAppearance.MyTheme.Body2"
+                app:layout_constraintBottom_toBottomOf="@+id/book_rating_bar"
+                app:layout_constraintEnd_toStartOf="@+id/v_guideline_90"
+                app:layout_constraintStart_toEndOf="@+id/book_rating_bar"
+                app:layout_constraintTop_toTopOf="@+id/book_rating_bar" />
+
+            <com.google.android.material.textview.MaterialTextView
+                android:id="@+id/book_desc"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="16dp"
+                android:fontFamily="@font/yantramanav"
+                app:layout_constraintEnd_toStartOf="@+id/v_guideline_90"
+                app:layout_constraintStart_toStartOf="@+id/book_rating_bar"
+                app:layout_constraintTop_toBottomOf="@+id/book_rating_bar" />
+
+            <ImageView
+                android:id="@+id/notification_disabled_icon"
+                android:layout_width="20dp"
+                android:layout_height="20dp"
+                android:layout_marginTop="16dp"
+                android:src="@drawable/bell_slash"
+                app:layout_constraintStart_toStartOf="@id/book_desc"
+                app:layout_constraintTop_toBottomOf="@id/book_desc"
+                app:tint="?android:attr/textColorPrimary" />
+
+            <com.google.android.material.textview.MaterialTextView
+                android:id="@+id/notification_disabled_text"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="8dp"
+                android:fontFamily="@font/yantramanav"
+                android:text="NOTIFICATION DISABLED"
+                android:textAppearance="@style/TextAppearance.MyTheme.Body2"
+                app:layout_constraintBottom_toBottomOf="@+id/notification_disabled_icon"
+                app:layout_constraintEnd_toStartOf="@+id/v_guideline_90"
+                app:layout_constraintStart_toEndOf="@+id/notification_disabled_icon"
+                app:layout_constraintTop_toTopOf="@+id/notification_disabled_icon" />
+
+            <androidx.constraintlayout.widget.Group
+                android:id="@+id/notification_disabled"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                app:constraint_referenced_ids="notification_disabled_icon, notification_disabled_text" />
+
             <com.google.android.material.chip.Chip
-                android:id="@+id/last_updated"
+                android:id="@+id/book_genre"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="16dp"
+                android:layout_marginTop="8dp"
+                android:layout_marginEnd="16dp"
+                android:fontFamily="@font/yantramanav"
+                android:textAlignment="center"
+                android:textColor="?attr/colorSurface"
+                android:visibility="gone"
+                app:chipBackgroundColor="?android:attr/textColorPrimary"
+                app:layout_constraintEnd_toStartOf="@+id/v_guideline_90"
+                app:layout_constraintStart_toEndOf="@+id/book_image"
+                app:layout_constraintTop_toBottomOf="@+id/menu_image_view"
+                tools:text="Fantasy"
+                tools:visibility="visible" />
+
+            <androidx.constraintlayout.widget.Barrier
+                android:id="@+id/simple_barrier"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                app:barrierDirection="bottom"
+                app:constraint_referenced_ids="book_title,book_genre,book_image,book_desc,notification_disabled_icon"
+                tools:layout_editor_absoluteY="425dp" />
+
+            <com.google.android.material.textview.MaterialTextView
+                android:id="@+id/library_label"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="8dp"
-                android:textAlignment="viewStart"
-                android:textAppearance="@style/TextAppearance.MaterialComponents.Subtitle2"
-                app:layout_constraintStart_toStartOf="@+id/v_guideline_10"
-                app:layout_constraintTop_toBottomOf="@+id/book_image"
-                tools:text="10 January, 2020" />
+                android:fontFamily="@font/yantramanav"
+                android:text="Add to Library"
+                app:layout_constraintEnd_toEndOf="@+id/library_button"
+                app:layout_constraintStart_toStartOf="@+id/library_button"
+                app:layout_constraintTop_toBottomOf="@+id/library_button" />
+
+            <ImageView
+                android:id="@+id/download_image_view"
+                android:layout_width="40dp"
+                android:layout_height="40dp"
+                android:layout_marginTop="16dp"
+                android:contentDescription="Download Chapters"
+                android:fontFamily="@font/yantramanav"
+                android:padding="10dp"
+                android:src="@drawable/download"
+                android:tooltipText="Download Chapters"
+                app:layout_constraintEnd_toStartOf="@+id/v_guideline_90"
+                app:layout_constraintStart_toEndOf="@+id/book_image"
+                app:layout_constraintTop_toBottomOf="@+id/library_label"
+                app:tint="?android:attr/textColorPrimary" />
+
+            <com.google.android.material.textview.MaterialTextView
+                android:id="@+id/download_label"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="8dp"
+                android:fontFamily="@font/yantramanav"
+                android:text="Download"
+                app:layout_constraintEnd_toEndOf="@+id/download_image_view"
+                app:layout_constraintStart_toStartOf="@+id/download_image_view"
+                app:layout_constraintTop_toBottomOf="@+id/download_image_view" />
+
+            <ImageView
+                android:id="@+id/menu_image_view"
+                android:layout_width="40dp"
+                android:layout_height="40dp"
+                android:layout_marginTop="16dp"
+                android:contentDescription="Download Chapters"
+                android:fontFamily="@font/yantramanav"
+                android:padding="10dp"
+                android:src="@drawable/menu_dots"
+                android:tooltipText="Download Chapters"
+                app:layout_constraintEnd_toStartOf="@+id/v_guideline_90"
+                app:layout_constraintStart_toEndOf="@+id/book_image"
+                app:layout_constraintTop_toBottomOf="@+id/download_label"
+                app:tint="?android:attr/textColorPrimary" />
+
+
+            <androidx.constraintlayout.widget.Guideline
+                android:id="@+id/v_guideline_10"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                app:layout_constraintGuide_percent="0.05" />
+
+            <androidx.constraintlayout.widget.Guideline
+                android:id="@+id/v_guideline_90"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                app:layout_constraintGuide_percent="0.95" />
+
+            <ImageView
+                android:id="@+id/library_button"
+                android:layout_width="32dp"
+                android:layout_height="32dp"
+                android:layout_marginTop="32dp"
+                android:src="@drawable/heart"
+                app:layout_constraintEnd_toStartOf="@+id/v_guideline_90"
+                app:layout_constraintStart_toEndOf="@+id/book_image"
+                app:layout_constraintTop_toTopOf="parent"
+                app:tint="?android:attr/textColorPrimary" />
+
+            <include
+                android:id="@+id/error_group"
+                layout="@layout/error_layout"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:visibility="gone"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/simple_barrier" />
 
             <com.google.android.material.card.MaterialCardView
                 android:id="@+id/materialCardView"
@@ -75,10 +250,11 @@
                     android:layout_margin="12dp"
                     android:orientation="vertical">
 
-                    <TextView
+                    <com.google.android.material.textview.MaterialTextView
                         android:id="@+id/chapter_text"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
+                        android:fontFamily="@font/anton"
                         android:padding="8dp"
                         android:text="Chapters"
                         android:textAppearance="@style/TextAppearance.MaterialComponents.Headline5" />
@@ -95,56 +271,14 @@
 
             </com.google.android.material.card.MaterialCardView>
 
-            <androidx.constraintlayout.widget.Barrier
-                android:id="@+id/simple_barrier"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                app:barrierDirection="bottom"
-                app:constraint_referenced_ids="header,last_updated,book_image"
-                tools:layout_editor_absoluteY="112dp" />
-
-            <androidx.constraintlayout.widget.Guideline
-                android:id="@+id/v_guideline_10"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:orientation="vertical"
-                app:layout_constraintGuide_percent="0.1" />
-
-            <androidx.constraintlayout.widget.Guideline
-                android:id="@+id/v_guideline_90"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:orientation="vertical"
-                app:layout_constraintGuide_percent="0.9" />
-
-            <ImageView
-                android:id="@+id/download_image_view"
-                android:layout_width="36dp"
-                android:layout_height="36dp"
-                android:layout_marginStart="8dp"
-                android:contentDescription="Download Chapters"
-                android:padding="10dp"
-                android:src="@drawable/download"
-                android:tooltipText="Download Chapters"
-                app:layout_constraintBottom_toBottomOf="@+id/last_updated"
-                app:layout_constraintStart_toEndOf="@+id/last_updated"
-                app:layout_constraintTop_toTopOf="@+id/last_updated"
-                app:tint="?android:attr/textColorPrimary" />
-
-
-            <ImageView
-                android:id="@+id/library_button"
-                android:layout_width="36dp"
-                android:layout_height="36dp"
-                android:layout_marginStart="8dp"
-                android:contentDescription="Add to library"
-                android:padding="10dp"
-                android:src="@drawable/add"
-                android:tooltipText="Add to library"
-                app:layout_constraintBottom_toBottomOf="@+id/download_image_view"
-                app:layout_constraintStart_toEndOf="@+id/download_image_view"
-                app:layout_constraintTop_toTopOf="@+id/download_image_view"
-                app:tint="?android:attr/textColorPrimary" />
+            <ProgressBar
+                android:id="@+id/meta_progress"
+                style="?android:attr/progressBarStyle"
+                android:layout_width="24dp"
+                android:layout_height="24dp"
+                android:layout_marginTop="16dp"
+                app:layout_constraintEnd_toStartOf="@+id/v_guideline_90"
+                app:layout_constraintTop_toBottomOf="@+id/book_image" />
 
         </androidx.constraintlayout.widget.ConstraintLayout>
     </androidx.core.widget.NestedScrollView>

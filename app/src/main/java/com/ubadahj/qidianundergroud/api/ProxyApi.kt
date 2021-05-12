@@ -1,7 +1,7 @@
 package com.ubadahj.qidianundergroud.api
 
-import com.ubadahj.qidianundergroud.api.models.BookJson
-import com.ubadahj.qidianundergroud.api.models.ChapterGroupJson
+import com.ubadahj.qidianundergroud.api.models.undeground.BookJson
+import com.ubadahj.qidianundergroud.api.models.undeground.ChapterGroupJson
 import retrofit2.http.Field
 import retrofit2.http.FormUrlEncoded
 import retrofit2.http.POST

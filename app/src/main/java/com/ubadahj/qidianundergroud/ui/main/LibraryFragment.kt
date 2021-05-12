@@ -7,21 +7,24 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.core.widget.addTextChangedListener
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
+import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
-import androidx.recyclerview.widget.LinearLayoutManager
+import androidx.recyclerview.widget.GridLayoutManager
 import com.google.android.material.snackbar.Snackbar
 import com.ubadahj.qidianundergroud.R
 import com.ubadahj.qidianundergroud.databinding.BookListFragmentBinding
 import com.ubadahj.qidianundergroud.models.Resource
-import com.ubadahj.qidianundergroud.ui.adapters.BookAdapter
+import com.ubadahj.qidianundergroud.ui.adapters.LibraryAdapter
 import com.ubadahj.qidianundergroud.ui.adapters.MenuAdapter
+import com.ubadahj.qidianundergroud.ui.adapters.decorations.GridItemOffsetDecoration
 import com.ubadahj.qidianundergroud.ui.dialog.MenuDialog
 import com.ubadahj.qidianundergroud.ui.models.MenuDialogItem
+import com.ubadahj.qidianundergroud.utils.ui.toDp
 
 class LibraryFragment : Fragment() {
 
     private val viewModel: MainViewModel by activityViewModels()
-    private val adapter: BookAdapter = BookAdapter(listOf()) {
+    private val adapter: LibraryAdapter = LibraryAdapter(listOf(), lifecycleScope) {
         viewModel.selectedBook.value = it
         findNavController().navigate(
             LibraryFragmentDirections.actionLibraryFragmentToBookFragment()
@@ -32,23 +35,14 @@ class LibraryFragment : Fragment() {
             listOf(
                 MenuDialogItem("History", R.drawable.archive),
                 MenuDialogItem("Settings", R.drawable.settings),
-                MenuDialogItem("About", R.drawable.info)
-            )
-        ) { _, i ->
-            when (i) {
-                0 -> {
-                }
-                1 -> {
-                }
-                2 -> {
+                MenuDialogItem("About", R.drawable.info) {
                     com.mikepenz.aboutlibraries.LibsBuilder().start(requireContext())
                 }
-            }
-        }
+            )
+        )
     )
 
-    private
-    var binding: BookListFragmentBinding? = null
+    private var binding: BookListFragmentBinding? = null
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -71,8 +65,15 @@ class LibraryFragment : Fragment() {
                     LibraryFragmentDirections.actionLibraryFragmentToBrowseFragment()
                 )
             }
-            bookListingView.layoutManager = LinearLayoutManager(requireContext())
+
             bookListingView.adapter = adapter
+            bookListingView.layoutManager = GridLayoutManager(requireContext(), 2)
+            bookListingView.addItemDecoration(
+                GridItemOffsetDecoration(
+                    2, 12.toDp(requireContext()).toInt()
+                )
+            )
+
             searchBar.searchEditText.addTextChangedListener { text: Editable? ->
                 adapter.filter.filter((text))
             }
@@ -106,8 +107,8 @@ class LibraryFragment : Fragment() {
         return when (item.itemId) {
             R.id.search -> {
                 binding?.apply {
-                    val searchBarVisible = bookListingView.y != searchBar.root.y
-                    bookListingView.animate()
+                    val searchBarVisible = bookListingViewContainer.y != searchBar.root.y
+                    bookListingViewContainer.animate()
                         .alpha(1f)
                         .translationY(if (!searchBarVisible) searchBar.root.height + 32f else 0f)
                         .start()
