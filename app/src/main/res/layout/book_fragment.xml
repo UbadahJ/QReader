@@ -86,6 +86,35 @@
                 app:layout_constraintStart_toStartOf="@+id/book_rating_bar"
                 app:layout_constraintTop_toBottomOf="@+id/book_rating_bar" />
 
+            <ImageView
+                android:id="@+id/notification_disabled_icon"
+                android:layout_width="20dp"
+                android:layout_height="20dp"
+                android:layout_marginTop="16dp"
+                android:src="@drawable/bell_slash"
+                app:layout_constraintStart_toStartOf="@id/book_desc"
+                app:layout_constraintTop_toBottomOf="@id/book_desc"
+                app:tint="?android:attr/textColorPrimary" />
+
+            <com.google.android.material.textview.MaterialTextView
+                android:id="@+id/notification_disabled_text"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="8dp"
+                android:fontFamily="@font/yantramanav"
+                android:text="NOTIFICATION DISABLED"
+                android:textAppearance="@style/TextAppearance.MyTheme.Body2"
+                app:layout_constraintBottom_toBottomOf="@+id/notification_disabled_icon"
+                app:layout_constraintEnd_toStartOf="@+id/v_guideline_90"
+                app:layout_constraintStart_toEndOf="@+id/notification_disabled_icon"
+                app:layout_constraintTop_toTopOf="@+id/notification_disabled_icon" />
+
+            <androidx.constraintlayout.widget.Group
+                android:id="@+id/notification_disabled"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                app:constraint_referenced_ids="notification_disabled_icon, notification_disabled_text" />
+
             <com.google.android.material.chip.Chip
                 android:id="@+id/book_genre"
                 android:layout_width="0dp"
@@ -109,7 +138,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 app:barrierDirection="bottom"
-                app:constraint_referenced_ids="book_title,book_genre,book_image,book_desc"
+                app:constraint_referenced_ids="book_title,book_genre,book_image,book_desc,notification_disabled_icon"
                 tools:layout_editor_absoluteY="425dp" />
 
             <com.google.android.material.textview.MaterialTextView

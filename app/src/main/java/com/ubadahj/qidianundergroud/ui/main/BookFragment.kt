@@ -162,6 +162,7 @@ class BookFragment : Fragment() {
         when (it) {
             is Resource.Loading -> {
                 metaProgress.visible = true
+                notificationDisabled.visible = false
             }
             is Resource.Success -> {
                 metaProgress.visible = false
@@ -173,12 +174,14 @@ class BookFragment : Fragment() {
                     bookRating.text = rating.toString()
                     bookGenre.text = category
                     bookGenre.visible = true
+                    notificationDisabled.visible = !enableNotification
 
                     configureMenu(book, this)
                 }
             }
             is Resource.Error -> {
                 metaProgress.visible = false
+                notificationDisabled.visible = false
                 root.snackBar("Failed to load metadata")
             }
         }
