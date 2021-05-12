@@ -5,6 +5,7 @@ A simple application intended provide extension to the capabilities of the websi
 ## Features :sparkles:
 
 - Access all the books available on the website
+- Loads book information directly from WebNovel.com
 - A builtin chapter reader optimized for reading on mobile devices
 - Support for downloading books for offline reading
 - Notifications service for book updates with multiple actions
@@ -22,5 +23,4 @@ A simple application intended provide extension to the capabilities of the websi
 
 ## Upcoming features :rocket:
 
-- Per-chapter bookmark instead of chapter group
-- Book metadata support
+- Better chapter reader
