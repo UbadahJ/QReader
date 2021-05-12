@@ -93,7 +93,7 @@ class ChapterFragment : Fragment() {
     @SuppressLint("SetJavaScriptEnabled")
     private fun init(chapters: ChapterGroup) {
         binding?.apply {
-            errorButton.setOnClickListener { getChapterContents(chapters, true) }
+            errorGroup.errorButton.setOnClickListener { getChapterContents(chapters, true) }
         }
         getChapterContents(chapters)
     }
@@ -111,7 +111,7 @@ class ChapterFragment : Fragment() {
         when (resource) {
             is Resource.Error -> {
                 toolbar.appbar.title = "Error"
-                errorGroup.visibility = View.VISIBLE
+                errorGroup.root.visibility = View.VISIBLE
                 progressBar.visibility = View.GONE
 
                 menu.adapter.submitList(
@@ -121,11 +121,11 @@ class ChapterFragment : Fragment() {
             is Resource.Loading -> {
                 toolbar.appbar.title = "Loading"
                 progressBar.visibility = View.VISIBLE
-                errorGroup.visibility = View.GONE
+                errorGroup.root.visibility = View.GONE
             }
             is Resource.Success -> {
                 progressBar.visibility = View.GONE
-                errorGroup.visibility = View.GONE
+                errorGroup.root.visibility = View.GONE
             }
         }
     }

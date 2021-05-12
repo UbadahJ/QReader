@@ -63,17 +63,28 @@ class BookFragment : Fragment() {
             findNavController().popBackStack()
     }
 
-    private fun init(book: Book) {
+    private fun init(book: Book, ignoreAvaliable: Boolean = false) {
         configureMenu(book)
         binding?.apply {
             bookTitle.text = book.name
             bookImage.load(R.drawable.placeholder_600_800)
 
-            configureLibraryButton(book)
-            configureDownloadButton(book)
-            configureMenuButton()
+            if (book.isAvailable || ignoreAvaliable) {
+                configureLibraryButton(book)
+                configureDownloadButton(book)
+                configureMenuButton()
 
-            configureGroupAdapter()
+                configureGroupAdapter()
+            } else {
+                errorGroup.apply {
+                    root.visible = true
+                    errorText.text = "The book is not longer avaliable"
+                    errorButton.text = "Continue"
+                    errorButton.setOnClickListener {
+                        init(book, true)
+                    }
+                }
+            }
 
             lifecycleScope.launchWhenResumed {
                 viewModel.getMetadata(requireContext(), book).observe(viewLifecycleOwner) {
@@ -225,16 +236,17 @@ class BookFragment : Fragment() {
                         }
                         is Resource.Loading -> {
                             loadingProgress.visibility = View.VISIBLE
-                        materialCardView.visibility = View.GONE
-                    }
-                    is Resource.Error -> {
-                        loadingProgress.visibility = View.GONE
-                        materialCardView.visibility = View.GONE
-                        Snackbar.make(root, R.string.error_refreshing, Snackbar.LENGTH_SHORT).show()
+                            materialCardView.visibility = View.GONE
+                        }
+                        is Resource.Error -> {
+                            loadingProgress.visibility = View.GONE
+                            materialCardView.visibility = View.GONE
+                            Snackbar.make(root, R.string.error_refreshing, Snackbar.LENGTH_SHORT)
+                                .show()
+                        }
                     }
                 }
             }
-        }
     }
 
     override fun onDestroyView() {
