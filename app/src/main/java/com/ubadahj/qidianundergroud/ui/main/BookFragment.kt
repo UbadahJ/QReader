@@ -213,14 +213,14 @@ class BookFragment : Fragment() {
         )
 
         if (metadata != null) {
-            val notifyOp = if (metadata.enableNotification) "Disable" else "Enable"
-            menuItems.add(
-                MenuDialogItem("$notifyOp notifications for this book", R.drawable.bell) {
-                    lifecycleScope.launchWhenResumed {
-                        book.setNotifications(requireContext(), !metadata.enableNotification)
-                    }
+            val (action, drawable) = if (metadata.enableNotification) ("Disable" to R.drawable.bell_slash)
+            else ("Enable" to R.drawable.bell)
+
+            menuItems.add(MenuDialogItem("$action notifications", drawable) {
+                lifecycleScope.launchWhenResumed {
+                    book.setNotifications(requireContext(), !metadata.enableNotification)
                 }
-            )
+            })
         }
 
         menuAdapter.submitList(menuItems)
