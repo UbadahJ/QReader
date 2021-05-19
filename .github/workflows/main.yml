@@ -15,7 +15,7 @@ jobs:
 
       - name: Extract version
         shell: bash
-        run: echo "##[set-output name=version;]$(commit_count=$( git rev-list --count HEAD ); branch_name=$( git rev-parse --abbrev-ref HEAD ); branch_commit_count=$( git rev-list --count HEAD ^master ); echo b$commit_count$(if [ $branch_name != "master" ]; then echo "+${branch_commit_count}"; fi)-$branch_name;)"
+        run: echo "##[set-output name=version;]$(commit_count=$( git rev-list --count master ); branch_name=$( git rev-parse --abbrev-ref HEAD ); branch_commit_count=$( git rev-list --count HEAD ^master ); echo b$commit_count$(if [ $branch_name != "master" ]; then echo "+${branch_commit_count}"; fi)-$branch_name;)"
         id: version_id
 
       - name: Version name
