@@ -20,7 +20,9 @@ jobs:
 
       - name: Version name
         shell: bash
-        run: echo Creating debug package for echo ${GITHUB_REF#refs/heads/}-$(git rev-parse --short HEAD)
+        env:
+          VERSION_ID: ${{ steps.version_id.outputs.version }}
+        run: echo Creating debug package for $VERSION_ID
 
       - name: Use Java8
         uses: actions/setup-java@v1
