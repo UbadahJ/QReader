@@ -23,8 +23,8 @@ android {
         applicationId = "com.ubadahj.qidianundergroud"
         minSdkVersion(AndroidConfig.minSdk)
         targetSdkVersion(AndroidConfig.targetSdk)
-        versionCode = getCommitCount().toInt()
-        versionName = "1.0-${getGitSha()} [${getBranchName()}]"
+        versionCode = getMasterCommitCount().toInt()
+        versionName = getAppVersion()
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
     }
@@ -128,7 +128,16 @@ dependencies {
     implementation("io.coil-kt:coil:1.2.1")
 }
 
-fun getCommitCount(): String = runCommand("git rev-list --count master")
+fun getAppVersion(): String {
+    var version = "1.0b${getMasterCommitCount()}"
+    if (getBranchName() != "master") {
+        version += "+${runCommand("git rev-list --count HEAD ^master")}"
+    }
+
+    return "$version-${getBranchName()}"
+}
+
+fun getMasterCommitCount(): String = runCommand("git rev-list --count master")
 
 fun getGitSha(): String = runCommand("git rev-parse --short HEAD")
 

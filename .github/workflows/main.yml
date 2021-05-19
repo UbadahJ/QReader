@@ -4,6 +4,7 @@ on:
   push:
     branches:
       - master
+      - develop
 
 jobs:
   build:
@@ -14,7 +15,7 @@ jobs:
 
       - name: Extract version
         shell: bash
-        run: echo "##[set-output name=version;]$(echo ${GITHUB_REF#refs/heads/}-$(git rev-parse --short HEAD))"
+        run: echo "##[set-output name=version;]$(commit_count=$( git rev-list --count HEAD ); branch_name=$( git rev-parse --abbrev-ref HEAD ); branch_commit_count=$( git rev-list --count HEAD ^master ); echo b$commit_count$(if [ $branch_name != "master" ]; then echo "+${branch_commit_count}"; fi)-$branch_name;)"
         id: version_id
 
       - name: Version name
@@ -35,7 +36,7 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           VERSION_ID: ${{ steps.version_id.outputs.version }}
         with:
-          tag_name: "1.0-${{ env.VERSION_ID }}"
+          tag_name: "1.0${{ env.VERSION_ID }}"
           asset_path: app/build/outputs/apk/debug/app-debug.apk
           asset_name: debug.apk
           asset_content_type: application/zip
