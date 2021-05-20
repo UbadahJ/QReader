@@ -16,7 +16,6 @@ buildscript {
         classpath("org.jetbrains.kotlin:kotlin-gradle-plugin:${Dependencies.KOTLIN}")
         classpath("androidx.navigation:navigation-safe-args-gradle-plugin:${Dependencies.NAVIGATION}")
         classpath("com.mikepenz.aboutlibraries.plugin:aboutlibraries-plugin:${Dependencies.ABOUT_LIB}")
-        classpath("com.squareup.sqldelight:gradle-plugin:${Dependencies.SQL_DELIGHT}")
     }
 }
 

@@ -11,7 +11,7 @@ plugins {
 
     id("androidx.navigation.safeargs.kotlin")
     id("com.mikepenz.aboutlibraries.plugin")
-    id("com.squareup.sqldelight")
+    id("com.squareup.sqldelight") version Dependencies.SQL_DELIGHT
     id("com.github.ben-manes.versions") version Dependencies.VERSIONS_PLUGIN
 }
 
@@ -62,7 +62,7 @@ dependencies {
     implementation("org.jetbrains.kotlinx:kotlinx-coroutines-android:1.4.3")
 
     implementation("androidx.core:core-ktx:1.3.2")
-    implementation("androidx.fragment:fragment-ktx:1.3.3")
+    implementation("androidx.fragment:fragment-ktx:1.3.4")
     implementation("androidx.recyclerview:recyclerview:1.2.0")
     implementation("androidx.appcompat:appcompat:1.2.0")
     implementation("androidx.constraintlayout:constraintlayout:2.0.4")
@@ -79,24 +79,24 @@ dependencies {
     implementation("androidx.navigation:navigation-ui-ktx:${Dependencies.NAVIGATION}")
 
     // For Json
-    val moshi_version = "1.12.0"
-    implementation("com.squareup.moshi:moshi:$moshi_version")
-    implementation("com.squareup.moshi:moshi-kotlin:$moshi_version")
-    kapt("com.squareup.moshi:moshi-kotlin-codegen:$moshi_version")
+    val moshiVersion = "1.12.0"
+    implementation("com.squareup.moshi:moshi:$moshiVersion")
+    implementation("com.squareup.moshi:moshi-kotlin:$moshiVersion")
+    kapt("com.squareup.moshi:moshi-kotlin-codegen:$moshiVersion")
 
     // For web requests
-    val okhttp_version = "4.9.0"
-    val retrofit_version = "2.9.0"
-    implementation("com.squareup.retrofit2:retrofit:$retrofit_version")
-    implementation("com.squareup.retrofit2:converter-moshi:$retrofit_version")
-    implementation("com.squareup.okhttp3:okhttp:$okhttp_version")
-    implementation("com.squareup.okhttp3:logging-interceptor:$okhttp_version")
+    val okhttpVersion = "4.9.0"
+    val retrofitVersion = "2.9.0"
+    implementation("com.squareup.retrofit2:retrofit:$retrofitVersion")
+    implementation("com.squareup.retrofit2:converter-moshi:$retrofitVersion")
+    implementation("com.squareup.okhttp3:okhttp:$okhttpVersion")
+    implementation("com.squareup.okhttp3:logging-interceptor:$okhttpVersion")
 
     // Lifecycle support
-    val lifecycle_version = "2.3.1"
-    implementation("androidx.lifecycle:lifecycle-viewmodel-ktx:$lifecycle_version")
-    implementation("androidx.lifecycle:lifecycle-livedata-ktx:$lifecycle_version")
-    implementation("androidx.lifecycle:lifecycle-runtime-ktx:$lifecycle_version")
+    val lifecycleVersion = "2.3.1"
+    implementation("androidx.lifecycle:lifecycle-viewmodel-ktx:$lifecycleVersion")
+    implementation("androidx.lifecycle:lifecycle-livedata-ktx:$lifecycleVersion")
+    implementation("androidx.lifecycle:lifecycle-runtime-ktx:$lifecycleVersion")
 
     // Theming
     implementation("com.google.android.material:material:1.3.0")
@@ -105,8 +105,8 @@ dependencies {
     implementation("androidx.browser:browser:1.3.0")
 
     // For notification service
-    val work_version = "2.5.0"
-    implementation("androidx.work:work-runtime-ktx:$work_version")
+    val workVersion = "2.5.0"
+    implementation("androidx.work:work-runtime-ktx:$workVersion")
 
     // For logging
     implementation("com.github.ajalt:timberkt:1.5.1")
