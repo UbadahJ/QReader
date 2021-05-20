@@ -4,6 +4,11 @@ import android.app.NotificationChannel
 import android.app.NotificationManager
 import android.content.Context
 import android.os.Build
+import androidx.core.app.NotificationCompat
+import androidx.core.graphics.drawable.toBitmap
+import coil.ImageLoader
+import coil.request.ImageRequest
+import coil.transform.CircleCropTransformation
 import com.ubadahj.qidianundergroud.R
 
 const val CHANNEL_ID: String = "42000"
@@ -35,4 +40,21 @@ fun createNotificationChannel(context: Context) {
             context.getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
         notificationManager.createNotificationChannel(channel)
     }
+}
+
+suspend fun NotificationCompat.Builder.setLargeIcon(
+    context: Context,
+    data: Any?
+): NotificationCompat.Builder {
+    if (data != null) {
+        val request = ImageRequest.Builder(context)
+            .data(data)
+            .transformations(CircleCropTransformation())
+            .target { setLargeIcon(it.toBitmap()) }
+            .build()
+
+        ImageLoader(context).execute(request)
+    }
+
+    return this
 }
