@@ -1,8 +1,3 @@
-import java.io.ByteArrayOutputStream
-import java.text.SimpleDateFormat
-import java.util.*
-
-
 plugins {
     id("com.android.application")
     kotlin("android")
@@ -13,6 +8,8 @@ plugins {
     id("com.mikepenz.aboutlibraries.plugin")
     id("com.squareup.sqldelight") version Dependencies.SQL_DELIGHT
     id("com.github.ben-manes.versions") version Dependencies.VERSIONS_PLUGIN
+
+    id("com.diffplug.spotless") version "5.12.5"
 }
 
 android {
@@ -128,31 +125,38 @@ dependencies {
     implementation("io.coil-kt:coil:1.2.1")
 }
 
-fun getAppVersion(): String {
-    var version = "1.0b${getMasterCommitCount()}"
-    if (getBranchName() != "master") {
-        version += "+${runCommand("git rev-list --count HEAD ^master")}"
-    }
+spotless {
+    format("misc") {
+        target("*.gradle", "*.md", ".gitignore")
 
-    return "$version-${getBranchName()}"
+        trimTrailingWhitespace()
+        indentWithSpaces()
+        endWithNewline()
+    }
+    java {
+        googleJavaFormat("1.8").aosp()
+    }
+    kotlin {
+        target("**/*.kt")
+        ktlint("0.41.0").userData(
+            mapOf(
+                "disabled_rules" to "no-wildcard-imports, no-blank-line-before-rbrace"
+            )
+        )
+
+        trimTrailingWhitespace()
+        indentWithSpaces()
+        endWithNewline()
+    }
+    kotlinGradle {
+        target("**/*.kts")
+
+        trimTrailingWhitespace()
+        indentWithSpaces()
+        endWithNewline()
+    }
 }
 
-fun getMasterCommitCount(): String = runCommand("git rev-list --count master")
-
-fun getGitSha(): String = runCommand("git rev-parse --short HEAD")
-
-fun getBranchName(): String = runCommand("git rev-parse --abbrev-ref HEAD")
-
-fun getBuildTime(): String =
-    SimpleDateFormat("yyyy-MM-dd'T'HH:mm'Z'")
-        .apply { timeZone = TimeZone.getTimeZone("UTC") }
-        .format(Date())
-
-fun runCommand(command: String): String {
-    val byteOut = ByteArrayOutputStream()
-    project.exec {
-        commandLine = command.split(" ")
-        standardOutput = byteOut
-    }
-    return String(byteOut.toByteArray()).trim()
+tasks.register("spotlessHook") {
+    createSpotlessGitHook()
 }

@@ -1,6 +1,5 @@
 package com.ubadahj.qidianundergroud.api.models.webnovel
 
-
 import com.squareup.moshi.Json
 import com.squareup.moshi.JsonClass
 

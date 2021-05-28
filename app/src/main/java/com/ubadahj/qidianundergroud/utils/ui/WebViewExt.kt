@@ -9,20 +9,20 @@ suspend fun WebView.getHtml(): String = suspendCancellableCoroutine { continuati
         throw IllegalStateException("Javascript is disabled")
 
     evaluateJavascript(
-            "(function() {\n" +
-                    "    return (\n" +
-                    "        '<html>' +\n" +
-                    "        document.getElementsByTagName('html')[0].innerHTML +\n" +
-                    "        '</html>'\n" +
-                    "    );\n" +
-                    "})();"
+        "(function() {\n" +
+            "    return (\n" +
+            "        '<html>' +\n" +
+            "        document.getElementsByTagName('html')[0].innerHTML +\n" +
+            "        '</html>'\n" +
+            "    );\n" +
+            "})();"
     ) {
         continuation.resume(
-                it!!.replace("\\u003C", "<")
-                        .replace("\\n", "")
-                        .replace("\\t", "")
-                        .replace("\\\"", "\"")
-                        .replace("<hr />", "")
+            it!!.replace("\\u003C", "<")
+                .replace("\\n", "")
+                .replace("\\t", "")
+                .replace("\\\"", "\"")
+                .replace("<hr />", "")
         )
     }
 }

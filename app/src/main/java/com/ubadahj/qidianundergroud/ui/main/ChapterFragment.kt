@@ -33,20 +33,27 @@ class ChapterFragment : Fragment() {
     private var adapter: ChapterAdapter = ChapterAdapter(listOf())
 
     override fun onCreateView(
-        inflater: LayoutInflater, container: ViewGroup?,
+        inflater: LayoutInflater,
+        container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View {
         return ChapterFragmentBinding.inflate(inflater, container, false).apply {
             binding = this
-            viewModel.selectedGroup.observe(viewLifecycleOwner, { group ->
-                group?.apply { init(this) }
-            })
-            viewModel.selectedChapter.observe(viewLifecycleOwner, { chapter ->
-                chapter?.apply {
-                    toolbar.appbar.title = this.title
-                    viewModel.selectedGroup.value?.updateLastRead(requireContext(), getIndex())
+            viewModel.selectedGroup.observe(
+                viewLifecycleOwner,
+                { group ->
+                    group?.apply { init(this) }
                 }
-            })
+            )
+            viewModel.selectedChapter.observe(
+                viewLifecycleOwner,
+                { chapter ->
+                    chapter?.apply {
+                        toolbar.appbar.title = this.title
+                        viewModel.selectedGroup.value?.updateLastRead(requireContext(), getIndex())
+                    }
+                }
+            )
         }.root
     }
 
@@ -65,7 +72,7 @@ class ChapterFragment : Fragment() {
                     return@addOnScrollStateListener
 
                 viewModel.selectedChapter.value = this@ChapterFragment.adapter.currentList[
-                        (rc.layoutManager as LinearLayoutManager).findFirstVisibleItemPosition()
+                    (rc.layoutManager as LinearLayoutManager).findFirstVisibleItemPosition()
                 ]
             }
         }
@@ -101,10 +108,13 @@ class ChapterFragment : Fragment() {
     private fun getChapterContents(group: ChapterGroup, refresh: Boolean = false) {
         viewModel
             .getChapterContents(requireContext(), group, refresh)
-            .observe(viewLifecycleOwner, {
-                binding?.updateUIIndicators(it)
-                updateRecyclerAdapter(it)
-            })
+            .observe(
+                viewLifecycleOwner,
+                {
+                    binding?.updateUIIndicators(it)
+                    updateRecyclerAdapter(it)
+                }
+            )
     }
 
     private fun ChapterFragmentBinding.updateUIIndicators(resource: Resource<List<Chapter>>) {
@@ -133,9 +143,9 @@ class ChapterFragment : Fragment() {
     private fun updateRecyclerAdapter(resource: Resource<List<Chapter>>) {
         val group = viewModel.selectedGroup.value
         val chapter = viewModel.selectedChapter.value
-        val hasDataChanged = chapter == null
-                || adapter.currentList.isEmpty()
-                || chapter.groupLink != group?.link
+        val hasDataChanged = chapter == null ||
+            adapter.currentList.isEmpty() ||
+            chapter.groupLink != group?.link
 
         if (hasDataChanged && resource is Resource.Success) {
             adapter.submitList(resource.data!!)
@@ -151,14 +161,16 @@ class ChapterFragment : Fragment() {
     }
 
     private fun updateMenu(items: List<Chapter>) {
-        menu.adapter.submitList(items.mapIndexed { i, it ->
-            MenuDialogItem(it.title) {
-                binding?.apply {
-                    viewModel.selectedChapter.value = it
-                    chapterRecyclerView.linearScroll(i)
+        menu.adapter.submitList(
+            items.mapIndexed { i, it ->
+                MenuDialogItem(it.title) {
+                    binding?.apply {
+                        viewModel.selectedChapter.value = it
+                        chapterRecyclerView.linearScroll(i)
+                    }
                 }
             }
-        })
+        )
     }
 
     private fun Chapter.getIndex(): Int {

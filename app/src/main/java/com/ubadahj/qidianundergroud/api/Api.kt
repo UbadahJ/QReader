@@ -12,9 +12,11 @@ class Api(private val proxy: Boolean = false) {
 
     companion object {
         val client: OkHttpClient = OkHttpClient.Builder().apply {
-            networkInterceptors().add(HttpLoggingInterceptor().apply {
-                setLevel(HttpLoggingInterceptor.Level.BASIC)
-            })
+            networkInterceptors().add(
+                HttpLoggingInterceptor().apply {
+                    setLevel(HttpLoggingInterceptor.Level.BASIC)
+                }
+            )
             cookieJar(MemoryCookieJar())
         }.build()
 
@@ -49,7 +51,7 @@ class Api(private val proxy: Boolean = false) {
     suspend fun getChapters(bookId: String): List<ChapterGroupJson> {
         if (proxy)
             return proxyApi.getChapters(
-                "https://toc.qidianunderground.org/api/v1/pages/public/${bookId}/chapters",
+                "https://toc.qidianunderground.org/api/v1/pages/public/$bookId/chapters",
                 "rnd"
             )
         return api.getChapters(bookId)
