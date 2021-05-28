@@ -84,11 +84,14 @@ class MainViewModel : ViewModel() {
         emit(Resource.Loading())
         try {
             emitSource(
-                ChapterRepository(context).getChaptersContent({
-                    WebView(it).apply {
-                        settings.javaScriptEnabled = true
-                    }
-                }, group, refresh)
+                ChapterRepository(context).getChaptersContent(
+                    {
+                        WebView(it).apply {
+                            settings.javaScriptEnabled = true
+                        }
+                    },
+                    group, refresh
+                )
                     .catch { Resource.Error<List<Chapter>>(it) }
                     .map {
                         Resource.Success(it)

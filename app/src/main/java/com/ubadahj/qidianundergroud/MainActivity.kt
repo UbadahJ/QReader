@@ -42,7 +42,7 @@ class MainActivity : AppCompatActivity() {
                 viewModel.selectedBook.value = bookRepo.getBookById(this).first()
                 viewModel.selectedChapter.value = null
             }
-            val groups = intent.extras?.getString("chapters")?.apply {
+            val groups = intent.extras?.getString("group")?.apply {
                 viewModel.selectedGroup.value = groupRepo.getGroupByLink(this).first()
             }
 

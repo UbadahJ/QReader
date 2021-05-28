@@ -35,7 +35,7 @@ class BookAdapter(
     }
 
     class ViewHolder(val binding: BookItemBinding, onClick: (Int) -> Unit) :
-            RecyclerView.ViewHolder(binding.root) {
+        RecyclerView.ViewHolder(binding.root) {
         init {
             binding.root.setOnClickListener { onClick(bindingAdapterPosition) }
         }
@@ -43,10 +43,10 @@ class BookAdapter(
 
     class DiffCallback : DiffUtil.ItemCallback<Book>() {
         override fun areItemsTheSame(oldItem: Book, newItem: Book): Boolean =
-                oldItem.id == newItem.id
+            oldItem.id == newItem.id
 
         override fun areContentsTheSame(oldItem: Book, newItem: Book): Boolean =
-                oldItem == newItem
+            oldItem == newItem
     }
 
 }

@@ -11,4 +11,3 @@ data class ChapterGroupJson(
     @Json(name = "Text") val text: String,
     @Json(name = "Href") val link: String
 ) : Parcelable
-

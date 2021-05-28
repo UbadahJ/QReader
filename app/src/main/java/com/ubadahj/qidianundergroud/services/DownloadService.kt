@@ -43,9 +43,12 @@ class DownloadService(context: Context, params: WorkerParameters) :
             notify(notificationId, builder.build())
 
             try {
-                bookRepo.download(book, {
-                    WebView(it).apply { settings.javaScriptEnabled = true }
-                }).flowOn(Dispatchers.Main)
+                bookRepo.download(
+                    book,
+                    {
+                        WebView(it).apply { settings.javaScriptEnabled = true }
+                    }
+                ).flowOn(Dispatchers.Main)
                     .collectIndexed { i, group ->
                         builder.setContentText(group.text)
                         builder.setProgress(groups.size, i, false)

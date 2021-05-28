@@ -41,7 +41,8 @@ class BookFragment : Fragment() {
     private var menuAdapter = MenuAdapter(listOf())
 
     override fun onCreateView(
-        inflater: LayoutInflater, container: ViewGroup?,
+        inflater: LayoutInflater,
+        container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View {
         binding = BookFragmentBinding.inflate(inflater, container, false)
@@ -50,11 +51,14 @@ class BookFragment : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        viewModel.selectedBook.observe(viewLifecycleOwner, { value ->
-            lifecycleScope.launchWhenResumed {
-                value?.apply { init(this) }
+        viewModel.selectedBook.observe(
+            viewLifecycleOwner,
+            { value ->
+                lifecycleScope.launchWhenResumed {
+                    value?.apply { init(this) }
+                }
             }
-        })
+        )
     }
 
     override fun onResume() {
@@ -127,9 +131,11 @@ class BookFragment : Fragment() {
     ) {
         downloadImageView.setOnClickListener {
             val work = OneTimeWorkRequestBuilder<DownloadService>().apply {
-                setInputData(Data.Builder().apply {
-                    putString("book_id", book.id)
-                }.build())
+                setInputData(
+                    Data.Builder().apply {
+                        putString("book_id", book.id)
+                    }.build()
+                )
             }.build()
             WorkManager.getInstance(requireContext()).enqueueUniqueWork(
                 "download-service", ExistingWorkPolicy.KEEP, work
@@ -144,12 +150,15 @@ class BookFragment : Fragment() {
     }
 
     private fun BookFragmentBinding.configureGroupAdapter() {
-        chapterListView.adapter = GroupAdapter(listOf(), {
-            viewModel.selectedGroup.value = it
-            findNavController().navigate(
-                BookFragmentDirections.actionBookFragmentToChapterFragment()
-            )
-        }) {
+        chapterListView.adapter = GroupAdapter(
+            listOf(),
+            {
+                viewModel.selectedGroup.value = it
+                findNavController().navigate(
+                    BookFragmentDirections.actionBookFragmentToChapterFragment()
+                )
+            }
+        ) {
             GroupDetailsDialog(it)
                 .show(requireActivity().supportFragmentManager, null)
         }
@@ -216,11 +225,13 @@ class BookFragment : Fragment() {
             val (action, drawable) = if (metadata.enableNotification) ("Disable" to R.drawable.bell_slash)
             else ("Enable" to R.drawable.bell)
 
-            menuItems.add(MenuDialogItem("$action notifications", drawable) {
-                lifecycleScope.launchWhenResumed {
-                    book.setNotifications(requireContext(), !metadata.enableNotification)
+            menuItems.add(
+                MenuDialogItem("$action notifications", drawable) {
+                    lifecycleScope.launchWhenResumed {
+                        book.setNotifications(requireContext(), !metadata.enableNotification)
+                    }
                 }
-            })
+            )
         }
 
         menuAdapter.submitList(menuItems)
