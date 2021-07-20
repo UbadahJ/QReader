@@ -7,6 +7,7 @@ import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.asLiveData
 import androidx.lifecycle.liveData
+import com.github.ajalt.timberkt.Timber.e
 import com.ubadahj.qidianundergroud.models.*
 import com.ubadahj.qidianundergroud.repositories.BookRepository
 import com.ubadahj.qidianundergroud.repositories.ChapterGroupRepository
@@ -99,6 +100,7 @@ class MainViewModel : ViewModel() {
                     .asLiveData()
             )
         } catch (e: Exception) {
+            e(e) { "Failed loading content" }
             emit(Resource.Error<List<Chapter>>(e))
         }
     }
