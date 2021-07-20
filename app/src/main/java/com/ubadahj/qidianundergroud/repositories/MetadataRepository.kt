@@ -19,8 +19,15 @@ class MetadataRepository(context: Context) {
     suspend fun getBook(book: Book, refresh: Boolean = false): Flow<Metadata?> {
         val dbMeta = database.metadataQueries.select(book.id).executeAsOneOrNull()
         if (refresh || dbMeta == null) {
-            WebNovelApi.getBook(book)?.toMetadata(book)?.also {
-                database.metadataQueries.insert(it)
+            WebNovelApi.getBook(book)?.toMetadata(book)?.also { meta ->
+                if (meta != dbMeta) {
+                    database.transaction {
+                        database.metadataQueries.insert(meta)
+                        database.chapterGroupQueries.getByBookId(meta.bookId).executeAsList()
+                            .filter { "book" in it.link }
+                            .forEach { database.chapterGroupQueries.deleteByLink(it.link) }
+                    }
+                }
             }
         }
 
