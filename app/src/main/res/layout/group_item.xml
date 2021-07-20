@@ -19,6 +19,17 @@
         app:layout_constraintTop_toTopOf="parent"
         tools:text="Chapter • 110 ⁓ 143" />
 
+    <com.google.android.material.textview.MaterialTextView
+        android:id="@+id/chapter_source"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="4dp"
+        android:textAlignment="textStart"
+        app:layout_constraintEnd_toStartOf="@+id/menu"
+        app:layout_constraintStart_toStartOf="@id/chapter_id"
+        app:layout_constraintTop_toBottomOf="@id/chapter_id"
+        tools:text="WebNovel" />
+
     <ImageView
         android:id="@+id/menu"
         android:layout_width="wrap_content"
@@ -38,16 +49,15 @@
         android:layout_marginTop="8dp"
         android:textSize="12sp"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/chapter_id"
+        app:layout_constraintTop_toBottomOf="@id/chapter_source"
         tools:text="➦ Chapter 101" />
 
     <androidx.constraintlayout.widget.Barrier
         android:id="@+id/barrier3"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginBottom="8dp"
         app:barrierDirection="bottom"
-        app:constraint_referenced_ids="chapter_id,read_progress"
+        app:constraint_referenced_ids="chapter_id,read_progress,chapter_source"
         tools:layout_editor_absoluteX="8dp"
         tools:layout_editor_absoluteY="16dp" />
 

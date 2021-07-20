@@ -32,10 +32,11 @@ class ChapterRepository(val context: Context) {
     ): Flow<List<Chapter>> {
         val dbChapters = database.chapterGroupQueries.contents(group.link).executeAsList()
         if (refresh || dbChapters.isEmpty()) {
-            if ("book" in group.link)
-                fetchWebNovelChapters(group)
-            else
-                fetchDefaultChapters(webViewFactory, group)
+            when {
+                "vim" in group.link -> fetchDefaultChapters(webViewFactory, group)
+                "pstbn" in group.link -> fetchDefaultChapters(webViewFactory, group)
+                else -> fetchWebNovelChapters(group)
+            }
         }
 
         return database.chapterGroupQueries.contents(group.link).asFlow().mapToList()
