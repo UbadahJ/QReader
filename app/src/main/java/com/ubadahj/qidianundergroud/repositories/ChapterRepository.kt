@@ -49,12 +49,12 @@ class ChapterRepository(val context: Context) {
                     .filter { "Chapter" in it.text() }
                     .filter { it.select("h2.text-center").first() != null }
                     .forEach {
-                        val title = it.select("h2.text-center").first().html().unescapeHtml()
+                        val title = it.select("h2.text-center").first()?.html()?.unescapeHtml()
                         val contents = it.select("p").outerHtml().unescapeHtml()
                         database.chapterQueries.insertByValues(
-                            group.link.md5 + title.md5,
+                            group.link.md5 + title?.md5,
                             group.link,
-                            title,
+                            title ?: "",
                             contents
                         )
                     }

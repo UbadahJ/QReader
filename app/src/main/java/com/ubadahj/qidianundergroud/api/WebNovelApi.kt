@@ -1,9 +1,11 @@
 package com.ubadahj.qidianundergroud.api
 
 import com.ubadahj.qidianundergroud.api.models.webnovel.WNBookRemote
+import com.ubadahj.qidianundergroud.api.models.webnovel.WNChapterRemote
 import com.ubadahj.qidianundergroud.api.models.webnovel.WNRawChapterLinksRemote
 import com.ubadahj.qidianundergroud.api.models.webnovel.WNSearchResultRemote
 import com.ubadahj.qidianundergroud.models.Book
+import com.ubadahj.qidianundergroud.models.Metadata
 import okhttp3.HttpUrl.Companion.toHttpUrl
 import okhttp3.ResponseBody
 import org.jsoup.Jsoup
@@ -33,10 +35,26 @@ object WebNovelApi {
         return bookPage.body()?.parseBookPage(searchResult)
     }
 
+    suspend fun getChapter(bookMeta: Metadata): List<WNChapterRemote>? {
+        return webNovelApi.getChaptersLinks(getToken(), bookMeta.id).body()
+            ?.data
+            ?.volumeItems
+            ?.flatMap { it.chapterItems }
+            ?.map {
+                WNChapterRemote(
+                    it.name,
+                    "${bookMeta.link}/${it.name}_${it.id}".replace("?", ""),
+                    it.index,
+                    it.isVip != 0
+                )
+            }
+    }
+
     private fun getToken(): String {
-        return Api.client.cookieJar.loadForRequest(WEB_NOVEL_URL.toHttpUrl()).filter {
-            it.name == "_csrfToken"
-        }.first().value
+        return Api.client.cookieJar
+            .loadForRequest(WEB_NOVEL_URL.toHttpUrl())
+            .first { it.name == "_csrfToken" }
+            .value
     }
 
     private fun ResponseBody.parseSearchPage(): List<WNSearchResultRemote> {
@@ -44,21 +62,20 @@ object WebNovelApi {
         val document = Jsoup.parse(string())
         val container = document.getElementsByClass("search-result-container").first()
 
-        container.getElementsByTag("li").forEach { li ->
-            val hyperlink = li.getElementsByTag("a").first()
-            results.add(
-                WNSearchResultRemote(
-                    name = hyperlink.attr("title"),
-                    link = "https://${
-                        hyperlink.attr("href").let {
-                            if ("webnovel" !in it) "webnovel.com$it"
-                        }
-                    }",
-                    tags = parseTags(li),
-                    rating = parseRating(li),
-                    desc = parseDescription(li)
+        container?.getElementsByTag("li")?.forEach { li ->
+            li.getElementsByTag("a").first()?.let { hyperlink ->
+                results.add(
+                    WNSearchResultRemote(
+                        name = hyperlink.attr("title"),
+                        link = hyperlink.attr("href").let {
+                            "https://${if ("webnovel" !in it) "webnovel.com$it" else it}"
+                        },
+                        tags = parseTags(li),
+                        rating = parseRating(li),
+                        desc = parseDescription(li)
+                    )
                 )
-            )
+            }
         }
 
         return results
