@@ -49,7 +49,11 @@ object WebNovelApi {
             results.add(
                 WNSearchResultRemote(
                     name = hyperlink.attr("title"),
-                    link = "https:${hyperlink.attr("href")}",
+                    link = "https://${
+                        hyperlink.attr("href").let {
+                            if ("webnovel" !in it) "webnovel.com$it"
+                        }
+                    }",
                     tags = parseTags(li),
                     rating = parseRating(li),
                     desc = parseDescription(li)
