@@ -1,9 +1,16 @@
 package com.ubadahj.qidianundergroud.api
 
 import com.ubadahj.qidianundergroud.api.models.webnovel.WNBookRemote
+import com.ubadahj.qidianundergroud.api.models.webnovel.WNChapterRemote
 import com.ubadahj.qidianundergroud.api.models.webnovel.WNRawChapterLinksRemote
 import com.ubadahj.qidianundergroud.api.models.webnovel.WNSearchResultRemote
 import com.ubadahj.qidianundergroud.models.Book
+import com.ubadahj.qidianundergroud.models.Chapter
+import com.ubadahj.qidianundergroud.models.ChapterGroup
+import com.ubadahj.qidianundergroud.models.Metadata
+import com.ubadahj.qidianundergroud.utils.md5
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.withContext
 import okhttp3.HttpUrl.Companion.toHttpUrl
 import okhttp3.ResponseBody
 import org.jsoup.Jsoup
@@ -12,6 +19,7 @@ import retrofit2.Response
 import retrofit2.http.GET
 import retrofit2.http.Path
 import retrofit2.http.Query
+import retrofit2.http.Url
 
 object WebNovelApi {
 
@@ -33,10 +41,49 @@ object WebNovelApi {
         return bookPage.body()?.parseBookPage(searchResult)
     }
 
+    suspend fun getChapter(bookMeta: Metadata): List<WNChapterRemote>? {
+        return webNovelApi.getChaptersLinks(getToken(), bookMeta.id).body()
+            ?.data
+            ?.volumeItems
+            ?.flatMap { it.chapterItems }
+            ?.map {
+                WNChapterRemote(
+                    it.name,
+                    "${bookMeta.link}/${it.name}_${it.id}".replace("?", ""),
+                    it.index,
+                    it.isVip != 0
+                )
+            }
+    }
+
+    suspend fun getChapterContents(group: ChapterGroup): Chapter {
+        val html = withContext(Dispatchers.IO) {
+            webNovelApi.getChapterContents(group.link).body()?.string()
+                ?: throw IllegalStateException("Unable to fetch page")
+        }
+
+        val doc = Jsoup.parse(html)
+        doc.getElementsByClass("pirate").forEach { it.remove() }
+
+        val title = doc.select("h3.dib").text()
+        val contents = doc.getElementsByClass("cha-content").first()
+            ?.getElementsByTag("p")
+            ?.joinToString("\n\n") { it.text().trim() }
+            ?: throw IllegalStateException("Either chapter is premium or parsing failed")
+
+        return Chapter(
+            group.link.md5 + title.md5,
+            group.link,
+            title,
+            contents
+        )
+    }
+
     private fun getToken(): String {
-        return Api.client.cookieJar.loadForRequest(WEB_NOVEL_URL.toHttpUrl()).filter {
-            it.name == "_csrfToken"
-        }.first().value
+        return Api.client.cookieJar
+            .loadForRequest(WEB_NOVEL_URL.toHttpUrl())
+            .first { it.name == "_csrfToken" }
+            .value
     }
 
     private fun ResponseBody.parseSearchPage(): List<WNSearchResultRemote> {
@@ -44,17 +91,18 @@ object WebNovelApi {
         val document = Jsoup.parse(string())
         val container = document.getElementsByClass("search-result-container").first()
 
-        container.getElementsByTag("li").forEach { li ->
-            val hyperlink = li.getElementsByTag("a").first()
-            results.add(
-                WNSearchResultRemote(
-                    name = hyperlink.attr("title"),
-                    link = "https:${hyperlink.attr("href")}",
-                    tags = parseTags(li),
-                    rating = parseRating(li),
-                    desc = parseDescription(li)
+        container?.getElementsByTag("li")?.forEach { li ->
+            li.getElementsByTag("a").first()?.let { hyperlink ->
+                results.add(
+                    WNSearchResultRemote(
+                        name = hyperlink.attr("title"),
+                        link = hyperlink.attr("href"),
+                        tags = parseTags(li),
+                        rating = parseRating(li),
+                        desc = parseDescription(li)
+                    )
                 )
-            )
+            }
         }
 
         return results
@@ -145,5 +193,10 @@ private interface IWebNovelApi {
         @Query("_csrfToken") csrfToken: String,
         @Query("bookId") bookId: String
     ): Response<WNRawChapterLinksRemote>
+
+    @GET
+    suspend fun getChapterContents(
+        @Url link: String
+    ): Response<ResponseBody>
 
 }

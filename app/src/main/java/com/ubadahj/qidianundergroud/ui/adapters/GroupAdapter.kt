@@ -9,10 +9,7 @@ import androidx.recyclerview.widget.RecyclerView
 import com.ubadahj.qidianundergroud.R
 import com.ubadahj.qidianundergroud.databinding.GroupItemBinding
 import com.ubadahj.qidianundergroud.models.ChapterGroup
-import com.ubadahj.qidianundergroud.utils.models.contains
-import com.ubadahj.qidianundergroud.utils.models.firstChapter
-import com.ubadahj.qidianundergroud.utils.models.isRead
-import com.ubadahj.qidianundergroud.utils.models.lastChapter
+import com.ubadahj.qidianundergroud.utils.models.*
 import com.ubadahj.qidianundergroud.utils.ui.visible
 
 class GroupAdapter(
@@ -57,6 +54,7 @@ class GroupAdapter(
 
         holder.binding.chapterId.text = chapterLabel
         holder.binding.readProgress.text = "➦  Chapter ${group.lastRead}"
+        holder.binding.chapterSource.text = group.source
 
         holder.binding.chapterId.setTextColor(
             if (group.isRead()) readColor else defaultColors[group]!!
