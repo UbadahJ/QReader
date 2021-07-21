@@ -7,6 +7,7 @@ A simple application intended provide extension to the capabilities of the websi
 - Access all the books available on the website
 - Loads book information directly from WebNovel.com
 - A builtin chapter reader optimized for reading on mobile devices
+- Support for reading and saving non-premium chapters from WebNovel.com 
 - Support for downloading books for offline reading
 - Notifications service for book updates with multiple actions
 - Bookmark progress on chapters
