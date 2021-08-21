@@ -200,7 +200,7 @@ class BookFragment : Fragment() {
         val menuItems: MutableList<MenuDialogItem> = mutableListOf(
             MenuDialogItem("Check for updates", R.drawable.refresh) {
                 lifecycleScope.launchWhenResumed {
-                    loadGroups(book, true)
+                    loadGroups(book, true, true)
                 }
             },
             MenuDialogItem("Reload book data", R.drawable.cloud_download) {
@@ -237,8 +237,12 @@ class BookFragment : Fragment() {
         menuAdapter.submitList(menuItems)
     }
 
-    private fun loadGroups(book: Book, refresh: Boolean = false) {
-        viewModel.getChapters(requireContext(), book, refresh)
+    private fun loadGroups(
+        book: Book,
+        refresh: Boolean = false,
+        webNovelRefresh: Boolean = false
+    ) {
+        viewModel.getChapters(requireContext(), book, refresh, webNovelRefresh)
             .observe(viewLifecycleOwner) { resource ->
                 binding?.apply {
                     when (resource) {

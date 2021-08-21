@@ -65,11 +65,16 @@ class MainViewModel : ViewModel() {
         }
     }
 
-    fun getChapters(context: Context, book: Book, refresh: Boolean = false) = liveData {
+    fun getChapters(
+        context: Context,
+        book: Book,
+        refresh: Boolean = false,
+        webNovelRefresh: Boolean = false
+    ) = liveData {
         emit(Resource.Loading())
         try {
             emitSource(
-                ChapterGroupRepository(context).getGroups(book, refresh)
+                ChapterGroupRepository(context).getGroups(book, refresh, webNovelRefresh)
                     .catch { Resource.Error<List<ChapterGroup>>(it) }
                     .map { it.sortedByDescending(ChapterGroup::firstChapter) }
                     .map { Resource.Success(it) }

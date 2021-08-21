@@ -47,18 +47,16 @@ class ChapterGroupRepository(context: Context) {
         database.chapterGroupQueries.updateLastRead(lastRead, group.link)
     }
 
-    suspend fun getGroups(book: Book, refresh: Boolean = false): Flow<List<ChapterGroup>> {
+    suspend fun getGroups(
+        book: Book,
+        refresh: Boolean = false,
+        webNovelRefresh: Boolean = false
+    ): Flow<List<ChapterGroup>> {
         val dbGroups = database.bookQueries.chapters(book.id).executeAsList()
         if (refresh || dbGroups.isEmpty()) {
             val remoteGroups = Api(proxy = true)
                 .getChapters(book.id)
                 .map { it.toGroup(book) }
-
-            val remoteWebNovelChapters = metaRepo.getBook(book, refresh).first()
-                ?.let { WebNovelApi.getChapter(it) }
-                ?.filter { !it.premium }
-                ?.map { it.toGroup(book) }
-                ?: listOf()
 
             val remoteChapters = remoteGroups.associateBy { it.firstChapter }
             val dbGroupsToUpdate = dbGroups
@@ -81,7 +79,17 @@ class ChapterGroupRepository(context: Context) {
                 // Due to INSERT OR IGNORE, we can ignore same entries
                 for (group in remoteGroups)
                     database.chapterGroupQueries.insert(group)
+            }
+        }
 
+        if (webNovelRefresh || dbGroups.isEmpty()) {
+            val remoteWebNovelChapters = metaRepo.getBook(book, refresh).first()
+                ?.let { WebNovelApi.getChapter(it) }
+                ?.filter { !it.premium }
+                ?.map { it.toGroup(book) }
+                ?: listOf()
+
+            database.chapterGroupQueries.transaction {
                 for (chapter in remoteWebNovelChapters)
                     database.chapterGroupQueries.insert(chapter)
             }
