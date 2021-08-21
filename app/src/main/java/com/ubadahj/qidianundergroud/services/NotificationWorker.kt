@@ -40,7 +40,7 @@ class NotificationWorker(
         createNotificationChannel(applicationContext)
         getNotifications().collect {
             with(NotificationManagerCompat.from(applicationContext)) {
-                notify(it.hashCode(), it.createNotification())
+                notify(it.id, it.createNotification())
             }
         }
         return Result.success()
@@ -114,6 +114,8 @@ class NotificationWorker(
         private val text = "$updateCount new chapter${if (updateCount > 1) "s" else ""} available"
 
         private val groupKey = "com.ubadahj.qidianunderground.CHAPTER_UPDATES"
+
+        val id: Int = book.id.toCharArray().sumOf { it.toInt() }
 
         suspend fun createNotification(): Notification =
             NotificationCompat.Builder(context, CHANNEL_ID)

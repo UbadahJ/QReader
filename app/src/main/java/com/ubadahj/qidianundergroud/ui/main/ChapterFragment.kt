@@ -128,7 +128,7 @@ class ChapterFragment : Fragment() {
                     listOf(MenuDialogItem("Error", R.drawable.unlink))
                 )
             }
-            is Resource.Loading -> {
+            Resource.Loading -> {
                 toolbar.appbar.title = "Loading"
                 progressBar.visibility = View.VISIBLE
                 errorGroup.root.visibility = View.GONE
