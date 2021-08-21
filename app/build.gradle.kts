@@ -4,6 +4,8 @@ plugins {
     kotlin("kapt")
     kotlin("plugin.parcelize")
 
+    id("com.google.gms.google-services")
+    id("com.google.firebase.crashlytics")
     id("androidx.navigation.safeargs.kotlin")
     id("com.mikepenz.aboutlibraries.plugin")
     id("com.squareup.sqldelight") version Dependencies.SQL_DELIGHT
@@ -67,6 +69,11 @@ dependencies {
     testImplementation("junit:junit:4.13.2")
     androidTestImplementation("androidx.test.ext:junit:1.1.3")
     androidTestImplementation("androidx.test.espresso:espresso-core:3.4.0")
+
+    // For firebase analytics
+    implementation(platform("com.google.firebase:firebase-bom:28.4.0"))
+    implementation("com.google.firebase:firebase-analytics-ktx")
+    implementation("com.google.firebase:firebase-crashlytics-ktx")
 
     // Required for new java.time.*
     coreLibraryDesugaring("com.android.tools:desugar_jdk_libs:1.1.5")
