@@ -8,7 +8,10 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.asLiveData
 import androidx.lifecycle.liveData
 import com.github.ajalt.timberkt.Timber.e
-import com.ubadahj.qidianundergroud.models.*
+import com.ubadahj.qidianundergroud.models.Book
+import com.ubadahj.qidianundergroud.models.Chapter
+import com.ubadahj.qidianundergroud.models.ChapterGroup
+import com.ubadahj.qidianundergroud.models.Resource
 import com.ubadahj.qidianundergroud.repositories.BookRepository
 import com.ubadahj.qidianundergroud.repositories.ChapterGroupRepository
 import com.ubadahj.qidianundergroud.repositories.ChapterRepository
@@ -24,44 +27,44 @@ class MainViewModel : ViewModel() {
     val selectedChapter: MutableLiveData<Chapter?> = MutableLiveData()
 
     fun libraryBooks(context: Context) = liveData {
-        emit(Resource.Loading())
+        emit(Resource.Loading)
         try {
             emitSource(
                 BookRepository(context).getLibraryBooks()
-                    .catch { Resource.Error<List<Book>>(it) }
+                    .catch { Resource.Error(it) }
                     .map { Resource.Success(it) }
                     .asLiveData()
             )
         } catch (e: Exception) {
-            emit(Resource.Error<List<Book>>(e))
+            emit(Resource.Error(e))
         }
     }
 
     fun getBooks(context: Context, refresh: Boolean = false) = liveData {
-        emit(Resource.Loading())
+        emit(Resource.Loading)
         try {
             emitSource(
                 BookRepository(context).getBooks(refresh)
-                    .catch { Resource.Error<List<Book>>(it) }
+                    .catch { Resource.Error(it) }
                     .map { Resource.Success(it) }
                     .asLiveData()
             )
         } catch (e: Exception) {
-            emit(Resource.Error<List<Book>>(e))
+            emit(Resource.Error(e))
         }
     }
 
     fun getMetadata(context: Context, book: Book, refresh: Boolean = false) = liveData {
-        emit(Resource.Loading())
+        emit(Resource.Loading)
         try {
             emitSource(
                 MetadataRepository(context).getBook(book, refresh)
-                    .catch { Resource.Error<Metadata?>(it) }
+                    .catch { Resource.Error(it) }
                     .map { Resource.Success(it) }
                     .asLiveData()
             )
         } catch (e: Exception) {
-            emit(Resource.Error<Metadata?>(e))
+            emit(Resource.Error(e))
         }
     }
 
@@ -71,23 +74,23 @@ class MainViewModel : ViewModel() {
         refresh: Boolean = false,
         webNovelRefresh: Boolean = false
     ) = liveData {
-        emit(Resource.Loading())
+        emit(Resource.Loading)
         try {
             emitSource(
                 ChapterGroupRepository(context).getGroups(book, refresh, webNovelRefresh)
-                    .catch { Resource.Error<List<ChapterGroup>>(it) }
+                    .catch { Resource.Error(it) }
                     .map { it.sortedByDescending(ChapterGroup::firstChapter) }
                     .map { Resource.Success(it) }
                     .asLiveData()
             )
         } catch (e: Exception) {
-            emit(Resource.Error<List<ChapterGroup>>(e))
+            emit(Resource.Error(e))
         }
     }
 
     @SuppressLint("SetJavaScriptEnabled")
     fun getChapterContents(context: Context, group: ChapterGroup, refresh: Boolean) = liveData {
-        emit(Resource.Loading())
+        emit(Resource.Loading)
         try {
             emitSource(
                 ChapterRepository(context).getChaptersContent(
@@ -98,7 +101,7 @@ class MainViewModel : ViewModel() {
                     },
                     group, refresh
                 )
-                    .catch { Resource.Error<List<Chapter>>(it) }
+                    .catch { Resource.Error(it) }
                     .map {
                         Resource.Success(it)
                     }
@@ -106,7 +109,7 @@ class MainViewModel : ViewModel() {
             )
         } catch (e: Exception) {
             e(e) { "Failed loading content" }
-            emit(Resource.Error<List<Chapter>>(e))
+            emit(Resource.Error(e))
         }
     }
 

@@ -87,7 +87,7 @@ class BrowseFragment : Fragment() {
 
                     adapter.submitList(resource.data!!)
                 }
-                is Resource.Loading -> binding?.progressBar?.visible = true
+                Resource.Loading -> binding?.progressBar?.visible = true
                 is Resource.Error -> {
                     binding?.apply {
                         progressBar.visible = false

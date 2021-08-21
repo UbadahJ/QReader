@@ -169,7 +169,7 @@ class BookFragment : Fragment() {
         book: Book
     ) {
         when (it) {
-            is Resource.Loading -> {
+            Resource.Loading -> {
                 metaProgress.visible = true
                 notificationDisabled.visible = false
             }
@@ -208,7 +208,7 @@ class BookFragment : Fragment() {
                     viewModel.getMetadata(requireContext(), book, true)
                         .observe(viewLifecycleOwner) {
                             binding?.configureMetadata(it, book)
-                            it.data?.apply {
+                            (it as? Resource.Success<Metadata?>)?.data?.apply {
                                 configureMenu(book, this)
                             }
                         }
@@ -252,7 +252,7 @@ class BookFragment : Fragment() {
                             (chapterListView.adapter as? GroupAdapter)
                                 ?.submitList(resource.data!!)
                         }
-                        is Resource.Loading -> {
+                        Resource.Loading -> {
                             loadingProgress.visibility = View.VISIBLE
                             materialCardView.visibility = View.GONE
                         }

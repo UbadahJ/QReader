@@ -83,7 +83,7 @@ class LibraryFragment : Fragment() {
                         progressBar.visibility = View.GONE
                         adapter.submitList(it.data!!)
                     }
-                    is Resource.Loading -> {
+                    Resource.Loading -> {
                         progressBar.visibility = View.VISIBLE
                     }
                     is Resource.Error -> {
