@@ -116,8 +116,8 @@ class ChapterFragment : Fragment() {
             .observe(
                 viewLifecycleOwner,
                 {
-                    binding?.updateUIIndicators(it)
                     updateRecyclerAdapter(it)
+                    binding?.updateUIIndicators(it)
                 }
             )
     }
@@ -126,8 +126,9 @@ class ChapterFragment : Fragment() {
         when (resource) {
             is Resource.Error -> {
                 toolbar.appbar.title = "Error"
-                errorGroup.root.visibility = View.VISIBLE
                 progressBar.visibility = View.GONE
+                chapterRecyclerView.visibility = View.GONE
+                errorGroup.root.visibility = View.VISIBLE
 
                 menu.adapter.submitList(
                     listOf(MenuDialogItem("Error", R.drawable.unlink))
@@ -135,12 +136,14 @@ class ChapterFragment : Fragment() {
             }
             Resource.Loading -> {
                 toolbar.appbar.title = "Loading"
-                progressBar.visibility = View.VISIBLE
+                chapterRecyclerView.visibility = View.GONE
                 errorGroup.root.visibility = View.GONE
+                progressBar.visibility = View.VISIBLE
             }
             is Resource.Success -> {
                 progressBar.visibility = View.GONE
                 errorGroup.root.visibility = View.GONE
+                chapterRecyclerView.visibility = View.VISIBLE
             }
         }
     }
