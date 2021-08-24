@@ -14,17 +14,34 @@ import com.google.android.material.snackbar.Snackbar
 import com.ubadahj.qidianundergroud.R
 import com.ubadahj.qidianundergroud.databinding.BookListFragmentBinding
 import com.ubadahj.qidianundergroud.models.Resource
+import com.ubadahj.qidianundergroud.repositories.ChapterGroupRepository
+import com.ubadahj.qidianundergroud.repositories.MetadataRepository
 import com.ubadahj.qidianundergroud.ui.adapters.LibraryAdapter
 import com.ubadahj.qidianundergroud.ui.adapters.MenuAdapter
 import com.ubadahj.qidianundergroud.ui.adapters.decorations.GridItemOffsetDecoration
 import com.ubadahj.qidianundergroud.ui.dialog.MenuDialog
 import com.ubadahj.qidianundergroud.ui.models.MenuDialogItem
 import com.ubadahj.qidianundergroud.utils.ui.toDp
+import dagger.hilt.android.AndroidEntryPoint
+import kotlinx.coroutines.flow.first
+import javax.inject.Inject
 
+@AndroidEntryPoint
 class LibraryFragment : Fragment() {
 
+    @Inject
+    lateinit var groupRepo: ChapterGroupRepository
+
+    @Inject
+    lateinit var metadataRepo: MetadataRepository
+
     private val viewModel: MainViewModel by activityViewModels()
-    private val adapter: LibraryAdapter = LibraryAdapter(listOf(), lifecycleScope) {
+    private val adapter: LibraryAdapter = LibraryAdapter(
+        listOf(),
+        { groupRepo.getGroups(it).first() },
+        { metadataRepo.getBook(it).first() },
+        lifecycleScope
+    ) {
         viewModel.selectedBook.value = it
         findNavController().navigate(
             LibraryFragmentDirections.actionLibraryFragmentToBookFragment()
@@ -77,7 +94,7 @@ class LibraryFragment : Fragment() {
             searchBar.searchEditText.addTextChangedListener { text: Editable? ->
                 adapter.filter.filter((text))
             }
-            viewModel.libraryBooks(requireContext()).observe(viewLifecycleOwner) {
+            viewModel.libraryBooks().observe(viewLifecycleOwner) {
                 when (it) {
                     is Resource.Success -> {
                         progressBar.visibility = View.GONE

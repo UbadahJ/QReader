@@ -6,6 +6,7 @@ import android.content.Context
 import android.content.Intent
 import androidx.core.app.NotificationCompat
 import androidx.core.app.NotificationManagerCompat
+import androidx.hilt.work.HiltWorker
 import androidx.work.CoroutineWorker
 import androidx.work.WorkerParameters
 import com.github.ajalt.timberkt.e
@@ -18,21 +19,22 @@ import com.ubadahj.qidianundergroud.repositories.BookRepository
 import com.ubadahj.qidianundergroud.repositories.ChapterGroupRepository
 import com.ubadahj.qidianundergroud.repositories.MetadataRepository
 import com.ubadahj.qidianundergroud.utils.models.lastChapter
-import com.ubadahj.qidianundergroud.utils.repositories.getGroups
+import dagger.assisted.Assisted
+import dagger.assisted.AssistedInject
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.flowOn
 
-class NotificationWorker(
-    context: Context,
-    params: WorkerParameters
+@HiltWorker
+class NotificationWorker @AssistedInject constructor(
+    @Assisted context: Context,
+    @Assisted params: WorkerParameters,
+    private val bookRepo: BookRepository,
+    private val groupRepo: ChapterGroupRepository,
+    private val metaRepo: MetadataRepository,
 ) : CoroutineWorker(context, params) {
-
-    private val bookRepo = BookRepository(context)
-    private val groupRepo = ChapterGroupRepository(context)
-    private val metaRepo = MetadataRepository(context)
 
     private val notificationId = 42069
 
@@ -53,7 +55,7 @@ class NotificationWorker(
 
         progressNotification(books) { book, metadata ->
             try {
-                val lastGroup = book.getGroups(applicationContext).first()
+                val lastGroup = groupRepo.getGroups(book).first()
                 val refreshedGroups = groupRepo.getGroups(book, true).first()
                 val updateCount = refreshedGroups.lastChapter() - lastGroup.lastChapter()
                 if (updateCount > 0 && metadata?.enableNotification == true)

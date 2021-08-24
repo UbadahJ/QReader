@@ -4,12 +4,15 @@ import android.content.Context
 import android.webkit.WebView
 import androidx.core.app.NotificationCompat
 import androidx.core.app.NotificationManagerCompat
+import androidx.hilt.work.HiltWorker
 import androidx.work.CoroutineWorker
 import androidx.work.WorkerParameters
 import com.github.ajalt.timberkt.d
 import com.github.ajalt.timberkt.e
 import com.ubadahj.qidianundergroud.R
 import com.ubadahj.qidianundergroud.repositories.BookRepository
+import dagger.assisted.Assisted
+import dagger.assisted.AssistedInject
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.collectIndexed
 import kotlinx.coroutines.flow.first
@@ -17,13 +20,16 @@ import kotlinx.coroutines.flow.flowOn
 import kotlin.math.abs
 import kotlin.random.Random
 
-class DownloadService(context: Context, params: WorkerParameters) :
-    CoroutineWorker(context, params) {
+@HiltWorker
+class DownloadService @AssistedInject constructor(
+    @Assisted context: Context,
+    @Assisted params: WorkerParameters,
+    private val bookRepo: BookRepository
+) : CoroutineWorker(context, params) {
 
     private val notificationId = 69420
 
     override suspend fun doWork(): Result {
-        val bookRepo = BookRepository(applicationContext)
         val book = bookRepo.getBookById(inputData.getString("book_id")!!).first()
         val groups = bookRepo.getGroups(book).first()
 

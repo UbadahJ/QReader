@@ -15,16 +15,28 @@ import com.ubadahj.qidianundergroud.repositories.BookRepository
 import com.ubadahj.qidianundergroud.repositories.ChapterGroupRepository
 import com.ubadahj.qidianundergroud.services.NotificationWorker
 import com.ubadahj.qidianundergroud.ui.main.MainViewModel
+import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
 import java.util.concurrent.TimeUnit
+import javax.inject.Inject
 
+@AndroidEntryPoint
 class MainActivity : AppCompatActivity() {
 
-    private lateinit var binding: MainActivityBinding
     private val viewModel: MainViewModel by viewModels()
-    private val notificationRequest =
-        PeriodicWorkRequestBuilder<NotificationWorker>(1, TimeUnit.HOURS).build()
+    private val notificationRequest = PeriodicWorkRequestBuilder<NotificationWorker>(
+        1, TimeUnit.HOURS
+    ).build()
+
+    private lateinit var binding: MainActivityBinding
+
+
+    @Inject
+    lateinit var bookRepo: BookRepository
+
+    @Inject
+    lateinit var groupRepo: ChapterGroupRepository
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -35,9 +47,6 @@ class MainActivity : AppCompatActivity() {
             Timber.plant(Timber.DebugTree())
 
         lifecycleScope.launch {
-            val bookRepo = BookRepository(baseContext)
-            val groupRepo = ChapterGroupRepository(baseContext)
-
             val book = intent.extras?.getString("book")?.apply {
                 viewModel.selectedBook.value = bookRepo.getBookById(this).first()
                 viewModel.selectedChapter.value = null

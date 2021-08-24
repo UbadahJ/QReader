@@ -14,6 +14,7 @@ import com.ubadahj.qidianundergroud.databinding.ChapterFragmentBinding
 import com.ubadahj.qidianundergroud.models.Chapter
 import com.ubadahj.qidianundergroud.models.ChapterGroup
 import com.ubadahj.qidianundergroud.models.Resource
+import com.ubadahj.qidianundergroud.repositories.ChapterGroupRepository
 import com.ubadahj.qidianundergroud.ui.adapters.ChapterAdapter
 import com.ubadahj.qidianundergroud.ui.adapters.MenuAdapter
 import com.ubadahj.qidianundergroud.ui.dialog.MenuDialog
@@ -21,12 +22,13 @@ import com.ubadahj.qidianundergroud.ui.listeners.OnSwipeTouchListener
 import com.ubadahj.qidianundergroud.ui.models.MenuDialogItem
 import com.ubadahj.qidianundergroud.utils.models.firstChapter
 import com.ubadahj.qidianundergroud.utils.models.lastChapter
-import com.ubadahj.qidianundergroud.utils.repositories.getGroups
-import com.ubadahj.qidianundergroud.utils.repositories.updateLastRead
 import com.ubadahj.qidianundergroud.utils.ui.addOnScrollStateListener
 import com.ubadahj.qidianundergroud.utils.ui.linearScroll
+import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.flow.first
+import javax.inject.Inject
 
+@AndroidEntryPoint
 class ChapterFragment : Fragment() {
 
     private val viewModel: MainViewModel by activityViewModels()
@@ -35,6 +37,10 @@ class ChapterFragment : Fragment() {
         MenuAdapter(listOf(MenuDialogItem("Loading", R.drawable.pulse)))
     )
     private var adapter: ChapterAdapter = ChapterAdapter(listOf())
+
+    @Inject
+    lateinit var groupRepo: ChapterGroupRepository
+
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -54,7 +60,9 @@ class ChapterFragment : Fragment() {
                 { chapter ->
                     chapter?.apply {
                         toolbar.appbar.title = this.title
-                        viewModel.selectedGroup.value?.updateLastRead(requireContext(), getIndex())
+                        viewModel.selectedGroup.value?.run {
+                            groupRepo.updateLastRead(this, getIndex())
+                        }
                     }
                 }
             )
@@ -112,7 +120,7 @@ class ChapterFragment : Fragment() {
 
     private fun getChapterContents(group: ChapterGroup, refresh: Boolean = false) {
         viewModel
-            .getChapterContents(requireContext(), group, refresh)
+            .getChapterContents(group, refresh)
             .observe(
                 viewLifecycleOwner,
                 {
@@ -170,7 +178,7 @@ class ChapterFragment : Fragment() {
                 val group = viewModel.selectedGroup.value
                 viewModel.selectedBook.value?.let { book ->
                     lifecycleScope.launchWhenCreated {
-                        book.getGroups(requireContext()).first()
+                        groupRepo.getGroups(book).first()
                             .firstOrNull { other -> group?.let { predicate(it, other) } == true }
                             ?.let { viewModel.selectedGroup.postValue(it) }
                     }

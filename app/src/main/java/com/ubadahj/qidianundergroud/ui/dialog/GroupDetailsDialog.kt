@@ -8,14 +8,14 @@ import com.google.android.material.bottomsheet.BottomSheetDialogFragment
 import com.ubadahj.qidianundergroud.R
 import com.ubadahj.qidianundergroud.databinding.GroupInfoMenuBinding
 import com.ubadahj.qidianundergroud.models.ChapterGroup
+import com.ubadahj.qidianundergroud.repositories.ChapterGroupRepository
 import com.ubadahj.qidianundergroud.ui.adapters.MenuAdapter
 import com.ubadahj.qidianundergroud.ui.models.MenuDialogItem
 import com.ubadahj.qidianundergroud.utils.models.firstChapter
-import com.ubadahj.qidianundergroud.utils.models.isDownloaded
 import com.ubadahj.qidianundergroud.utils.models.lastChapter
-import com.ubadahj.qidianundergroud.utils.repositories.updateLastRead
 
 class GroupDetailsDialog(
+    private val groupRepo: ChapterGroupRepository,
     private val group: ChapterGroup
 ) : BottomSheetDialogFragment() {
 
@@ -27,7 +27,7 @@ class GroupDetailsDialog(
             else -> "Currently reading chapter ${group.lastRead}"
         }
     private val downloaded: String
-        get() = if (group.isDownloaded(requireContext())) "This group is downloaded"
+        get() = if (groupRepo.isDownloaded(group)) "This group is downloaded"
         else "This group is not downloaded"
 
     override fun onCreateView(
@@ -46,7 +46,7 @@ class GroupDetailsDialog(
             recyclerView.adapter = MenuAdapter(
                 listOf(
                     MenuDialogItem("Mark as read", R.drawable.check) {
-                        group.updateLastRead(requireContext(), group.lastChapter)
+                        groupRepo.updateLastRead(group, group.lastChapter)
                         dismiss()
                     }
                 )

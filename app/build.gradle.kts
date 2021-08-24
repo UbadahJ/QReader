@@ -81,7 +81,9 @@ dependencies {
 
     // Dependency Injection
     implementation("com.google.dagger:hilt-android:${Dependencies.HILT}")
+    implementation("androidx.hilt:hilt-work:1.0.0")
     kapt("com.google.dagger:hilt-android-compiler:${Dependencies.HILT}")
+    kapt("androidx.hilt:hilt-compiler:1.0.0")
 
     // Navigation Support
     implementation("androidx.navigation:navigation-fragment-ktx:2.3.5")

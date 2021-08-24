@@ -12,6 +12,7 @@ import com.ubadahj.qidianundergroud.utils.md5
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import okhttp3.HttpUrl.Companion.toHttpUrl
+import okhttp3.OkHttpClient
 import okhttp3.ResponseBody
 import org.jsoup.Jsoup
 import org.jsoup.nodes.Element
@@ -20,14 +21,17 @@ import retrofit2.http.GET
 import retrofit2.http.Path
 import retrofit2.http.Query
 import retrofit2.http.Url
+import javax.inject.Inject
 
-object WebNovelApi {
+private const val WEB_NOVEL_URL = "https://www.webnovel.com/"
 
-    private const val WEB_NOVEL_URL = "https://www.webnovel.com/"
+class WebNovelApi @Inject constructor(
+    private val client: OkHttpClient,
+    private val provider: RetrofitProvider
+) {
 
     private val webNovelApi: IWebNovelApi by lazy {
-        Api.getRetrofit(WEB_NOVEL_URL)
-            .create(IWebNovelApi::class.java)
+        provider.get(WEB_NOVEL_URL).create(IWebNovelApi::class.java)
     }
 
     suspend fun getBook(book: Book): WNBookRemote? {
@@ -80,7 +84,7 @@ object WebNovelApi {
     }
 
     private fun getToken(): String {
-        return Api.client.cookieJar
+        return client.cookieJar
             .loadForRequest(WEB_NOVEL_URL.toHttpUrl())
             .first { it.name == "_csrfToken" }
             .value
