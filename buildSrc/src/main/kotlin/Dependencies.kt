@@ -5,4 +5,5 @@ object Dependencies {
     const val ABOUT_LIB = "8.3.1"
     const val SQL_DELIGHT = "1.5.0"
     const val VERSIONS_PLUGIN = "0.38.0"
+    const val HILT = "2.38.1"
 }

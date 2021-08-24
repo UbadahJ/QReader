@@ -4,6 +4,7 @@ plugins {
     kotlin("kapt")
     kotlin("plugin.parcelize")
 
+    id("dagger.hilt.android.plugin")
     id("com.google.gms.google-services")
     id("com.google.firebase.crashlytics")
     id("androidx.navigation.safeargs.kotlin")
@@ -61,10 +62,10 @@ dependencies {
     implementation("org.jetbrains.kotlinx:kotlinx-coroutines-android:1.5.1")
 
     implementation("androidx.core:core-ktx:1.6.0")
-    implementation("androidx.fragment:fragment-ktx:1.3.5")
+    implementation("androidx.fragment:fragment-ktx:1.3.6")
     implementation("androidx.recyclerview:recyclerview:1.2.1")
-    implementation("androidx.appcompat:appcompat:1.3.0")
-    implementation("androidx.constraintlayout:constraintlayout:2.0.4")
+    implementation("androidx.appcompat:appcompat:1.3.1")
+    implementation("androidx.constraintlayout:constraintlayout:2.1.0")
     implementation("androidx.legacy:legacy-support-v4:1.0.0")
     testImplementation("junit:junit:4.13.2")
     androidTestImplementation("androidx.test.ext:junit:1.1.3")
@@ -77,6 +78,10 @@ dependencies {
 
     // Required for new java.time.*
     coreLibraryDesugaring("com.android.tools:desugar_jdk_libs:1.1.5")
+
+    // Dependency Injection
+    implementation("com.google.dagger:hilt-android:${Dependencies.HILT}")
+    kapt("com.google.dagger:hilt-android-compiler:${Dependencies.HILT}")
 
     // Navigation Support
     implementation("androidx.navigation:navigation-fragment-ktx:2.3.5")
@@ -129,7 +134,11 @@ dependencies {
     implementation("com.squareup.sqldelight:android-driver:1.5.1")
     implementation("com.squareup.sqldelight:coroutines-extensions-jvm:1.5.1")
 
-    implementation("io.coil-kt:coil:1.3.0")
+    implementation("io.coil-kt:coil:1.3.1")
+}
+
+kapt {
+    correctErrorTypes = true
 }
 
 spotless {
