@@ -6,6 +6,7 @@ import android.view.*
 import androidx.appcompat.app.AppCompatActivity
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
+import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.ubadahj.qidianundergroud.R
@@ -16,12 +17,15 @@ import com.ubadahj.qidianundergroud.models.Resource
 import com.ubadahj.qidianundergroud.ui.adapters.ChapterAdapter
 import com.ubadahj.qidianundergroud.ui.adapters.MenuAdapter
 import com.ubadahj.qidianundergroud.ui.dialog.MenuDialog
+import com.ubadahj.qidianundergroud.ui.listeners.OnSwipeTouchListener
 import com.ubadahj.qidianundergroud.ui.models.MenuDialogItem
 import com.ubadahj.qidianundergroud.utils.models.firstChapter
 import com.ubadahj.qidianundergroud.utils.models.lastChapter
+import com.ubadahj.qidianundergroud.utils.repositories.getGroups
 import com.ubadahj.qidianundergroud.utils.repositories.updateLastRead
 import com.ubadahj.qidianundergroud.utils.ui.addOnScrollStateListener
 import com.ubadahj.qidianundergroud.utils.ui.linearScroll
+import kotlinx.coroutines.flow.first
 
 class ChapterFragment : Fragment() {
 
@@ -72,9 +76,10 @@ class ChapterFragment : Fragment() {
                     return@addOnScrollStateListener
 
                 viewModel.selectedChapter.value = this@ChapterFragment.adapter.currentList[
-                    (rc.layoutManager as LinearLayoutManager).findFirstVisibleItemPosition()
+                        (rc.layoutManager as LinearLayoutManager).findFirstVisibleItemPosition()
                 ]
             }
+            configureSwipeGestures()
         }
     }
 
@@ -111,8 +116,8 @@ class ChapterFragment : Fragment() {
             .observe(
                 viewLifecycleOwner,
                 {
-                    binding?.updateUIIndicators(it)
                     updateRecyclerAdapter(it)
+                    binding?.updateUIIndicators(it)
                 }
             )
     }
@@ -121,8 +126,9 @@ class ChapterFragment : Fragment() {
         when (resource) {
             is Resource.Error -> {
                 toolbar.appbar.title = "Error"
-                errorGroup.root.visibility = View.VISIBLE
                 progressBar.visibility = View.GONE
+                chapterRecyclerView.visibility = View.GONE
+                errorGroup.root.visibility = View.VISIBLE
 
                 menu.adapter.submitList(
                     listOf(MenuDialogItem("Error", R.drawable.unlink))
@@ -130,22 +136,55 @@ class ChapterFragment : Fragment() {
             }
             Resource.Loading -> {
                 toolbar.appbar.title = "Loading"
-                progressBar.visibility = View.VISIBLE
+                chapterRecyclerView.visibility = View.GONE
                 errorGroup.root.visibility = View.GONE
+                progressBar.visibility = View.VISIBLE
             }
             is Resource.Success -> {
                 progressBar.visibility = View.GONE
                 errorGroup.root.visibility = View.GONE
+                chapterRecyclerView.visibility = View.VISIBLE
             }
         }
+    }
+
+
+    @SuppressLint("ClickableViewAccessibility")
+    private fun ChapterFragmentBinding.configureSwipeGestures() {
+        chapterRecyclerView.setOnTouchListener(object : OnSwipeTouchListener(requireContext()) {
+            override fun onSwipeLeft() {
+                selectChapterGroup { current, other ->
+                    current.lastChapter == other.firstChapter - 1
+                }
+            }
+
+            override fun onSwipeRight() {
+                selectChapterGroup { current, other ->
+                    current.firstChapter == other.lastChapter + 1
+                }
+            }
+
+            private fun selectChapterGroup(
+                predicate: (current: ChapterGroup, other: ChapterGroup) -> Boolean
+            ) {
+                val group = viewModel.selectedGroup.value
+                viewModel.selectedBook.value?.let { book ->
+                    lifecycleScope.launchWhenCreated {
+                        book.getGroups(requireContext()).first()
+                            .firstOrNull { other -> group?.let { predicate(it, other) } == true }
+                            ?.let { viewModel.selectedGroup.postValue(it) }
+                    }
+                }
+            }
+        })
     }
 
     private fun updateRecyclerAdapter(resource: Resource<List<Chapter>>) {
         val group = viewModel.selectedGroup.value
         val chapter = viewModel.selectedChapter.value
         val hasDataChanged = chapter == null ||
-            adapter.currentList.isEmpty() ||
-            chapter.groupLink != group?.link
+                adapter.currentList.isEmpty() ||
+                chapter.groupLink != group?.link
 
         if (hasDataChanged && resource is Resource.Success) {
             adapter.submitList(resource.data!!)
