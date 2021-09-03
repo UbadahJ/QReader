@@ -26,4 +26,5 @@
     <string name="aboutLibraries_description_showVersion">true</string>
     <string name="aboutLibraries_description_text">Android reader for Qidian Underground API</string>
     <string name="downloader_name">Show download progress</string>
+    <string name="update_notification">Application updates</string>
 </resources>

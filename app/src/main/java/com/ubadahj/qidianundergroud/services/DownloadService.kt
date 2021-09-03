@@ -7,7 +7,6 @@ import androidx.core.app.NotificationManagerCompat
 import androidx.hilt.work.HiltWorker
 import androidx.work.CoroutineWorker
 import androidx.work.WorkerParameters
-import com.github.ajalt.timberkt.d
 import com.github.ajalt.timberkt.e
 import com.ubadahj.qidianundergroud.R
 import com.ubadahj.qidianundergroud.repositories.BookRepository
@@ -19,6 +18,8 @@ import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.flowOn
 import kotlin.math.abs
 import kotlin.random.Random
+
+private const val DOWNLOADER_ID: String = "69"
 
 @HiltWorker
 class DownloadService @AssistedInject constructor(
@@ -33,9 +34,12 @@ class DownloadService @AssistedInject constructor(
         val book = bookRepo.getBookById(inputData.getString("book_id")!!).first()
         val groups = bookRepo.getGroups(book).first()
 
-        d { "doWork: Book = $book" }
-
-        createDownloaderChannel(applicationContext)
+        createChannel(
+            applicationContext, Channel(
+                name = applicationContext.getString(R.string.downloader_name),
+                id = DOWNLOADER_ID
+            )
+        )
 
         val builder = NotificationCompat.Builder(applicationContext, DOWNLOADER_ID).apply {
             setContentTitle("Downloading ${book.name}")

@@ -27,6 +27,8 @@ import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.flowOn
 
+private const val CHANNEL_ID: String = "42000"
+
 @HiltWorker
 class NotificationWorker @AssistedInject constructor(
     @Assisted context: Context,
@@ -39,7 +41,12 @@ class NotificationWorker @AssistedInject constructor(
     private val notificationId = 42069
 
     override suspend fun doWork(): Result {
-        createNotificationChannel(applicationContext)
+        createChannel(
+            applicationContext, Channel(
+                name = applicationContext.getString(R.string.channel_name),
+                id = CHANNEL_ID
+            )
+        )
         getNotifications().collect {
             with(NotificationManagerCompat.from(applicationContext)) {
                 notify(it.id, it.createNotification())

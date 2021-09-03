@@ -7,6 +7,7 @@ import androidx.lifecycle.lifecycleScope
 import androidx.navigation.ActivityNavigator
 import androidx.navigation.findNavController
 import androidx.work.ExistingPeriodicWorkPolicy
+import androidx.work.OneTimeWorkRequestBuilder
 import androidx.work.PeriodicWorkRequestBuilder
 import androidx.work.WorkManager
 import com.github.ajalt.timberkt.Timber
@@ -14,6 +15,7 @@ import com.ubadahj.qidianundergroud.databinding.MainActivityBinding
 import com.ubadahj.qidianundergroud.repositories.BookRepository
 import com.ubadahj.qidianundergroud.repositories.ChapterGroupRepository
 import com.ubadahj.qidianundergroud.services.NotificationWorker
+import com.ubadahj.qidianundergroud.services.updater.service.UpdateService
 import com.ubadahj.qidianundergroud.ui.main.MainViewModel
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.flow.first
@@ -25,6 +27,7 @@ import javax.inject.Inject
 class MainActivity : AppCompatActivity() {
 
     private val viewModel: MainViewModel by viewModels()
+    private val updateRequest = OneTimeWorkRequestBuilder<UpdateService>().build()
     private val notificationRequest = PeriodicWorkRequestBuilder<NotificationWorker>(
         1, TimeUnit.HOURS
     ).build()
@@ -68,6 +71,7 @@ class MainActivity : AppCompatActivity() {
         WorkManager.getInstance(applicationContext).enqueueUniquePeriodicWork(
             "NotificationService", ExistingPeriodicWorkPolicy.REPLACE, notificationRequest
         )
+        WorkManager.getInstance(applicationContext).enqueue(updateRequest)
     }
 
     override fun onSupportNavigateUp() = findNavController(R.id.nav_host_fragment).navigateUp()
