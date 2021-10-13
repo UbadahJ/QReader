@@ -13,6 +13,7 @@ import androidx.work.ExistingWorkPolicy
 import androidx.work.OneTimeWorkRequestBuilder
 import androidx.work.WorkManager
 import coil.load
+import com.github.ajalt.timberkt.e
 import com.google.android.material.snackbar.Snackbar
 import com.ubadahj.qidianundergroud.R
 import com.ubadahj.qidianundergroud.databinding.BookFragmentBinding
@@ -267,6 +268,7 @@ class BookFragment : Fragment() {
                             materialCardView.visibility = View.GONE
                         }
                         is Resource.Error -> {
+                            e(resource.message)
                             loadingProgress.visibility = View.GONE
                             materialCardView.visibility = View.GONE
                             Snackbar.make(root, R.string.error_refreshing, Snackbar.LENGTH_SHORT)

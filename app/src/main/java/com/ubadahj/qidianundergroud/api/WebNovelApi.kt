@@ -192,7 +192,7 @@ private interface IWebNovelApi {
         @Path("bookId") bookId: String
     ): Response<ResponseBody>
 
-    @GET("apiajax/chapter/GetChapterList")
+    @GET("go/pcm/chapter/get-chapter-list")
     suspend fun getChaptersLinks(
         @Query("_csrfToken") csrfToken: String,
         @Query("bookId") bookId: String

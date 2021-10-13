@@ -7,17 +7,15 @@ import com.squareup.moshi.JsonClass
 data class WNChapterItemRemote(
     @Json(name = "chapterLevel")
     val chapterLevel: Int,
-    @Json(name = "createTime")
-    val createTime: String,
-    @Json(name = "id")
+    @Json(name = "chapterId")
     val id: String,
-    @Json(name = "index")
+    @Json(name = "chapterIndex")
     val index: Int,
     @Json(name = "isAuth")
     val isAuth: Int,
     @Json(name = "isVip")
     val isVip: Int,
-    @Json(name = "name")
+    @Json(name = "chapterName")
     val name: String,
     @Json(name = "userLevel")
     val userLevel: Int
