@@ -1,8 +1,6 @@
 package com.ubadahj.qidianundergroud.utils.models
 
-import android.content.Context
 import com.ubadahj.qidianundergroud.models.ChapterGroup
-import com.ubadahj.qidianundergroud.repositories.ChapterGroupRepository
 import java.util.*
 
 val ChapterGroup.firstChapter: Int
@@ -16,9 +14,6 @@ val ChapterGroup.total: Int
 
 fun ChapterGroup.isRead() = lastRead == lastChapter
 
-fun ChapterGroup.isDownloaded(context: Context) =
-    ChapterGroupRepository(context)
-        .isDownloaded(this)
 
 val ChapterGroup.source: String
     get() {

@@ -5,12 +5,10 @@ import com.squareup.moshi.JsonClass
 
 @JsonClass(generateAdapter = true)
 data class WNVolumeItemRemote(
-    @Json(name = "chapterCount")
-    val chapterCount: Int,
     @Json(name = "chapterItems")
     val chapterItems: List<WNChapterItemRemote>,
-    @Json(name = "index")
-    val index: Int,
-    @Json(name = "name")
+    @Json(name = "volumeId")
+    val id: Int,
+    @Json(name = "volumeName")
     val name: String
 )

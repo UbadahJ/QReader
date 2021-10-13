@@ -13,6 +13,7 @@ import androidx.work.ExistingWorkPolicy
 import androidx.work.OneTimeWorkRequestBuilder
 import androidx.work.WorkManager
 import coil.load
+import com.github.ajalt.timberkt.e
 import com.google.android.material.snackbar.Snackbar
 import com.ubadahj.qidianundergroud.R
 import com.ubadahj.qidianundergroud.databinding.BookFragmentBinding
@@ -20,25 +21,35 @@ import com.ubadahj.qidianundergroud.models.Book
 import com.ubadahj.qidianundergroud.models.Metadata
 import com.ubadahj.qidianundergroud.models.Resource
 import com.ubadahj.qidianundergroud.repositories.BookRepository
+import com.ubadahj.qidianundergroud.repositories.ChapterGroupRepository
+import com.ubadahj.qidianundergroud.repositories.MetadataRepository
 import com.ubadahj.qidianundergroud.services.DownloadService
 import com.ubadahj.qidianundergroud.ui.adapters.GroupAdapter
 import com.ubadahj.qidianundergroud.ui.adapters.MenuAdapter
 import com.ubadahj.qidianundergroud.ui.dialog.GroupDetailsDialog
 import com.ubadahj.qidianundergroud.ui.dialog.MenuDialog
 import com.ubadahj.qidianundergroud.ui.models.MenuDialogItem
-import com.ubadahj.qidianundergroud.utils.models.markAsRead
-import com.ubadahj.qidianundergroud.utils.models.setNotifications
-import com.ubadahj.qidianundergroud.utils.repositories.addToLibrary
-import com.ubadahj.qidianundergroud.utils.repositories.removeFromLibrary
 import com.ubadahj.qidianundergroud.utils.ui.snackBar
 import com.ubadahj.qidianundergroud.utils.ui.visible
+import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.flow.collect
+import javax.inject.Inject
 
+@AndroidEntryPoint
 class BookFragment : Fragment() {
 
     private val viewModel: MainViewModel by activityViewModels()
     private var binding: BookFragmentBinding? = null
     private var menuAdapter = MenuAdapter(listOf())
+
+    @Inject
+    lateinit var bookRepo: BookRepository
+
+    @Inject
+    lateinit var groupRepo: ChapterGroupRepository
+
+    @Inject
+    lateinit var metadataRepo: MetadataRepository
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -91,7 +102,7 @@ class BookFragment : Fragment() {
             }
 
             lifecycleScope.launchWhenResumed {
-                viewModel.getMetadata(requireContext(), book).observe(viewLifecycleOwner) {
+                viewModel.getMetadata(book).observe(viewLifecycleOwner) {
                     configureMetadata(it, book)
                 }
             }
@@ -112,14 +123,14 @@ class BookFragment : Fragment() {
         libraryButton.setOnClickListener {
             lifecycleScope.launchWhenCreated {
                 if (book.inLibrary) {
-                    book.removeFromLibrary(requireContext())
+                    bookRepo.removeFromLibrary(book)
                     root.snackBar("Removed book to the library")
                 } else {
-                    book.addToLibrary(requireContext())
+                    bookRepo.addToLibrary(book)
                     root.snackBar("Added book to the library")
                 }
 
-                BookRepository(requireContext())
+                bookRepo
                     .getBookById(book.id)
                     .collect { viewModel.selectedBook.postValue(it) }
             }
@@ -159,7 +170,7 @@ class BookFragment : Fragment() {
                 )
             }
         ) {
-            GroupDetailsDialog(it)
+            GroupDetailsDialog(groupRepo, it)
                 .show(requireActivity().supportFragmentManager, null)
         }
     }
@@ -205,7 +216,7 @@ class BookFragment : Fragment() {
             },
             MenuDialogItem("Reload book data", R.drawable.cloud_download) {
                 lifecycleScope.launchWhenResumed {
-                    viewModel.getMetadata(requireContext(), book, true)
+                    viewModel.getMetadata(book, true)
                         .observe(viewLifecycleOwner) {
                             binding?.configureMetadata(it, book)
                             (it as? Resource.Success<Metadata?>)?.data?.apply {
@@ -216,7 +227,7 @@ class BookFragment : Fragment() {
             },
             MenuDialogItem("Mark all chapters as read", R.drawable.check) {
                 lifecycleScope.launchWhenResumed {
-                    book.markAsRead(requireContext())
+                    bookRepo.markAllRead(book)
                 }
             }
         )
@@ -228,7 +239,7 @@ class BookFragment : Fragment() {
             menuItems.add(
                 MenuDialogItem("$action notifications", drawable) {
                     lifecycleScope.launchWhenResumed {
-                        book.setNotifications(requireContext(), !metadata.enableNotification)
+                        metadataRepo.setNotifications(book, !metadata.enableNotification)
                     }
                 }
             )
@@ -242,7 +253,7 @@ class BookFragment : Fragment() {
         refresh: Boolean = false,
         webNovelRefresh: Boolean = false
     ) {
-        viewModel.getChapters(requireContext(), book, refresh, webNovelRefresh)
+        viewModel.getChapters(book, refresh, webNovelRefresh)
             .observe(viewLifecycleOwner) { resource ->
                 binding?.apply {
                     when (resource) {
@@ -257,6 +268,7 @@ class BookFragment : Fragment() {
                             materialCardView.visibility = View.GONE
                         }
                         is Resource.Error -> {
+                            e(resource.message)
                             loadingProgress.visibility = View.GONE
                             materialCardView.visibility = View.GONE
                             Snackbar.make(root, R.string.error_refreshing, Snackbar.LENGTH_SHORT)

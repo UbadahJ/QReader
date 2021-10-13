@@ -3,23 +3,29 @@ package com.ubadahj.qidianundergroud.repositories
 import android.content.Context
 import com.squareup.sqldelight.runtime.coroutines.asFlow
 import com.squareup.sqldelight.runtime.coroutines.mapToOneNotNull
+import com.ubadahj.qidianundergroud.Database
 import com.ubadahj.qidianundergroud.api.WebNovelApi
 import com.ubadahj.qidianundergroud.api.models.webnovel.WNBookRemote
-import com.ubadahj.qidianundergroud.database.BookDatabase
 import com.ubadahj.qidianundergroud.models.Book
 import com.ubadahj.qidianundergroud.models.Metadata
+import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.withContext
+import javax.inject.Inject
+import javax.inject.Singleton
 
-class MetadataRepository(context: Context) {
-
-    private val database = BookDatabase.getInstance(context)
+@Singleton
+class MetadataRepository @Inject constructor(
+    @ApplicationContext val context: Context,
+    private val database: Database,
+    private val webNovelApi: WebNovelApi
+) {
 
     suspend fun getBook(book: Book, refresh: Boolean = false): Flow<Metadata?> {
         val dbMeta = database.metadataQueries.select(book.id).executeAsOneOrNull()
         if (refresh || dbMeta == null) {
-            WebNovelApi.getBook(book)?.toMetadata(book)?.also { meta ->
+            webNovelApi.getBook(book)?.toMetadata(book)?.also { meta ->
                 if (meta != dbMeta) {
                     database.transaction {
                         database.metadataQueries.insert(meta)

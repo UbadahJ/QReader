@@ -1,7 +1,6 @@
 package com.ubadahj.qidianundergroud.ui.main
 
 import android.annotation.SuppressLint
-import android.content.Context
 import android.webkit.WebView
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
@@ -17,20 +16,28 @@ import com.ubadahj.qidianundergroud.repositories.ChapterGroupRepository
 import com.ubadahj.qidianundergroud.repositories.ChapterRepository
 import com.ubadahj.qidianundergroud.repositories.MetadataRepository
 import com.ubadahj.qidianundergroud.utils.models.firstChapter
+import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.map
+import javax.inject.Inject
 
-class MainViewModel : ViewModel() {
+@HiltViewModel
+class MainViewModel @Inject constructor(
+    private val bookRepo: BookRepository,
+    private val groupRepo: ChapterGroupRepository,
+    private val chapterRepo: ChapterRepository,
+    private val metadataRepo: MetadataRepository
+) : ViewModel() {
 
     val selectedBook: MutableLiveData<Book?> = MutableLiveData()
     val selectedGroup: MutableLiveData<ChapterGroup?> = MutableLiveData()
     val selectedChapter: MutableLiveData<Chapter?> = MutableLiveData()
 
-    fun libraryBooks(context: Context) = liveData {
+    fun libraryBooks() = liveData {
         emit(Resource.Loading)
         try {
             emitSource(
-                BookRepository(context).getLibraryBooks()
+                bookRepo.getLibraryBooks()
                     .catch { Resource.Error(it) }
                     .map { Resource.Success(it) }
                     .asLiveData()
@@ -40,11 +47,11 @@ class MainViewModel : ViewModel() {
         }
     }
 
-    fun getBooks(context: Context, refresh: Boolean = false) = liveData {
+    fun getBooks(refresh: Boolean = false) = liveData {
         emit(Resource.Loading)
         try {
             emitSource(
-                BookRepository(context).getBooks(refresh)
+                bookRepo.getBooks(refresh)
                     .catch { Resource.Error(it) }
                     .map { Resource.Success(it) }
                     .asLiveData()
@@ -54,11 +61,11 @@ class MainViewModel : ViewModel() {
         }
     }
 
-    fun getMetadata(context: Context, book: Book, refresh: Boolean = false) = liveData {
+    fun getMetadata(book: Book, refresh: Boolean = false) = liveData {
         emit(Resource.Loading)
         try {
             emitSource(
-                MetadataRepository(context).getBook(book, refresh)
+                metadataRepo.getBook(book, refresh)
                     .catch { Resource.Error(it) }
                     .map { Resource.Success(it) }
                     .asLiveData()
@@ -69,7 +76,6 @@ class MainViewModel : ViewModel() {
     }
 
     fun getChapters(
-        context: Context,
         book: Book,
         refresh: Boolean = false,
         webNovelRefresh: Boolean = false
@@ -77,7 +83,7 @@ class MainViewModel : ViewModel() {
         emit(Resource.Loading)
         try {
             emitSource(
-                ChapterGroupRepository(context).getGroups(book, refresh, webNovelRefresh)
+                groupRepo.getGroups(book, refresh, webNovelRefresh)
                     .catch { Resource.Error(it) }
                     .map { it.sortedByDescending(ChapterGroup::firstChapter) }
                     .map { Resource.Success(it) }
@@ -89,17 +95,14 @@ class MainViewModel : ViewModel() {
     }
 
     @SuppressLint("SetJavaScriptEnabled")
-    fun getChapterContents(context: Context, group: ChapterGroup, refresh: Boolean) = liveData {
+    fun getChapterContents(group: ChapterGroup, refresh: Boolean) = liveData {
         emit(Resource.Loading)
         try {
             emitSource(
-                ChapterRepository(context).getChaptersContent(
-                    {
-                        WebView(it).apply {
-                            settings.javaScriptEnabled = true
-                        }
-                    },
-                    group, refresh
+                chapterRepo.getChaptersContent(
+                    { WebView(it).apply { settings.javaScriptEnabled = true } },
+                    group,
+                    refresh
                 )
                     .catch { Resource.Error(it) }
                     .map {

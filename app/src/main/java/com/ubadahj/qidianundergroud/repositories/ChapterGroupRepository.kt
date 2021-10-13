@@ -4,23 +4,30 @@ import android.content.Context
 import com.squareup.sqldelight.runtime.coroutines.asFlow
 import com.squareup.sqldelight.runtime.coroutines.mapToList
 import com.squareup.sqldelight.runtime.coroutines.mapToOne
+import com.ubadahj.qidianundergroud.Database
 import com.ubadahj.qidianundergroud.api.Api
 import com.ubadahj.qidianundergroud.api.WebNovelApi
 import com.ubadahj.qidianundergroud.api.models.undeground.ChapterGroupJson
 import com.ubadahj.qidianundergroud.api.models.webnovel.WNChapterRemote
-import com.ubadahj.qidianundergroud.database.BookDatabase
 import com.ubadahj.qidianundergroud.models.Book
 import com.ubadahj.qidianundergroud.models.ChapterGroup
 import com.ubadahj.qidianundergroud.utils.models.firstChapter
 import com.ubadahj.qidianundergroud.utils.models.lastChapter
 import com.ubadahj.qidianundergroud.utils.models.total
+import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.first
+import javax.inject.Inject
+import javax.inject.Singleton
 
-class ChapterGroupRepository(context: Context) {
-
-    private val database = BookDatabase.getInstance(context)
-    private val metaRepo = MetadataRepository(context)
+@Singleton
+class ChapterGroupRepository @Inject constructor(
+    @ApplicationContext val context: Context,
+    private val database: Database,
+    private val api: Api,
+    private val webNovelApi: WebNovelApi,
+    private val metaRepo: MetadataRepository
+) {
 
     fun getBook(group: ChapterGroup) = database.bookQueries
         .getById(group.bookId)
@@ -54,7 +61,7 @@ class ChapterGroupRepository(context: Context) {
     ): Flow<List<ChapterGroup>> {
         val dbGroups = database.bookQueries.chapters(book.id).executeAsList()
         if (refresh || dbGroups.isEmpty()) {
-            val remoteGroups = Api(proxy = true)
+            val remoteGroups = api
                 .getChapters(book.id)
                 .map { it.toGroup(book) }
 
@@ -84,7 +91,7 @@ class ChapterGroupRepository(context: Context) {
 
         if (webNovelRefresh || dbGroups.isEmpty()) {
             val remoteWebNovelChapters = metaRepo.getBook(book, refresh).first()
-                ?.let { WebNovelApi.getChapter(it) }
+                ?.let { webNovelApi.getChapter(it) }
                 ?.filter { !it.premium }
                 ?.map { it.toGroup(book) }
                 ?: listOf()

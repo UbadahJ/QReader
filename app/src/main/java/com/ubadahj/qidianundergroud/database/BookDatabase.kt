@@ -7,7 +7,6 @@ import com.squareup.sqldelight.db.SqlDriver
 import com.ubadahj.qidianundergroud.Database
 
 class BookDatabase private constructor(context: Context) {
-
     companion object {
         private var database: BookDatabase? = null
 

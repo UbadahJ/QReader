@@ -20,7 +20,9 @@ import com.ubadahj.qidianundergroud.ui.dialog.MenuDialog
 import com.ubadahj.qidianundergroud.ui.models.MenuDialogItem
 import com.ubadahj.qidianundergroud.utils.ui.snackBar
 import com.ubadahj.qidianundergroud.utils.ui.visible
+import dagger.hilt.android.AndroidEntryPoint
 
+@AndroidEntryPoint
 class BrowseFragment : Fragment() {
 
     private val viewModel: MainViewModel by activityViewModels()
@@ -29,7 +31,7 @@ class BrowseFragment : Fragment() {
             listOf(
                 MenuDialogItem("Refresh", R.drawable.refresh) {
                     viewModel
-                        .getBooks(requireContext(), refresh = true)
+                        .getBooks(refresh = true)
                         .observe(viewLifecycleOwner) { getBooks(it, true) }
                 }
             )
@@ -57,7 +59,7 @@ class BrowseFragment : Fragment() {
         super.onViewCreated(view, savedInstanceState)
         setHasOptionsMenu(true)
 
-        viewModel.getBooks(requireContext()).observe(viewLifecycleOwner, this::getBooks)
+        viewModel.getBooks().observe(viewLifecycleOwner, this::getBooks)
 
         binding?.apply {
             (requireActivity() as AppCompatActivity).setSupportActionBar(toolbar.appbar)

@@ -5,19 +5,26 @@ import android.webkit.WebView
 import com.squareup.sqldelight.runtime.coroutines.asFlow
 import com.squareup.sqldelight.runtime.coroutines.mapToList
 import com.squareup.sqldelight.runtime.coroutines.mapToOne
+import com.ubadahj.qidianundergroud.Database
 import com.ubadahj.qidianundergroud.api.Api
 import com.ubadahj.qidianundergroud.api.models.undeground.BookJson
-import com.ubadahj.qidianundergroud.database.BookDatabase
 import com.ubadahj.qidianundergroud.models.Book
+import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.withContext
+import javax.inject.Inject
+import javax.inject.Singleton
 
-class BookRepository(val context: Context) {
-
-    private val database = BookDatabase.getInstance(context)
+@Singleton
+class BookRepository @Inject constructor(
+    @ApplicationContext val context: Context,
+    private val database: Database,
+    private val api: Api,
+    private val chapterRepo: ChapterRepository
+) {
 
     fun getBookById(id: String) = database.bookQueries.getById(id).asFlow().mapToOne()
 
@@ -26,7 +33,7 @@ class BookRepository(val context: Context) {
         val dbBookIds = dbBooks.map { it.id }
 
         if (refresh || dbBooks.isEmpty()) {
-            val books = Api(proxy = true).getBooks().map { it.toBook() }
+            val books = api.getBooks().map { it.toBook() }
             val bookIds = books.map { it.id }
 
             val (toUpdate, notAvailable) = dbBooks.partition { it.id in bookIds }
@@ -68,7 +75,6 @@ class BookRepository(val context: Context) {
     }
 
     fun download(book: Book, factory: (Context) -> WebView, totalRetries: Int = 3) = flow {
-        val chapterRepo = ChapterRepository(context)
         val groups = getGroups(book).first()
         groups.forEachIndexed { i, group ->
             var retries = totalRetries

@@ -9,15 +9,16 @@ import coil.load
 import coil.transform.RoundedCornersTransformation
 import com.ubadahj.qidianundergroud.databinding.LibraryBookItemBinding
 import com.ubadahj.qidianundergroud.models.Book
-import com.ubadahj.qidianundergroud.repositories.MetadataRepository
+import com.ubadahj.qidianundergroud.models.ChapterGroup
+import com.ubadahj.qidianundergroud.models.Metadata
 import com.ubadahj.qidianundergroud.utils.models.isRead
-import com.ubadahj.qidianundergroud.utils.repositories.getGroups
 import com.ubadahj.qidianundergroud.utils.ui.toDp
 import com.ubadahj.qidianundergroud.utils.ui.visible
-import kotlinx.coroutines.flow.collect
 
 class LibraryAdapter(
     books: List<Book>,
+    private val groupSupplier: suspend (Book) -> List<ChapterGroup>,
+    private val metadataSupplier: suspend (Book) -> Metadata?,
     private val lifecycleScope: LifecycleCoroutineScope,
     private val onClick: (Book) -> Unit
 ) : FilterableListAdapter<Book, LibraryAdapter.ViewHolder>(DiffCallback()) {
@@ -45,29 +46,23 @@ class LibraryAdapter(
         val book = getItem(position)
         holder.binding.bookTitle.text = book.name
         lifecycleScope.launchWhenResumed {
-            MetadataRepository(context)
-                .getBook(book)
-                .collect { meta ->
-                    meta?.coverPath?.let {
-                        holder.binding.bookCover.load(it) {
-                            transformations(RoundedCornersTransformation(4.toDp(context).toFloat()))
-                        }
-                    }
+            metadataSupplier(book)?.coverPath?.let {
+                holder.binding.bookCover.load(it) {
+                    transformations(RoundedCornersTransformation(4.toDp(context).toFloat()))
                 }
+            }
         }
         lifecycleScope.launchWhenResumed {
-            book.getGroups(context)
-                .collect { group ->
-                    val unreadCount = group.filter { !it.isRead() }.size
-                    holder.binding.unreadCount.apply {
-                        if (unreadCount > 0) {
-                            visible = true
-                            text = unreadCount.toString()
-                        } else {
-                            visible = false
-                        }
-                    }
+            val group = groupSupplier(book)
+            val unreadCount = group.filter { !it.isRead() }.size
+            holder.binding.unreadCount.apply {
+                if (unreadCount > 0) {
+                    visible = true
+                    text = unreadCount.toString()
+                } else {
+                    visible = false
                 }
+            }
         }
     }
 
