@@ -109,13 +109,13 @@ dependencies {
     implementation("androidx.lifecycle:lifecycle-runtime-ktx:$lifecycleVersion")
 
     // Theming
-    implementation("com.google.android.material:material:1.4.0")
+    implementation("com.google.android.material:material:1.5.0-alpha04")
 
     // Custom tabs
     implementation("androidx.browser:browser:1.3.0")
 
     // For notification service
-    def workVersion = '2.6.0'
+    def workVersion = '2.7.0'
     implementation("androidx.work:work-runtime-ktx:$workVersion")
 
     // For logging

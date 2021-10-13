@@ -13,6 +13,7 @@ import com.ubadahj.qidianundergroud.BuildConfig
 import com.ubadahj.qidianundergroud.R
 import com.ubadahj.qidianundergroud.services.Channel
 import com.ubadahj.qidianundergroud.services.createChannel
+import com.ubadahj.qidianundergroud.services.flags
 import com.ubadahj.qidianundergroud.services.updater.api.UpdateApi
 import com.ubadahj.qidianundergroud.services.updater.models.Release
 import com.ubadahj.qidianundergroud.services.updater.models.Version
@@ -63,7 +64,7 @@ class UpdateService @AssistedInject constructor(
         context,
         release.hashCode(),
         Intent(Intent.ACTION_VIEW, release.htmlUrl.toUri()),
-        PendingIntent.FLAG_CANCEL_CURRENT
+        flags
     )
 
     private val Version.simpleText: String

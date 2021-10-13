@@ -147,7 +147,7 @@ class NotificationWorker @AssistedInject constructor(
                     putExtra("book", book.id)
                     putExtra("group", group?.link)
                 },
-                PendingIntent.FLAG_UPDATE_CURRENT
+                flags
             )!!
 
     }
