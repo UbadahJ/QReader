@@ -69,7 +69,7 @@
         <item name="toolbarStyle">@style/Widget.MaterialComponents.Toolbar.Surface</item>
     </style>
 
-    <style name="Base.Theme.MaterialThemeBuilder" parent="Theme.MaterialComponents.DayNight.NoActionBar">
+    <style name="Base.Theme.MaterialThemeBuilder" parent="Theme.Material3.DayNight.NoActionBar">
         <item name="android:statusBarColor" tools:ignore="NewApi">?android:attr/colorBackground
         </item>
         <item name="android:windowLightStatusBar" tools:ignore="NewApi">?attr/isLightTheme</item>
