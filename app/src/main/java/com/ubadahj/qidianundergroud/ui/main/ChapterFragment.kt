@@ -9,7 +9,6 @@ import androidx.fragment.app.activityViewModels
 import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
-import com.github.ajalt.timberkt.d
 import com.ubadahj.qidianundergroud.R
 import com.ubadahj.qidianundergroud.databinding.ChapterFragmentBinding
 import com.ubadahj.qidianundergroud.models.Chapter
@@ -25,6 +24,7 @@ import com.ubadahj.qidianundergroud.utils.models.firstChapter
 import com.ubadahj.qidianundergroud.utils.models.lastChapter
 import com.ubadahj.qidianundergroud.utils.ui.addOnScrollStateListener
 import com.ubadahj.qidianundergroud.utils.ui.linearScroll
+import com.ubadahj.qidianundergroud.utils.ui.preserveState
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.flow.first
 import javax.inject.Inject
@@ -173,9 +173,10 @@ class ChapterFragment : Fragment() {
             }
 
             override fun onScaleView(scale: Float) {
-                d { "onScaleView: $scale" }
                 adapter.textSizeSupplier = { 16f * scale }
-                chapterRecyclerView.adapter = adapter
+                chapterRecyclerView.preserveState {
+                    adapter = this@ChapterFragment.adapter
+                }
             }
 
             private fun selectChapterGroup(

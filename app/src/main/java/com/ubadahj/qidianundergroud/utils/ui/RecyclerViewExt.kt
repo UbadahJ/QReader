@@ -10,3 +10,9 @@ fun RecyclerView.linearScroll(pos: Int) {
         }
     }
 }
+
+fun RecyclerView.preserveState(action: RecyclerView.() -> Unit) {
+    val state = layoutManager?.onSaveInstanceState()
+    action()
+    layoutManager?.onRestoreInstanceState(state)
+}
