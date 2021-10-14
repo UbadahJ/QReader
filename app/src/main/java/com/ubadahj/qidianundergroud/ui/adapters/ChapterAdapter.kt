@@ -11,7 +11,10 @@ import com.l4digital.fastscroll.FastScroller
 import com.ubadahj.qidianundergroud.databinding.ChapterItemBinding
 import com.ubadahj.qidianundergroud.models.Chapter
 
-class ChapterAdapter(items: List<Chapter>) :
+class ChapterAdapter(
+    items: List<Chapter>,
+    var textSizeSupplier: () -> Float
+) :
     ListAdapter<Chapter, ChapterAdapter.ViewHolder>(DiffCallback()),
     FastScroller.SectionIndexer {
 
@@ -29,7 +32,7 @@ class ChapterAdapter(items: List<Chapter>) :
     }
 
     override fun onBindViewHolder(holder: ViewHolder, position: Int) {
-        holder.binding.contents.textSize = 16f
+        holder.binding.contents.textSize = textSizeSupplier()
         holder.binding.contents.setTextFuture(
             PrecomputedTextCompat.getTextFuture(
                 getItem(position).contents,
