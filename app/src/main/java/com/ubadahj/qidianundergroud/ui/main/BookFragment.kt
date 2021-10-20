@@ -1,9 +1,11 @@
 package com.ubadahj.qidianundergroud.ui.main
 
+import android.content.Intent
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.core.net.toUri
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import androidx.lifecycle.lifecycleScope
@@ -236,13 +238,25 @@ class BookFragment : Fragment() {
             val (action, drawable) = if (metadata.enableNotification) ("Disable" to R.drawable.bell_slash)
             else ("Enable" to R.drawable.bell)
 
-            menuItems.add(
+            menuItems.addAll(listOf(
                 MenuDialogItem("$action notifications", drawable) {
                     lifecycleScope.launchWhenResumed {
                         metadataRepo.setNotifications(book, !metadata.enableNotification)
                     }
+                },
+                MenuDialogItem("Open Webnovel Page", R.drawable.info) {
+                    try {
+                        requireActivity().startActivity(
+                            Intent(
+                                Intent.ACTION_VIEW,
+                                "https://webnovel.com${metadata.link}".toUri()
+                            )
+                        )
+                    } catch (e: Exception) {
+                        binding?.root?.snackBar("Failed to open link")
+                    }
                 }
-            )
+            ))
         }
 
         menuAdapter.submitList(menuItems)
