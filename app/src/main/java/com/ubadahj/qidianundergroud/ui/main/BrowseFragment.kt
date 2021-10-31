@@ -13,6 +13,7 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import com.ubadahj.qidianundergroud.R
 import com.ubadahj.qidianundergroud.databinding.BookListFragmentBinding
 import com.ubadahj.qidianundergroud.models.Book
+import com.ubadahj.qidianundergroud.models.Metadata
 import com.ubadahj.qidianundergroud.models.Resource
 import com.ubadahj.qidianundergroud.ui.adapters.BookAdapter
 import com.ubadahj.qidianundergroud.ui.adapters.MenuAdapter
@@ -72,7 +73,10 @@ class BrowseFragment : Fragment() {
         }
     }
 
-    private fun getBooks(resource: Resource<List<Book>>, isRefresh: Boolean = false) {
+    private fun getBooks(
+        resource: Resource<List<Pair<Book, Metadata?>>>,
+        isRefresh: Boolean = false
+    ) {
         lifecycleScope.launchWhenStarted {
             when (resource) {
                 is Resource.Success -> {
