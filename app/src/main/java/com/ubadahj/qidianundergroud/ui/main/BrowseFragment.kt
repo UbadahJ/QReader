@@ -10,11 +10,15 @@ import androidx.fragment.app.activityViewModels
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
+import androidx.work.ExistingWorkPolicy
+import androidx.work.OneTimeWorkRequestBuilder
+import androidx.work.WorkManager
 import com.ubadahj.qidianundergroud.R
 import com.ubadahj.qidianundergroud.databinding.BookListFragmentBinding
 import com.ubadahj.qidianundergroud.models.Book
 import com.ubadahj.qidianundergroud.models.Metadata
 import com.ubadahj.qidianundergroud.models.Resource
+import com.ubadahj.qidianundergroud.services.IndexService
 import com.ubadahj.qidianundergroud.ui.adapters.BookAdapter
 import com.ubadahj.qidianundergroud.ui.adapters.MenuAdapter
 import com.ubadahj.qidianundergroud.ui.dialog.MenuDialog
@@ -34,6 +38,12 @@ class BrowseFragment : Fragment() {
                     viewModel
                         .getBooks(refresh = true)
                         .observe(viewLifecycleOwner) { getBooks(it, true) }
+                },
+                MenuDialogItem("Generate Index", R.drawable.download) {
+                    val work = OneTimeWorkRequestBuilder<IndexService>().build()
+                    WorkManager.getInstance(requireContext()).enqueueUniqueWork(
+                        "index-service", ExistingWorkPolicy.KEEP, work
+                    )
                 }
             )
         )

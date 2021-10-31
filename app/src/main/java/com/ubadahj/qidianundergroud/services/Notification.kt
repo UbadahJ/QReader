@@ -10,14 +10,18 @@ import coil.ImageLoader
 import coil.request.ImageRequest
 import coil.transform.CircleCropTransformation
 
-data class Channel(val name: String, val id: String)
+data class Channel(
+    val name: String,
+    val id: String,
+    val importance: Int = NotificationManager.IMPORTANCE_DEFAULT
+)
 
 fun createChannel(context: Context, channel: Channel) {
     // Create the NotificationChannel, but only on API 26+ because
     // the NotificationChannel class is new and not in the support library
     if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
         val name = channel.name
-        val importance = NotificationManager.IMPORTANCE_DEFAULT
+        val importance = channel.importance
         // Register the channel with the system
         val notificationManager: NotificationManager = context.getSystemService(
             Context.NOTIFICATION_SERVICE
