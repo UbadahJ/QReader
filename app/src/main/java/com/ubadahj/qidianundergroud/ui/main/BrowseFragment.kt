@@ -3,6 +3,7 @@ package com.ubadahj.qidianundergroud.ui.main
 import android.os.Bundle
 import android.text.Editable
 import android.view.*
+import android.widget.AdapterView
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.widget.addTextChangedListener
 import androidx.fragment.app.Fragment
@@ -80,6 +81,27 @@ class BrowseFragment : Fragment() {
             searchBar.searchEditText.addTextChangedListener { text: Editable? ->
                 adapter.filter.filter((text))
             }
+            sortBySpinner.onItemSelectedListener = object : AdapterView.OnItemSelectedListener {
+                override fun onItemSelected(
+                    parent: AdapterView<*>?,
+                    view: View?,
+                    position: Int,
+                    id: Long
+                ) {
+                    when (position) {
+                        0 -> adapter.sortBy { it.first.name }
+                        1 -> adapter.sortBy { it.second?.author }
+                        2 -> adapter.sortBy { it.second?.rating }
+                        3 -> adapter.sortBy { it.first.lastUpdated }
+                        4 -> adapter.sortBy { it.first.completed }
+                    }
+                }
+
+                override fun onNothingSelected(parent: AdapterView<*>?) {
+                }
+            }
+            descendingSwitch.isUseMaterialThemeColors = true
+            descendingSwitch.setOnClickListener { adapter.reverse() }
         }
     }
 
@@ -121,7 +143,7 @@ class BrowseFragment : Fragment() {
                     val searchBarVisible = bookListingViewContainer.y != searchBar.root.y
                     bookListingViewContainer.animate()
                         .alpha(1f)
-                        .translationY(if (!searchBarVisible) searchBar.root.height + 32f else 0f)
+                        .translationY(if (!searchBarVisible) sortBySpinner.y + 32f else 0f)
                         .start()
                 }
                 true

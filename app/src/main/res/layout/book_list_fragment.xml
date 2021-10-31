@@ -22,6 +22,41 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/toolbar" />
 
+    <androidx.constraintlayout.widget.Group
+        android:id="@+id/options_group"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        app:constraint_referenced_ids="search_bar,sort_by_spinner,sort_by_text" />
+
+    <TextView
+        android:id="@+id/sort_by_text"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Sort By"
+        android:textAppearance="@style/TextAppearance.MyTheme.Subtitle1"
+        app:layout_constraintBottom_toBottomOf="@+id/descending_switch"
+        app:layout_constraintStart_toStartOf="@+id/search_bar"
+        app:layout_constraintTop_toTopOf="@+id/descending_switch" />
+
+
+    <com.google.android.material.switchmaterial.SwitchMaterial
+        android:id="@+id/descending_switch"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginEnd="16dp"
+        android:text="Descending"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/search_bar" />
+
+    <Spinner
+        android:id="@+id/sort_by_spinner"
+        android:layout_width="0dp"
+        android:layout_height="48dp"
+        android:entries="@array/browse_sort_by"
+        app:layout_constraintEnd_toEndOf="@+id/search_bar"
+        app:layout_constraintStart_toStartOf="@+id/sort_by_text"
+        app:layout_constraintTop_toBottomOf="@+id/descending_switch" />
+
     <androidx.coordinatorlayout.widget.CoordinatorLayout
         android:id="@+id/book_listing_view_container"
         android:layout_width="0dp"
@@ -32,7 +67,8 @@
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/toolbar">
+        app:layout_constraintTop_toBottomOf="@+id/toolbar"
+        tools:visibility="gone">
 
         <com.l4digital.fastscroll.FastScrollRecyclerView
             android:id="@+id/book_listing_view"

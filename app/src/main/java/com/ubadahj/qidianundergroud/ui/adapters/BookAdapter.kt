@@ -40,6 +40,11 @@ class BookAdapter(
         holder.bind(getItem(position))
     }
 
+    fun <R : Comparable<R>> sortBy(predicate: (BookWithMetadata) -> R?) =
+        submitList(currentList.sortedBy(predicate))
+
+    fun reverse() = submitList(currentList.reversed())
+
     class DiffCallback : DiffUtil.ItemCallback<BookWithMetadata>() {
         override fun areItemsTheSame(
             oldItem: BookWithMetadata,
