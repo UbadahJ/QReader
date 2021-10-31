@@ -1,52 +1,61 @@
 package com.ubadahj.qidianundergroud.ui.adapters
 
-import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.recyclerview.widget.DiffUtil
-import androidx.recyclerview.widget.RecyclerView
-import com.ubadahj.qidianundergroud.databinding.BookItemBinding
 import com.ubadahj.qidianundergroud.models.Book
+import com.ubadahj.qidianundergroud.models.Metadata
+import com.ubadahj.qidianundergroud.ui.adapters.factories.BookViewHolder
+import com.ubadahj.qidianundergroud.ui.adapters.factories.BookViewHolderFactory
+import com.ubadahj.qidianundergroud.ui.adapters.factories.BookViewHolderType
+
+typealias BookWithMetadata = Pair<Book, Metadata?>
 
 class BookAdapter(
-    books: List<Book>,
+    books: List<BookWithMetadata>,
     private val onClick: (Book) -> Unit
-) : FilterableListAdapter<Book, BookAdapter.ViewHolder>(DiffCallback()) {
+) : FilterableListAdapter<BookWithMetadata, BookViewHolder>(DiffCallback()) {
 
-    override val filterPredicate: (List<Book>, String) -> List<Book> = { list, constraint ->
-        list.filter { it.name.contains(constraint, true) }
-    }
+    override val filterPredicate: (List<BookWithMetadata>, String) -> List<BookWithMetadata> =
+        { list, constraint -> list.filter { it.first.name.contains(constraint, true) } }
 
-    override val bubbleText: ((Book) -> String) = { it.name.first().toString() }
+    override val bubbleText: ((BookWithMetadata) -> String) = { it.first.name.first().toString() }
 
     init {
         submitList(books)
+        stateRestorationPolicy = StateRestorationPolicy.PREVENT_WHEN_EMPTY
     }
 
-    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
-        return ViewHolder(
-            BookItemBinding.inflate(
-                LayoutInflater.from(parent.context), parent, false
-            )
-        ) { onClick(getItem(it)) }
-    }
+    override fun getItemViewType(position: Int): Int =
+        if (getItem(position).second != null) 1 else 0
 
-    override fun onBindViewHolder(holder: ViewHolder, position: Int) {
-        holder.binding.textView.text = getItem(position).name
-    }
-
-    class ViewHolder(val binding: BookItemBinding, onClick: (Int) -> Unit) :
-        RecyclerView.ViewHolder(binding.root) {
-        init {
-            binding.root.setOnClickListener { onClick(bindingAdapterPosition) }
+    override fun onCreateViewHolder(
+        parent: ViewGroup,
+        viewType: Int
+    ): BookViewHolder {
+        return BookViewHolderFactory.get(parent, BookViewHolderType.from(viewType)) {
+            onClick(getItem(it).first)
         }
     }
 
-    class DiffCallback : DiffUtil.ItemCallback<Book>() {
-        override fun areItemsTheSame(oldItem: Book, newItem: Book): Boolean =
-            oldItem.id == newItem.id
+    override fun onBindViewHolder(holder: BookViewHolder, position: Int) {
+        holder.bind(getItem(position))
+    }
 
-        override fun areContentsTheSame(oldItem: Book, newItem: Book): Boolean =
-            oldItem == newItem
+    fun <R : Comparable<R>> sortBy(predicate: (BookWithMetadata) -> R?) =
+        submitList(currentList.sortedBy(predicate))
+
+    fun reverse() = submitList(currentList.reversed())
+
+    class DiffCallback : DiffUtil.ItemCallback<BookWithMetadata>() {
+        override fun areItemsTheSame(
+            oldItem: BookWithMetadata,
+            newItem: BookWithMetadata
+        ): Boolean = oldItem.first.id == newItem.first.id
+
+        override fun areContentsTheSame(
+            oldItem: BookWithMetadata,
+            newItem: BookWithMetadata
+        ): Boolean = oldItem == newItem
     }
 
 }

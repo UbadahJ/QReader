@@ -2,6 +2,7 @@ package com.ubadahj.qidianundergroud.repositories
 
 import android.content.Context
 import com.squareup.sqldelight.runtime.coroutines.asFlow
+import com.squareup.sqldelight.runtime.coroutines.mapToList
 import com.squareup.sqldelight.runtime.coroutines.mapToOneNotNull
 import com.ubadahj.qidianundergroud.Database
 import com.ubadahj.qidianundergroud.api.WebNovelApi
@@ -21,6 +22,9 @@ class MetadataRepository @Inject constructor(
     private val database: Database,
     private val webNovelApi: WebNovelApi
 ) {
+
+    fun getAll(): Flow<List<Metadata>> =
+        database.metadataQueries.selectAll().asFlow().mapToList()
 
     suspend fun getBook(book: Book, refresh: Boolean = false): Flow<Metadata?> {
         val dbMeta = database.metadataQueries.select(book.id).executeAsOneOrNull()

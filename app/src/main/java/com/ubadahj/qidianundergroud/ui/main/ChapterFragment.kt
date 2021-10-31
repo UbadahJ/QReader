@@ -18,12 +18,13 @@ import com.ubadahj.qidianundergroud.repositories.ChapterGroupRepository
 import com.ubadahj.qidianundergroud.ui.adapters.ChapterAdapter
 import com.ubadahj.qidianundergroud.ui.adapters.MenuAdapter
 import com.ubadahj.qidianundergroud.ui.dialog.MenuDialog
-import com.ubadahj.qidianundergroud.ui.listeners.OnSwipeTouchListener
+import com.ubadahj.qidianundergroud.ui.listeners.OnGestureListener
 import com.ubadahj.qidianundergroud.ui.models.MenuDialogItem
 import com.ubadahj.qidianundergroud.utils.models.firstChapter
 import com.ubadahj.qidianundergroud.utils.models.lastChapter
 import com.ubadahj.qidianundergroud.utils.ui.addOnScrollStateListener
 import com.ubadahj.qidianundergroud.utils.ui.linearScroll
+import com.ubadahj.qidianundergroud.utils.ui.preserveState
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.flow.first
 import javax.inject.Inject
@@ -36,11 +37,10 @@ class ChapterFragment : Fragment() {
     private var menu: MenuDialog = MenuDialog(
         MenuAdapter(listOf(MenuDialogItem("Loading", R.drawable.pulse)))
     )
-    private var adapter: ChapterAdapter = ChapterAdapter(listOf())
+    private var adapter: ChapterAdapter = ChapterAdapter(listOf()) { 16f }
 
     @Inject
     lateinit var groupRepo: ChapterGroupRepository
-
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -159,7 +159,7 @@ class ChapterFragment : Fragment() {
 
     @SuppressLint("ClickableViewAccessibility")
     private fun ChapterFragmentBinding.configureSwipeGestures() {
-        chapterRecyclerView.setOnTouchListener(object : OnSwipeTouchListener(requireContext()) {
+        chapterRecyclerView.setOnTouchListener(object : OnGestureListener(requireContext()) {
             override fun onSwipeLeft() {
                 selectChapterGroup { current, other ->
                     current.lastChapter == other.firstChapter - 1
@@ -169,6 +169,13 @@ class ChapterFragment : Fragment() {
             override fun onSwipeRight() {
                 selectChapterGroup { current, other ->
                     current.firstChapter == other.lastChapter + 1
+                }
+            }
+
+            override fun onScaleView(scale: Float) {
+                adapter.textSizeSupplier = { 16f * scale }
+                chapterRecyclerView.preserveState {
+                    adapter = this@ChapterFragment.adapter
                 }
             }
 

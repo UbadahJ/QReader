@@ -28,6 +28,10 @@ android {
         versionCode getMasterCommitCount()
         versionName getAppVersion()
 
+        def enableAnalytics = getBranchName() != "master"
+        manifestPlaceholders = [enableAnalytics: enableAnalytics]
+        buildConfigField("boolean", "ENABLE_ANALYTICS", "${enableAnalytics}")
+
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
     }
 

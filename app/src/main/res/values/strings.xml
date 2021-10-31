@@ -27,4 +27,13 @@
     <string name="aboutLibraries_description_text">Android reader for Qidian Underground API</string>
     <string name="downloader_name">Show download progress</string>
     <string name="update_notification">Application updates</string>
+    <string name="index_name">Show current book indexing progress</string>
+
+    <string-array name="browse_sort_by">
+        <item>Name</item>
+        <item>Author</item>
+        <item>Rating</item>
+        <item>Last Updated</item>
+        <item>Completed</item>
+    </string-array>
 </resources>

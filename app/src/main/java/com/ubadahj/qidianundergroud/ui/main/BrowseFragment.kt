@@ -3,6 +3,7 @@ package com.ubadahj.qidianundergroud.ui.main
 import android.os.Bundle
 import android.text.Editable
 import android.view.*
+import android.widget.AdapterView
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.widget.addTextChangedListener
 import androidx.fragment.app.Fragment
@@ -10,10 +11,15 @@ import androidx.fragment.app.activityViewModels
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
+import androidx.work.ExistingWorkPolicy
+import androidx.work.OneTimeWorkRequestBuilder
+import androidx.work.WorkManager
 import com.ubadahj.qidianundergroud.R
 import com.ubadahj.qidianundergroud.databinding.BookListFragmentBinding
 import com.ubadahj.qidianundergroud.models.Book
+import com.ubadahj.qidianundergroud.models.Metadata
 import com.ubadahj.qidianundergroud.models.Resource
+import com.ubadahj.qidianundergroud.services.IndexService
 import com.ubadahj.qidianundergroud.ui.adapters.BookAdapter
 import com.ubadahj.qidianundergroud.ui.adapters.MenuAdapter
 import com.ubadahj.qidianundergroud.ui.dialog.MenuDialog
@@ -33,6 +39,12 @@ class BrowseFragment : Fragment() {
                     viewModel
                         .getBooks(refresh = true)
                         .observe(viewLifecycleOwner) { getBooks(it, true) }
+                },
+                MenuDialogItem("Generate Index", R.drawable.download) {
+                    val work = OneTimeWorkRequestBuilder<IndexService>().build()
+                    WorkManager.getInstance(requireContext()).enqueueUniqueWork(
+                        "index-service", ExistingWorkPolicy.KEEP, work
+                    )
                 }
             )
         )
@@ -69,10 +81,34 @@ class BrowseFragment : Fragment() {
             searchBar.searchEditText.addTextChangedListener { text: Editable? ->
                 adapter.filter.filter((text))
             }
+            sortBySpinner.onItemSelectedListener = object : AdapterView.OnItemSelectedListener {
+                override fun onItemSelected(
+                    parent: AdapterView<*>?,
+                    view: View?,
+                    position: Int,
+                    id: Long
+                ) {
+                    when (position) {
+                        0 -> adapter.sortBy { it.first.name }
+                        1 -> adapter.sortBy { it.second?.author }
+                        2 -> adapter.sortBy { it.second?.rating }
+                        3 -> adapter.sortBy { it.first.lastUpdated }
+                        4 -> adapter.sortBy { it.first.completed }
+                    }
+                }
+
+                override fun onNothingSelected(parent: AdapterView<*>?) {
+                }
+            }
+            descendingSwitch.isUseMaterialThemeColors = true
+            descendingSwitch.setOnClickListener { adapter.reverse() }
         }
     }
 
-    private fun getBooks(resource: Resource<List<Book>>, isRefresh: Boolean = false) {
+    private fun getBooks(
+        resource: Resource<List<Pair<Book, Metadata?>>>,
+        isRefresh: Boolean = false
+    ) {
         lifecycleScope.launchWhenStarted {
             when (resource) {
                 is Resource.Success -> {
@@ -107,7 +143,7 @@ class BrowseFragment : Fragment() {
                     val searchBarVisible = bookListingViewContainer.y != searchBar.root.y
                     bookListingViewContainer.animate()
                         .alpha(1f)
-                        .translationY(if (!searchBarVisible) searchBar.root.height + 32f else 0f)
+                        .translationY(if (!searchBarVisible) sortBySpinner.y + 32f else 0f)
                         .start()
                 }
                 true

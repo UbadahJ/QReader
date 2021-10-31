@@ -29,6 +29,10 @@ SELECT *
 FROM Metadata
 WHERE bookId = ?;
 
+selectAll:
+SELECT *
+FROM Metadata;
+
 delete:
 DELETE
 FROM Metadata
