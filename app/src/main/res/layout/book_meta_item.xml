@@ -50,4 +50,16 @@
         app:layout_constraintTop_toTopOf="@+id/author_name"
         tools:text="★ 4.4" />
 
+    <TextView
+        android:id="@+id/completed_text"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="8dp"
+        android:text="COMPLETED"
+        android:textAllCaps="false"
+        android:textAppearance="@style/TextAppearance.MyTheme.Body2"
+        android:textStyle="italic"
+        app:layout_constraintStart_toStartOf="@+id/author_name"
+        app:layout_constraintTop_toBottomOf="@+id/author_name" />
+
 </androidx.constraintlayout.widget.ConstraintLayout>

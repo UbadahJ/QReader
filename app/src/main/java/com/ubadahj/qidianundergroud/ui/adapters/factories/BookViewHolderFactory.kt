@@ -10,6 +10,7 @@ import com.ubadahj.qidianundergroud.databinding.BookNonMetaItemBinding
 import com.ubadahj.qidianundergroud.models.Book
 import com.ubadahj.qidianundergroud.models.Metadata
 import com.ubadahj.qidianundergroud.utils.ui.inflater
+import com.ubadahj.qidianundergroud.utils.ui.visible
 
 
 enum class BookViewHolderType {
@@ -51,7 +52,8 @@ object BookViewHolderFactory {
         onClick: (Int) -> Unit
     ) : BookViewHolder(binding, onClick) {
         override fun bind(item: Pair<Book, Metadata?>) {
-            binding.textView.text = item.first.name
+            binding.bookTitle.text = item.first.name
+            binding.completedText.visible = item.first.completed
         }
     }
 
@@ -68,6 +70,7 @@ object BookViewHolderFactory {
             binding.bookTitle.text = item.first.name
             binding.authorName.text = item.second?.author
             binding.ratingText.text = "★ ${item.second?.rating}"
+            binding.completedText.visible = item.first.completed
         }
     }
 
