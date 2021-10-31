@@ -13,9 +13,9 @@
         android:id="@+id/book_cover"
         android:layout_width="48dp"
         android:layout_height="48dp"
-        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintBottom_toBottomOf="@+id/completed_text"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
+        app:layout_constraintTop_toTopOf="@+id/book_title" />
 
     <TextView
         android:id="@+id/book_title"
@@ -26,7 +26,7 @@
         android:text=""
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toEndOf="@+id/book_cover"
-        app:layout_constraintTop_toTopOf="@+id/book_cover"
+        app:layout_constraintTop_toTopOf="parent"
         tools:text="My House of Horrors" />
 
     <TextView
@@ -35,7 +35,6 @@
         android:layout_height="wrap_content"
         android:layout_marginTop="8dp"
         android:layout_marginEnd="8dp"
-        app:layout_constraintBottom_toBottomOf="@+id/book_cover"
         app:layout_constraintEnd_toStartOf="@+id/rating_text"
         app:layout_constraintStart_toStartOf="@+id/book_title"
         app:layout_constraintTop_toBottomOf="@+id/book_title"
@@ -45,7 +44,7 @@
         android:id="@+id/rating_text"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintBottom_toBottomOf="@+id/author_name"
         app:layout_constraintEnd_toEndOf="@+id/book_title"
         app:layout_constraintTop_toTopOf="@+id/author_name"
         tools:text="★ 4.4" />
@@ -59,6 +58,7 @@
         android:textAllCaps="false"
         android:textAppearance="@style/TextAppearance.MyTheme.Body2"
         android:textStyle="italic"
+        app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintStart_toStartOf="@+id/author_name"
         app:layout_constraintTop_toBottomOf="@+id/author_name" />
 

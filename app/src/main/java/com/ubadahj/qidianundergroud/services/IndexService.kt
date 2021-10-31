@@ -13,7 +13,9 @@ import com.ubadahj.qidianundergroud.repositories.BookRepository
 import com.ubadahj.qidianundergroud.repositories.MetadataRepository
 import dagger.assisted.Assisted
 import dagger.assisted.AssistedInject
-import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.coroutineScope
+import kotlinx.coroutines.flow.*
 import kotlin.math.abs
 import kotlin.random.Random
 
@@ -51,11 +53,15 @@ class IndexService @AssistedInject constructor(
             notify(notificationId, builder.build())
 
             try {
-                books.forEachIndexed { i, it ->
-                    builder.setContentText(it.name)
-                    builder.setProgress(books.size, i, false)
-                    metaRepo.getBook(it)
-                    notify(notificationId, builder.build())
+                coroutineScope {
+                    books.asFlow()
+                        .flowOn(Dispatchers.IO)
+                        .flatMapMerge(12) { flow { emit(it.apply { metaRepo.getBook(this) }) } }
+                        .collectIndexed { i, it ->
+                            builder.setContentText("[${i}/${books.size}] ${it.name}")
+                            builder.setProgress(books.size, i, false)
+                            notify(notificationId, builder.build())
+                        }
                 }
             } catch (e: Exception) {
                 e(e) { "getNotifications: Failed generating index" }
