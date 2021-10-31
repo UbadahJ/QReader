@@ -22,6 +22,7 @@ class BookAdapter(
 
     init {
         submitList(books)
+        stateRestorationPolicy = StateRestorationPolicy.PREVENT_WHEN_EMPTY
     }
 
     override fun getItemViewType(position: Int): Int =
