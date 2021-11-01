@@ -1,21 +1,18 @@
 package com.ubadahj.qidianundergroud.ui.adapters
 
-import android.view.LayoutInflater
 import android.view.ViewGroup
-import androidx.core.text.PrecomputedTextCompat
-import androidx.core.widget.TextViewCompat
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
-import androidx.recyclerview.widget.RecyclerView
 import com.l4digital.fastscroll.FastScroller
-import com.ubadahj.qidianundergroud.databinding.ChapterItemBinding
-import com.ubadahj.qidianundergroud.models.Chapter
+import com.ubadahj.qidianundergroud.ui.adapters.factories.ChapterViewHolder
+import com.ubadahj.qidianundergroud.ui.adapters.factories.ChapterViewHolderFactory
+import com.ubadahj.qidianundergroud.ui.adapters.factories.ChapterViewHolderType
+import com.ubadahj.qidianundergroud.ui.models.ChapterUIItem
 
 class ChapterAdapter(
-    items: List<Chapter>,
-    var textSizeSupplier: () -> Float
-) :
-    ListAdapter<Chapter, ChapterAdapter.ViewHolder>(DiffCallback()),
+    items: List<ChapterUIItem>,
+    var scaleFactor: () -> Float
+) : ListAdapter<ChapterUIItem, ChapterViewHolder>(DiffCallback()),
     FastScroller.SectionIndexer {
 
     init {
@@ -23,38 +20,29 @@ class ChapterAdapter(
         stateRestorationPolicy = StateRestorationPolicy.PREVENT_WHEN_EMPTY
     }
 
-    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
-        return ViewHolder(
-            ChapterItemBinding.inflate(
-                LayoutInflater.from(parent.context), parent, false
-            )
-        )
+    override fun getItemViewType(position: Int): Int = when (getItem(position)) {
+        is ChapterUIItem.ChapterUITitleItem -> ChapterViewHolderType.TITLE.ordinal
+        is ChapterUIItem.ChapterUIContentItem -> ChapterViewHolderType.CONTENTS.ordinal
     }
 
-    override fun onBindViewHolder(holder: ViewHolder, position: Int) {
-        holder.binding.contents.textSize = textSizeSupplier()
-        holder.binding.contents.setTextFuture(
-            PrecomputedTextCompat.getTextFuture(
-                getItem(position).contents,
-                TextViewCompat.getTextMetricsParams(holder.binding.contents),
-                null
-            )
-        )
+    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ChapterViewHolder {
+        return ChapterViewHolderFactory.get(parent, ChapterViewHolderType.from(viewType))
     }
 
-    class ViewHolder(val binding: ChapterItemBinding) :
-        RecyclerView.ViewHolder(binding.root)
+    override fun onBindViewHolder(holder: ChapterViewHolder, position: Int) {
+        holder.bind(getItem(position).chapter, scaleFactor())
+    }
 
-    class DiffCallback : DiffUtil.ItemCallback<Chapter>() {
-        override fun areItemsTheSame(oldItem: Chapter, newItem: Chapter): Boolean =
-            oldItem.id == newItem.id
+    class DiffCallback : DiffUtil.ItemCallback<ChapterUIItem>() {
+        override fun areItemsTheSame(oldItem: ChapterUIItem, newItem: ChapterUIItem): Boolean =
+            oldItem.chapter.id == newItem.chapter.id
 
-        override fun areContentsTheSame(oldItem: Chapter, newItem: Chapter): Boolean =
-            oldItem == newItem
+        override fun areContentsTheSame(oldItem: ChapterUIItem, newItem: ChapterUIItem): Boolean =
+            oldItem.chapter == newItem.chapter
     }
 
     override fun getSectionText(position: Int): CharSequence {
-        return getItem(position).title.split(':').first().trim()
+        return getItem(position).chapter.title.split(':').first().trim()
     }
 
 }

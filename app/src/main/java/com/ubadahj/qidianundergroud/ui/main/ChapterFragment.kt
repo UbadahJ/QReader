@@ -3,7 +3,6 @@ package com.ubadahj.qidianundergroud.ui.main
 import android.annotation.SuppressLint
 import android.os.Bundle
 import android.view.*
-import androidx.appcompat.app.AppCompatActivity
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import androidx.lifecycle.lifecycleScope
@@ -17,8 +16,11 @@ import com.ubadahj.qidianundergroud.models.Resource
 import com.ubadahj.qidianundergroud.repositories.ChapterGroupRepository
 import com.ubadahj.qidianundergroud.ui.adapters.ChapterAdapter
 import com.ubadahj.qidianundergroud.ui.adapters.MenuAdapter
+import com.ubadahj.qidianundergroud.ui.adapters.decorations.HeaderItemDecoration
+import com.ubadahj.qidianundergroud.ui.adapters.factories.ChapterViewHolderType
 import com.ubadahj.qidianundergroud.ui.dialog.MenuDialog
 import com.ubadahj.qidianundergroud.ui.listeners.OnGestureListener
+import com.ubadahj.qidianundergroud.ui.models.ChapterUIItem
 import com.ubadahj.qidianundergroud.ui.models.MenuDialogItem
 import com.ubadahj.qidianundergroud.utils.models.firstChapter
 import com.ubadahj.qidianundergroud.utils.models.lastChapter
@@ -37,7 +39,7 @@ class ChapterFragment : Fragment() {
     private var menu: MenuDialog = MenuDialog(
         MenuAdapter(listOf(MenuDialogItem("Loading", R.drawable.pulse)))
     )
-    private var adapter: ChapterAdapter = ChapterAdapter(listOf()) { 16f }
+    private var adapter: ChapterAdapter = ChapterAdapter(listOf()) { 1f }
 
     @Inject
     lateinit var groupRepo: ChapterGroupRepository
@@ -49,23 +51,16 @@ class ChapterFragment : Fragment() {
     ): View {
         return ChapterFragmentBinding.inflate(inflater, container, false).apply {
             binding = this
-            viewModel.selectedGroup.observe(
-                viewLifecycleOwner,
-                { group ->
-                    group?.apply { init(this) }
-                }
-            )
-            viewModel.selectedChapter.observe(
-                viewLifecycleOwner,
-                { chapter ->
-                    chapter?.apply {
-                        toolbar.appbar.title = this.title
-                        viewModel.selectedGroup.value?.run {
-                            groupRepo.updateLastRead(this, getIndex())
-                        }
+            viewModel.selectedGroup.observe(viewLifecycleOwner) { group ->
+                group?.apply { init(this) }
+            }
+            viewModel.selectedChapter.observe(viewLifecycleOwner) { chapter ->
+                chapter?.apply {
+                    viewModel.selectedGroup.value?.run {
+                        groupRepo.updateLastRead(this, getIndex())
                     }
                 }
-            )
+            }
         }.root
     }
 
@@ -73,20 +68,19 @@ class ChapterFragment : Fragment() {
         super.onViewCreated(view, savedInstanceState)
         setHasOptionsMenu(true)
         binding?.apply {
-            (requireActivity() as AppCompatActivity).apply {
-                setSupportActionBar(toolbar.appbar)
-                supportActionBar?.setDisplayHomeAsUpEnabled(true)
-            }
-
             chapterRecyclerView.adapter = adapter
             chapterRecyclerView.addOnScrollStateListener { rc, state ->
                 if (state != RecyclerView.SCROLL_STATE_IDLE)
                     return@addOnScrollStateListener
 
-                viewModel.selectedChapter.value = this@ChapterFragment.adapter.currentList[
-                        (rc.layoutManager as LinearLayoutManager).findFirstVisibleItemPosition()
-                ]
+                val firstPos =
+                    (rc.layoutManager as LinearLayoutManager).findFirstVisibleItemPosition()
+                viewModel.selectedChapter.value = this@ChapterFragment.adapter.currentList
+                    .map { it.chapter }[firstPos]
             }
+            chapterRecyclerView.addItemDecoration(HeaderItemDecoration(chapterRecyclerView) {
+                adapter.getItemViewType(it) == ChapterViewHolderType.TITLE.ordinal
+            })
             configureSwipeGestures()
         }
     }
@@ -133,7 +127,6 @@ class ChapterFragment : Fragment() {
     private fun ChapterFragmentBinding.updateUIIndicators(resource: Resource<List<Chapter>>) {
         when (resource) {
             is Resource.Error -> {
-                toolbar.appbar.title = "Error"
                 progressBar.visibility = View.GONE
                 chapterRecyclerView.visibility = View.GONE
                 errorGroup.root.visibility = View.VISIBLE
@@ -143,7 +136,6 @@ class ChapterFragment : Fragment() {
                 )
             }
             Resource.Loading -> {
-                toolbar.appbar.title = "Loading"
                 chapterRecyclerView.visibility = View.GONE
                 errorGroup.root.visibility = View.GONE
                 progressBar.visibility = View.VISIBLE
@@ -173,7 +165,7 @@ class ChapterFragment : Fragment() {
             }
 
             override fun onScaleView(scale: Float) {
-                adapter.textSizeSupplier = { 16f * scale }
+                adapter.scaleFactor = { scale }
                 chapterRecyclerView.preserveState {
                     adapter = this@ChapterFragment.adapter
                 }
@@ -202,7 +194,7 @@ class ChapterFragment : Fragment() {
                 chapter.groupLink != group?.link
 
         if (hasDataChanged && resource is Resource.Success) {
-            adapter.submitList(resource.data!!)
+            adapter.submitList(resource.data.toUIModel())
             updateMenu(resource.data)
 
             viewModel.selectedGroup.value?.let { group ->
@@ -235,5 +227,11 @@ class ChapterFragment : Fragment() {
                 "Failed to get lastChapter from ViewModel selectChapterGroup"
             )
         }
+    }
+
+    private fun List<Chapter>.toUIModel(): List<ChapterUIItem> = flatMap {
+        listOf(
+            ChapterUIItem.ChapterUITitleItem(it), ChapterUIItem.ChapterUIContentItem(it)
+        )
     }
 }
