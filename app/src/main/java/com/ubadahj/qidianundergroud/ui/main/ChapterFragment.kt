@@ -201,7 +201,7 @@ class ChapterFragment : Fragment() {
                 val index = if (group.lastRead != 0) group.lastRead - group.firstChapter else 0
 
                 viewModel.selectedChapter.value = resource.data[index]
-                binding?.chapterRecyclerView?.linearScroll(index)
+                binding?.chapterRecyclerView?.linearScroll(index * 2)
             }
         }
     }
