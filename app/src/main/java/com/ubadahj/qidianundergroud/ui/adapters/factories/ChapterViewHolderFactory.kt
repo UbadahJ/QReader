@@ -46,12 +46,10 @@ object ChapterViewHolderFactory {
             val split = item.title.split(":")
             binding.headerChapterNumber.apply {
                 text = split.first()
-                textSize = 16f * scaleFactor
                 visible = split.first() != split.last()
             }
             binding.headerChapterInfo.apply {
                 text = split.last()
-                textSize = 24f * scaleFactor
             }
         }
     }
