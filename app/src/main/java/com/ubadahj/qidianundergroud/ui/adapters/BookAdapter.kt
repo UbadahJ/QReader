@@ -18,7 +18,8 @@ class BookAdapter(
     override val filterPredicate: (List<BookWithMetadata>, String) -> List<BookWithMetadata> =
         { list, constraint -> list.filter { it.first.name.contains(constraint, true) } }
 
-    override val bubbleText: ((BookWithMetadata) -> String) = { it.first.name.first().toString() }
+    override var bubbleText: ((BookWithMetadata) -> String) = { it.first.name.first().toString() }
+        private set
 
     init {
         submitList(books)
@@ -41,8 +42,10 @@ class BookAdapter(
         holder.bind(getItem(position))
     }
 
-    fun <R : Comparable<R>> sortBy(predicate: (BookWithMetadata) -> R?) =
+    fun <R : Comparable<R>> sortBy(predicate: (BookWithMetadata) -> R?) {
         submitList(currentList.sortedBy(predicate))
+        bubbleText = { predicate(it).toString() }
+    }
 
     fun reverse() = submitList(currentList.reversed())
 
