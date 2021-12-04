@@ -1,6 +1,7 @@
 package com.ubadahj.qidianundergroud.di.modules
 
 import android.content.Context
+import android.content.SharedPreferences
 import com.squareup.moshi.Moshi
 import com.squareup.moshi.kotlin.reflect.KotlinJsonAdapterFactory
 import com.ubadahj.qidianundergroud.Database
@@ -25,6 +26,11 @@ object DataModule {
         return Moshi.Builder()
             .add(KotlinJsonAdapterFactory())
             .build()
+    }
+
+    @Provides
+    fun providesPreferences(@ApplicationContext context: Context): SharedPreferences {
+        return context.getSharedPreferences("commons", Context.MODE_PRIVATE);
     }
 
 }

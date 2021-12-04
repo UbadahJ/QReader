@@ -13,6 +13,7 @@ import com.ubadahj.qidianundergroud.databinding.ChapterFragmentBinding
 import com.ubadahj.qidianundergroud.models.Chapter
 import com.ubadahj.qidianundergroud.models.ChapterGroup
 import com.ubadahj.qidianundergroud.models.Resource
+import com.ubadahj.qidianundergroud.preferences.ReaderPreferences
 import com.ubadahj.qidianundergroud.repositories.ChapterGroupRepository
 import com.ubadahj.qidianundergroud.ui.adapters.ChapterAdapter
 import com.ubadahj.qidianundergroud.ui.adapters.MenuAdapter
@@ -44,6 +45,9 @@ class ChapterFragment : Fragment() {
     @Inject
     lateinit var groupRepo: ChapterGroupRepository
 
+    @Inject
+    lateinit var preferences: ReaderPreferences
+
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
@@ -68,6 +72,7 @@ class ChapterFragment : Fragment() {
         super.onViewCreated(view, savedInstanceState)
         setHasOptionsMenu(true)
         binding?.apply {
+            adapter.scaleFactor = { preferences.fontScale }
             chapterRecyclerView.adapter = adapter
             chapterRecyclerView.addOnScrollStateListener { rc, state ->
                 if (state != RecyclerView.SCROLL_STATE_IDLE)
@@ -165,6 +170,7 @@ class ChapterFragment : Fragment() {
             }
 
             override fun onScaleView(scale: Float) {
+                preferences.fontScale = scale
                 adapter.scaleFactor = { scale }
                 chapterRecyclerView.preserveState {
                     adapter = this@ChapterFragment.adapter
