@@ -21,6 +21,7 @@ import retrofit2.http.GET
 import retrofit2.http.Path
 import retrofit2.http.Query
 import retrofit2.http.Url
+import java.util.*
 import javax.inject.Inject
 
 private const val WEB_NOVEL_URL = "https://www.webnovel.com/"
@@ -83,11 +84,16 @@ class WebNovelApi @Inject constructor(
         )
     }
 
-    private fun getToken(): String {
-        return client.cookieJar
-            .loadForRequest(WEB_NOVEL_URL.toHttpUrl())
-            .first { it.name == "_csrfToken" }
-            .value
+    private suspend fun getToken(): String {
+        return try {
+            client.cookieJar
+                .loadForRequest(WEB_NOVEL_URL.toHttpUrl())
+                .first { it.name == "_csrfToken" }
+                .value
+        } catch (e: NoSuchElementException) {
+            webNovelApi.ping()
+            getToken()
+        }
     }
 
     private fun ResponseBody.parseSearchPage(): List<WNSearchResultRemote> {
@@ -182,6 +188,9 @@ class WebNovelApi @Inject constructor(
 }
 
 private interface IWebNovelApi {
+
+    @GET("/")
+    suspend fun ping(): Response<ResponseBody>
 
     @GET("search")
     suspend fun searchBooks(@Query("keywords") query: String): Response<ResponseBody>
