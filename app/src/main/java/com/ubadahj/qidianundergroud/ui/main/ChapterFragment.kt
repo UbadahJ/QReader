@@ -5,6 +5,8 @@ import android.os.Bundle
 import android.view.*
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
+import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.flowWithLifecycle
 import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
@@ -29,6 +31,7 @@ import com.ubadahj.qidianundergroud.utils.ui.addOnScrollStateListener
 import com.ubadahj.qidianundergroud.utils.ui.linearScroll
 import com.ubadahj.qidianundergroud.utils.ui.preserveState
 import dagger.hilt.android.AndroidEntryPoint
+import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.flow.first
 import javax.inject.Inject
 
@@ -72,7 +75,6 @@ class ChapterFragment : Fragment() {
         super.onViewCreated(view, savedInstanceState)
         setHasOptionsMenu(true)
         binding?.apply {
-            adapter.scaleFactor = { preferences.fontScale }
             chapterRecyclerView.adapter = adapter
             chapterRecyclerView.addOnScrollStateListener { rc, state ->
                 if (state != RecyclerView.SCROLL_STATE_IDLE)
@@ -87,6 +89,7 @@ class ChapterFragment : Fragment() {
                 adapter.getItemViewType(it) == ChapterViewHolderType.TITLE.ordinal
             })
             configureSwipeGestures()
+            configurePreferencesFlow()
         }
     }
 
@@ -116,6 +119,17 @@ class ChapterFragment : Fragment() {
         }
         getChapterContents(chapters)
     }
+
+    private fun ChapterFragmentBinding.configurePreferencesFlow() =
+        lifecycleScope.launchWhenResumed {
+            preferences.fontScale.asFlow().flowWithLifecycle(lifecycle, Lifecycle.State.RESUMED)
+                .collect {
+                    adapter.scaleFactor = { it }
+                    chapterRecyclerView.preserveState {
+                        adapter = this@ChapterFragment.adapter
+                    }
+                }
+        }
 
     private fun getChapterContents(group: ChapterGroup, refresh: Boolean = false) {
         viewModel
@@ -170,11 +184,7 @@ class ChapterFragment : Fragment() {
             }
 
             override fun onScaleView(scale: Float) {
-                preferences.fontScale = scale
-                adapter.scaleFactor = { scale }
-                chapterRecyclerView.preserveState {
-                    adapter = this@ChapterFragment.adapter
-                }
+                preferences.fontScale.set(scale)
             }
 
             private fun selectChapterGroup(
