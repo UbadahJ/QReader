@@ -31,6 +31,8 @@ import com.ubadahj.qidianundergroud.ui.adapters.MenuAdapter
 import com.ubadahj.qidianundergroud.ui.dialog.GroupDetailsDialog
 import com.ubadahj.qidianundergroud.ui.dialog.MenuDialog
 import com.ubadahj.qidianundergroud.ui.models.MenuDialogItem
+import com.ubadahj.qidianundergroud.utils.models.firstChapter
+import com.ubadahj.qidianundergroud.utils.models.isRead
 import com.ubadahj.qidianundergroud.utils.ui.snackBar
 import com.ubadahj.qidianundergroud.utils.ui.visible
 import dagger.hilt.android.AndroidEntryPoint
@@ -64,6 +66,7 @@ class BookFragment : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+        binding?.readLatestButton?.visible = false
         viewModel.selectedBook.observe(
             viewLifecycleOwner,
             { value ->
@@ -274,8 +277,16 @@ class BookFragment : Fragment() {
                         is Resource.Success -> {
                             materialCardView.visibility = View.VISIBLE
                             loadingProgress.visibility = View.GONE
-                            (chapterListView.adapter as? GroupAdapter)
-                                ?.submitList(resource.data!!)
+                            (chapterListView.adapter as? GroupAdapter)?.submitList(resource.data)
+                            {
+                                val latestChapter = resource.data
+                                    .filter { !it.isRead() }
+                                    .minByOrNull { it.firstChapter }!!
+                                binding?.readLatestButton?.apply {
+                                    text = "Read chapter ${latestChapter.firstChapter}"
+                                    visible = true
+                                }
+                            }
                         }
                         Resource.Loading -> {
                             loadingProgress.visibility = View.VISIBLE
