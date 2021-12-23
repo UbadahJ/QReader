@@ -285,6 +285,12 @@ class BookFragment : Fragment() {
                                 binding?.readLatestButton?.apply {
                                     text = "Read chapter ${latestChapter.firstChapter}"
                                     visible = true
+                                    setOnClickListener {
+                                        viewModel.selectedGroup.value = latestChapter
+                                        findNavController().navigate(
+                                            BookFragmentDirections.actionBookFragmentToChapterFragment()
+                                        )
+                                    }
                                 }
                             }
                         }
