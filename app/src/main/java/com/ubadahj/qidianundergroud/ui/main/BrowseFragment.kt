@@ -88,8 +88,8 @@ class BrowseFragment : Fragment() {
                     position: Int,
                     id: Long
                 ) {
+                    adapter.sortBy { it.first.name }
                     when (position) {
-                        0 -> adapter.sortBy { it.first.name }
                         1 -> adapter.sortBy { it.second?.author }
                         2 -> adapter.sortBy { it.second?.rating }
                         3 -> adapter.sortBy { it.first.lastUpdated }
@@ -115,7 +115,7 @@ class BrowseFragment : Fragment() {
                     binding?.apply {
                         progressBar.visible = false
                         if (isRefresh) {
-                            val count = resource.data!!.size - adapter.currentList.size
+                            val count = resource.data.size - adapter.currentList.size
                             if (count == 0)
                                 root.snackBar("No new books found!")
                             else
@@ -123,7 +123,22 @@ class BrowseFragment : Fragment() {
                         }
                     }
 
-                    adapter.submitList(resource.data!!)
+                    binding?.apply {
+                        adapter.submitList(
+                            resource.data.run {
+                                val list = when (sortBySpinner.selectedItemPosition) {
+                                    1 -> sortedBy { it.second?.author }
+                                    2 -> sortedBy { it.second?.rating }
+                                    3 -> sortedBy { it.first.lastUpdated }
+                                    4 -> sortedBy { it.first.completed }
+                                    else -> sortedBy { it.first.name }
+                                }
+
+                                if (descendingSwitch.isChecked) list.reversed()
+                                else list
+                            }
+                        )
+                    } ?: adapter.submitList(resource.data)
                 }
                 Resource.Loading -> binding?.progressBar?.visible = true
                 is Resource.Error -> {

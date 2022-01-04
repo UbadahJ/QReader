@@ -6,10 +6,6 @@
     android:layout_height="match_parent"
     tools:context=".ui.main.ChapterFragment">
 
-    <include
-        android:id="@+id/toolbar"
-        layout="@layout/material_toolbar" />
-
     <com.l4digital.fastscroll.FastScrollRecyclerView
         android:id="@+id/chapter_recycler_view"
         android:layout_width="0dp"
@@ -23,7 +19,7 @@
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/toolbar" />
+        app:layout_constraintTop_toTopOf="parent" />
 
     <ProgressBar
         android:id="@+id/progress_bar"

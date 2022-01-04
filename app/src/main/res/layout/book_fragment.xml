@@ -86,14 +86,24 @@
                 app:layout_constraintStart_toStartOf="@+id/book_rating_bar"
                 app:layout_constraintTop_toBottomOf="@+id/book_rating_bar" />
 
+            <Button
+                android:id="@+id/read_latest_button"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="8dp"
+                app:layout_constraintEnd_toEndOf="@+id/book_desc"
+                app:layout_constraintStart_toStartOf="@+id/book_desc"
+                app:layout_constraintTop_toBottomOf="@+id/book_desc"
+                tools:text="Read Chapter 102" />
+
             <ImageView
                 android:id="@+id/notification_disabled_icon"
                 android:layout_width="20dp"
                 android:layout_height="20dp"
-                android:layout_marginTop="16dp"
+                android:layout_marginTop="8dp"
                 android:src="@drawable/bell_slash"
-                app:layout_constraintStart_toStartOf="@id/book_desc"
-                app:layout_constraintTop_toBottomOf="@id/book_desc"
+                app:layout_constraintStart_toStartOf="@id/read_latest_button"
+                app:layout_constraintTop_toBottomOf="@id/read_latest_button"
                 app:tint="?android:attr/textColorPrimary" />
 
             <com.google.android.material.textview.MaterialTextView
@@ -279,6 +289,7 @@
                 android:layout_marginTop="16dp"
                 app:layout_constraintEnd_toStartOf="@+id/v_guideline_90"
                 app:layout_constraintTop_toBottomOf="@+id/book_image" />
+
 
         </androidx.constraintlayout.widget.ConstraintLayout>
     </androidx.core.widget.NestedScrollView>
