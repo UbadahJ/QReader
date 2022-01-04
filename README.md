@@ -22,6 +22,14 @@ A simple application intended provide extension to the capabilities of the websi
 | Book     | ![book_view_dark](images/book_view_dark.png)               | ![book_view_light](images/book_view_light.png)               |
 | Chapters | ![chapter_contents_dark](images/chapter_contents_dark.png) | ![chapter_contents_light](images/chapter_contents_light.png) |
 
-## Upcoming features :rocket:
+## Project Milestones
 
-- Better chapter reader
+Learn more about upcoming features and fixes
+
+https://github.com/users/UbadahJ/projects/1
+
+## Discussion
+
+Jump into discussions on 
+
+https://github.com/UbadahJ/QReader/discussions/
