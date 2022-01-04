@@ -278,20 +278,21 @@ class BookFragment : Fragment() {
                             materialCardView.visibility = View.VISIBLE
                             loadingProgress.visibility = View.GONE
                             (chapterListView.adapter as? GroupAdapter)?.submitList(resource.data)
-                            {
+                            binding?.readLatestButton?.apply {
                                 val latestChapter = resource.data
                                     .filter { !it.isRead() }
-                                    .minByOrNull { it.firstChapter }!!
-                                binding?.readLatestButton?.apply {
-                                    text = "Read chapter ${latestChapter.firstChapter}"
-                                    visible = true
-                                    setOnClickListener {
-                                        viewModel.selectedGroup.value = latestChapter
-                                        findNavController().navigate(
-                                            BookFragmentDirections.actionBookFragmentToChapterFragment()
-                                        )
+                                    .minByOrNull { it.firstChapter }
+                                    ?.also { group ->
+                                        text = "Read chapter ${group.lastRead}"
+                                        setOnClickListener {
+                                            viewModel.selectedGroup.value = group
+                                            findNavController().navigate(
+                                                BookFragmentDirections.actionBookFragmentToChapterFragment()
+                                            )
+                                        }
                                     }
-                                }
+
+                                visible = latestChapter != null
                             }
                         }
                         Resource.Loading -> {
