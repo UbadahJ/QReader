@@ -8,7 +8,7 @@ CREATE TABLE `Group`
     lastRead INTEGER AS Int   NOT NULL DEFAULT 0,
     CONSTRAINT chapter_group_ibfk
         FOREIGN KEY (bookId)
-            REFERENCES Book (id)
+            REFERENCES BaseBook (id)
             ON DELETE CASCADE
 );
 

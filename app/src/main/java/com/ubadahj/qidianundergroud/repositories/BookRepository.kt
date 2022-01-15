@@ -8,6 +8,7 @@ import com.squareup.sqldelight.runtime.coroutines.mapToOne
 import com.ubadahj.qidianundergroud.Database
 import com.ubadahj.qidianundergroud.api.UndergroundApi
 import com.ubadahj.qidianundergroud.api.models.underground.UndergroundBook
+import com.ubadahj.qidianundergroud.models.BaseBook
 import com.ubadahj.qidianundergroud.models.Book
 import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.Dispatchers
@@ -91,7 +92,7 @@ class BookRepository @Inject constructor(
         }
     }
 
-    private fun UndergroundBook.toBook() = Book(
+    private fun UndergroundBook.toBook() = BaseBook(
         id = id,
         name = name,
         lastUpdated = lastUpdated,

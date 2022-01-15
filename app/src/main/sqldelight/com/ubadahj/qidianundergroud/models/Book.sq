@@ -2,7 +2,7 @@ import java.lang.Boolean;
 
 -- TABLE
 
-CREATE TABLE Book
+CREATE TABLE BaseBook
 (
     id          TEXT               NOT NULL,
     name        TEXT               NOT NULL,
@@ -12,6 +12,24 @@ CREATE TABLE Book
     isAvailable INTEGER AS Boolean DEFAULT 1 NOT NULL,
     PRIMARY KEY (id)
 );
+
+CREATE VIEW Book AS
+SELECT
+    b.id,
+    b.name,
+    b.lastUpdated,
+    b.completed,
+    m.link,
+    m.author,
+    m.coverPath,
+    m.category,
+    m.description,
+    m.rating,
+    b.isAvailable,
+    b.inLibrary,
+    m.enableNotification
+FROM BaseBook b
+LEFT JOIN Metadata m ON b.id == m.bookId;
 
 -- QUERIES
 
@@ -35,49 +53,49 @@ FROM Book
 WHERE name LIKE ?;
 
 insert:
-INSERT OR IGNORE INTO Book(id, name, lastUpdated, completed, inLibrary, isAvailable)
+INSERT OR IGNORE INTO BaseBook(id, name, lastUpdated, completed, inLibrary, isAvailable)
 VALUES ?;
 
 insertByValues:
-INSERT INTO Book(id, name, lastUpdated, completed)
+INSERT INTO BaseBook(id, name, lastUpdated, completed)
 VALUES (? , ?, ?, ?);
 
 update:
-UPDATE Book
+UPDATE BaseBook
 SET name = ?, lastUpdated = ?, completed = ?
 WHERE id = ?;
 
 setAvailable:
-UPDATE Book
+UPDATE BaseBook
 SET isAvailable = ?
 WHERE id = ?;
 
 overwrite:
-UPDATE Book
+UPDATE BaseBook
 SET name = ?, lastUpdated = ?, completed = ?, inLibrary = ?, lastUpdated = ?
 WHERE id = ?;
 
 upsert {
-    UPDATE Book
+    UPDATE BaseBook
     SET name = :name, lastUpdated = :lastUpdated, completed = :completed
     WHERE id = :id;
 
-    INSERT OR IGNORE INTO Book(id, name, lastUpdated, completed)
+    INSERT OR IGNORE INTO BaseBook(id, name, lastUpdated, completed)
     VALUES (:id, :name, :lastUpdated, :completed);
 }
 
 deleteById:
 DELETE
-FROM Book
+FROM BaseBook
 WHERE id = ?;
 
 addToLibrary:
-UPDATE Book
+UPDATE BaseBook
 SET inLibrary = 1
 WHERE id = ?;
 
 removeFromLibrary:
-UPDATE Book
+UPDATE BaseBook
 SET inLibrary = 0
 WHERE id = ?;
 
