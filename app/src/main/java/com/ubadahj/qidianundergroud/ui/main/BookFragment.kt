@@ -8,6 +8,7 @@ import android.view.ViewGroup
 import androidx.core.net.toUri
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
+import androidx.lifecycle.flowWithLifecycle
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
 import androidx.work.Data
@@ -36,6 +37,7 @@ import com.ubadahj.qidianundergroud.utils.ui.snackBar
 import com.ubadahj.qidianundergroud.utils.ui.visible
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.flow.collect
+import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 @AndroidEntryPoint
@@ -66,14 +68,11 @@ class BookFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         binding?.readLatestButton?.visible = false
-        viewModel.selectedBook.observe(
-            viewLifecycleOwner,
-            { value ->
-                lifecycleScope.launchWhenResumed {
-                    value?.apply { init(this) }
-                }
+        lifecycleScope.launch {
+            viewModel.selectedBook.flowWithLifecycle(lifecycle).collect { value ->
+                value?.apply { init(this) }
             }
-        )
+        }
     }
 
     override fun onResume() {
@@ -105,8 +104,8 @@ class BookFragment : Fragment() {
                 }
             }
 
-            lifecycleScope.launchWhenResumed {
-                viewModel.getMetadata(book).observe(viewLifecycleOwner) {
+            lifecycleScope.launch {
+                viewModel.getMetadata(book).flowWithLifecycle(lifecycle).collect {
                     configureMetadata(it, book)
                 }
             }
@@ -125,7 +124,7 @@ class BookFragment : Fragment() {
         }
 
         libraryButton.setOnClickListener {
-            lifecycleScope.launchWhenCreated {
+            lifecycleScope.launch {
                 if (book.inLibrary) {
                     bookRepo.removeFromLibrary(book)
                     root.snackBar("Removed book to the library")
@@ -136,7 +135,7 @@ class BookFragment : Fragment() {
 
                 bookRepo
                     .getBookById(book.id)
-                    .collect { viewModel.selectedBook.postValue(it) }
+                    .collect { viewModel.selectedBook.value = it }
             }
         }
     }
@@ -214,14 +213,15 @@ class BookFragment : Fragment() {
     private fun configureMenu(book: Book, metadata: Metadata? = null) {
         val menuItems: MutableList<MenuDialogItem> = mutableListOf(
             MenuDialogItem("Check for updates", R.drawable.refresh) {
-                lifecycleScope.launchWhenResumed {
+                lifecycleScope.launch {
                     loadGroups(book, true, true)
                 }
             },
             MenuDialogItem("Reload book data", R.drawable.cloud_download) {
-                lifecycleScope.launchWhenResumed {
+                lifecycleScope.launch {
                     viewModel.getMetadata(book, true)
-                        .observe(viewLifecycleOwner) {
+                        .flowWithLifecycle(lifecycle)
+                        .collect {
                             binding?.configureMetadata(it, book)
                             (it as? Resource.Success<Metadata?>)?.data?.apply {
                                 configureMenu(book, this)
@@ -230,7 +230,7 @@ class BookFragment : Fragment() {
                 }
             },
             MenuDialogItem("Mark all chapters as read", R.drawable.check) {
-                lifecycleScope.launchWhenResumed {
+                lifecycleScope.launch {
                     bookRepo.markAllRead(book)
                 }
             }
@@ -242,7 +242,7 @@ class BookFragment : Fragment() {
 
             menuItems.addAll(listOf(
                 MenuDialogItem("$action notifications", drawable) {
-                    lifecycleScope.launchWhenResumed {
+                    lifecycleScope.launch {
                         metadataRepo.setNotifications(book, !metadata.enableNotification)
                     }
                 },
@@ -269,45 +269,52 @@ class BookFragment : Fragment() {
         refresh: Boolean = false,
         webNovelRefresh: Boolean = false
     ) {
-        viewModel.getChapters(book, refresh, webNovelRefresh)
-            .observe(viewLifecycleOwner) { resource ->
-                binding?.apply {
-                    when (resource) {
-                        is Resource.Success -> {
-                            materialCardView.visibility = View.VISIBLE
-                            loadingProgress.visibility = View.GONE
-                            (chapterListView.adapter as? GroupAdapter)?.submitList(resource.data)
-                            binding?.readLatestButton?.apply {
-                                val latestChapter = resource.data
-                                    .filter { !it.isRead() }
-                                    .minByOrNull { it.firstChapter }
-                                    ?.also { group ->
-                                        text = "Read chapter ${group.lastRead}"
-                                        setOnClickListener {
-                                            viewModel.selectedGroup.value = group
-                                            findNavController().navigate(
-                                                BookFragmentDirections.actionBookFragmentToChapterFragment()
-                                            )
+        lifecycleScope.launch {
+            viewModel.getChapters(book, refresh, webNovelRefresh)
+                .flowWithLifecycle(lifecycle)
+                .collect { resource ->
+                    binding?.apply {
+                        when (resource) {
+                            is Resource.Success -> {
+                                materialCardView.visibility = View.VISIBLE
+                                loadingProgress.visibility = View.GONE
+                                (chapterListView.adapter as? GroupAdapter)?.submitList(resource.data)
+                                binding?.readLatestButton?.apply {
+                                    val latestChapter = resource.data
+                                        .filter { !it.isRead() }
+                                        .minByOrNull { it.firstChapter }
+                                        ?.also { group ->
+                                            text = "Read chapter ${group.lastRead}"
+                                            setOnClickListener {
+                                                viewModel.selectedGroup.value = group
+                                                findNavController().navigate(
+                                                    BookFragmentDirections.actionBookFragmentToChapterFragment()
+                                                )
+                                            }
                                         }
-                                    }
 
-                                visible = latestChapter != null
+                                    visible = latestChapter != null
+                                }
                             }
-                        }
-                        Resource.Loading -> {
-                            loadingProgress.visibility = View.VISIBLE
-                            materialCardView.visibility = View.GONE
-                        }
-                        is Resource.Error -> {
-                            e(resource.message)
-                            loadingProgress.visibility = View.GONE
-                            materialCardView.visibility = View.GONE
-                            Snackbar.make(root, R.string.error_refreshing, Snackbar.LENGTH_SHORT)
-                                .show()
+                            Resource.Loading -> {
+                                loadingProgress.visibility = View.VISIBLE
+                                materialCardView.visibility = View.GONE
+                            }
+                            is Resource.Error -> {
+                                e(resource.message)
+                                loadingProgress.visibility = View.GONE
+                                materialCardView.visibility = View.GONE
+                                Snackbar.make(
+                                    root,
+                                    R.string.error_refreshing,
+                                    Snackbar.LENGTH_SHORT
+                                )
+                                    .show()
+                            }
                         }
                     }
                 }
-            }
+        }
     }
 
     override fun onDestroyView() {

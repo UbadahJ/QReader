@@ -11,17 +11,20 @@ import dagger.Provides
 import dagger.hilt.InstallIn
 import dagger.hilt.android.qualifiers.ApplicationContext
 import dagger.hilt.components.SingletonComponent
+import javax.inject.Singleton
 
 @Module
 @InstallIn(SingletonComponent::class)
 object DataModule {
 
+    @Singleton
     @Provides
     fun providesDatabase(@ApplicationContext context: Context): Database {
         return BookDatabase.getInstance(context)
     }
 
     @Provides
+    @Singleton
     fun providesMoshi(): Moshi {
         return Moshi.Builder()
             .add(KotlinJsonAdapterFactory())
@@ -29,6 +32,7 @@ object DataModule {
     }
 
     @Provides
+    @Singleton
     fun providesPreferences(@ApplicationContext context: Context): SharedPreferences {
         return context.getSharedPreferences("commons", Context.MODE_PRIVATE);
     }

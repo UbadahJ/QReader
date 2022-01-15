@@ -2,10 +2,8 @@ package com.ubadahj.qidianundergroud.ui.main
 
 import android.annotation.SuppressLint
 import android.webkit.WebView
-import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
-import androidx.lifecycle.asLiveData
-import androidx.lifecycle.liveData
+import com.github.ajalt.timberkt.Timber.d
 import com.github.ajalt.timberkt.Timber.e
 import com.ubadahj.qidianundergroud.models.Book
 import com.ubadahj.qidianundergroud.models.Content
@@ -16,8 +14,7 @@ import com.ubadahj.qidianundergroud.repositories.ContentRepository
 import com.ubadahj.qidianundergroud.repositories.GroupRepository
 import com.ubadahj.qidianundergroud.repositories.MetadataRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
-import kotlinx.coroutines.flow.catch
-import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.flow.*
 import javax.inject.Inject
 
 @HiltViewModel
@@ -28,46 +25,43 @@ class MainViewModel @Inject constructor(
     private val metadataRepo: MetadataRepository
 ) : ViewModel() {
 
-    val selectedBook: MutableLiveData<Book?> = MutableLiveData()
-    val selectedGroup: MutableLiveData<Group?> = MutableLiveData()
-    val selectedChapter: MutableLiveData<Content?> = MutableLiveData()
+    val selectedBook: MutableStateFlow<Book?> = MutableStateFlow(null)
+    val selectedGroup: MutableStateFlow<Group?> = MutableStateFlow(null)
+    val selectedChapter: MutableStateFlow<Content?> = MutableStateFlow(null)
 
-    val libraryBooks = liveData {
+    val libraryBooks = flow {
         emit(Resource.Loading)
         try {
-            emitSource(
+            emitAll(
                 bookRepo.getLibraryBooks()
                     .catch { Resource.Error(it) }
                     .map { Resource.Success(it) }
-                    .asLiveData()
             )
         } catch (e: Exception) {
             emit(Resource.Error(e))
         }
     }
 
-    fun getBooks(refresh: Boolean = false) = liveData {
+    fun getBooks(refresh: Boolean = false) = flow {
         emit(Resource.Loading)
         try {
-            emitSource(
+            emitAll(
                 bookRepo.getBooks(refresh)
                     .catch { Resource.Error(it) }
-                    .map { books -> Resource.Success(books) }
-                    .asLiveData()
+                    .map { books -> Resource.Success(books.also { d { "getBooks: ${it.size}" } }) }
             )
         } catch (e: Exception) {
             emit(Resource.Error(e))
         }
     }
 
-    fun getMetadata(book: Book, refresh: Boolean = false) = liveData {
+    fun getMetadata(book: Book, refresh: Boolean = false) = flow {
         emit(Resource.Loading)
         try {
-            emitSource(
+            emitAll(
                 metadataRepo.getBook(book, refresh)
                     .catch { Resource.Error(it) }
                     .map { Resource.Success(it) }
-                    .asLiveData()
             )
         } catch (e: Exception) {
             emit(Resource.Error(e))
@@ -78,15 +72,14 @@ class MainViewModel @Inject constructor(
         book: Book,
         refresh: Boolean = false,
         webNovelRefresh: Boolean = false
-    ) = liveData {
+    ) = flow {
         emit(Resource.Loading)
         try {
-            emitSource(
+            emitAll(
                 groupRepo.getGroups(book, refresh, webNovelRefresh)
                     .catch { Resource.Error(it) }
                     .map { it.sortedByDescending(Group::firstChapter) }
                     .map { Resource.Success(it) }
-                    .asLiveData()
             )
         } catch (e: Exception) {
             emit(Resource.Error(e))
@@ -94,10 +87,10 @@ class MainViewModel @Inject constructor(
     }
 
     @SuppressLint("SetJavaScriptEnabled")
-    fun getChapterContents(group: Group, refresh: Boolean) = liveData {
+    fun getChapterContents(group: Group, refresh: Boolean) = flow {
         emit(Resource.Loading)
         try {
-            emitSource(
+            emitAll(
                 contentRepo.getContents(
                     { WebView(it).apply { settings.javaScriptEnabled = true } },
                     group,
@@ -107,7 +100,6 @@ class MainViewModel @Inject constructor(
                     .map {
                         Resource.Success(it)
                     }
-                    .asLiveData()
             )
         } catch (e: Exception) {
             e(e) { "Failed loading content" }

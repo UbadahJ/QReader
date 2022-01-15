@@ -39,7 +39,7 @@ getByBookId:
 SELECT *
 FROM `Group`
 WHERE bookId = ?
-ORDER BY CAST(TRIM(SUBSTR(text, 1, INSTR(text, '-') - 1)) AS INTEGER);
+ORDER BY firstChapter;
 
 insert:
 INSERT OR IGNORE INTO BaseGroup(bookId, text, link, lastRead)

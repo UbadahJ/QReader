@@ -39,9 +39,13 @@ class BookAdapter(
         holder.bind(getItem(position))
     }
 
-    fun <R : Comparable<R>> sortBy(predicate: (Book) -> R?) {
+    fun <R : Comparable<R>> sortBy(
+        bubbleText: R?.() -> String? = { this?.toString()?.first()?.uppercase() },
+        predicate: (Book) -> R?
+    ) {
+        if (currentList.isEmpty()) return
         submitList(currentList.sortedBy(predicate))
-        bubbleText = { predicate(it).toString() }
+        this.bubbleText = { predicate(it).bubbleText() ?: "Unspecified" }
     }
 
     fun reverse() = submitList(currentList.reversed())

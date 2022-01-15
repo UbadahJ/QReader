@@ -31,6 +31,7 @@ import com.ubadahj.qidianundergroud.utils.ui.preserveState
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 @AndroidEntryPoint
@@ -56,13 +57,19 @@ class ChapterFragment : Fragment() {
     ): View {
         return ChapterFragmentBinding.inflate(inflater, container, false).apply {
             binding = this
-            viewModel.selectedGroup.observe(viewLifecycleOwner) { group ->
-                group?.apply { init(this) }
-            }
-            viewModel.selectedChapter.observe(viewLifecycleOwner) { chapter ->
-                chapter?.apply {
-                    viewModel.selectedGroup.value?.run {
-                        groupRepo.updateLastRead(this, getIndex())
+            lifecycleScope.launch {
+                launch {
+                    viewModel.selectedGroup.flowWithLifecycle(lifecycle).collect { group ->
+                        group?.apply { init(this) }
+                    }
+                }
+                launch {
+                    viewModel.selectedChapter.flowWithLifecycle(lifecycle).collect { chapter ->
+                        chapter?.apply {
+                            viewModel.selectedGroup.value?.run {
+                                groupRepo.updateLastRead(this, getIndex())
+                            }
+                        }
                     }
                 }
             }
@@ -119,7 +126,7 @@ class ChapterFragment : Fragment() {
     }
 
     private fun ChapterFragmentBinding.configurePreferencesFlow() =
-        lifecycleScope.launchWhenResumed {
+        lifecycleScope.launch {
             preferences.fontScale.asFlow().flowWithLifecycle(lifecycle, Lifecycle.State.RESUMED)
                 .collect {
                     adapter.scaleFactor = { it }
@@ -130,15 +137,15 @@ class ChapterFragment : Fragment() {
         }
 
     private fun getChapterContents(group: Group, refresh: Boolean = false) {
-        viewModel
-            .getChapterContents(group, refresh)
-            .observe(
-                viewLifecycleOwner,
-                {
+        lifecycleScope.launch {
+            viewModel
+                .getChapterContents(group, refresh)
+                .flowWithLifecycle(lifecycle)
+                .collect {
                     updateRecyclerAdapter(it)
                     binding?.updateUIIndicators(it)
                 }
-            )
+        }
     }
 
     private fun ChapterFragmentBinding.updateUIIndicators(resource: Resource<List<Content>>) {
@@ -190,10 +197,10 @@ class ChapterFragment : Fragment() {
             ) {
                 val group = viewModel.selectedGroup.value
                 viewModel.selectedBook.value?.let { book ->
-                    lifecycleScope.launchWhenCreated {
+                    lifecycleScope.launch {
                         groupRepo.getGroups(book).first()
                             .firstOrNull { other -> group?.let { predicate(it, other) } == true }
-                            ?.let { viewModel.selectedGroup.postValue(it) }
+                            ?.let { viewModel.selectedGroup.value = it }
                     }
                 }
             }

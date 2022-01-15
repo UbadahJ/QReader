@@ -37,8 +37,8 @@ FROM BaseBook b
                     FROM `Group` g) subG1 ON subG1.bookId = b.id
          LEFT JOIN (SELECT bookId, COUNT(*) AS totalUnread
                     FROM `Group` g
-                    WHERE g.lastRead = g.lastChapter) subG2 ON subG2.bookId = b.id
-         LEFT JOIN (SELECT bookId, COUNT(*) AS lastRead
+                    WHERE g.lastRead != g.lastChapter) subG2 ON subG2.bookId = b.id
+         LEFT JOIN (SELECT bookId, lastRead
                     FROM `Group` g
                     WHERE g.lastRead != g.lastChapter
                     ORDER BY g.lastRead
