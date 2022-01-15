@@ -3,17 +3,10 @@ package com.ubadahj.qidianundergroud.utils.models
 import com.ubadahj.qidianundergroud.models.Group
 import java.util.*
 
-val Group.firstChapter: Int
-    get() = text.split("-").first().trim().toInt()
-
-val Group.lastChapter: Int
-    get() = text.split("-").last().trim().toInt()
-
 val Group.total: Int
-    get() = lastChapter - firstChapter + 1
+    get() = (lastChapter - firstChapter + 1).toInt()
 
-fun Group.isRead() = lastRead == lastChapter
-
+fun Group.isRead() = lastRead == lastChapter.toInt()
 
 val Group.source: String
     get() {

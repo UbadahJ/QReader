@@ -14,22 +14,36 @@ CREATE TABLE BaseBook
 );
 
 CREATE VIEW Book AS
-SELECT
-    b.id,
-    b.name,
-    b.lastUpdated,
-    b.completed,
-    m.link,
-    m.author,
-    m.coverPath,
-    m.category,
-    m.description,
-    m.rating,
-    b.isAvailable,
-    b.inLibrary,
-    m.enableNotification
+SELECT b.id,
+       m.id AS novelId,
+       b.name,
+       b.lastUpdated,
+       b.completed,
+       m.link,
+       m.author,
+       m.coverPath,
+       m.category,
+       m.description,
+       m.rating,
+       b.isAvailable,
+       b.inLibrary,
+       subG1.totalGroups,
+       subG2.totalUnread,
+       subG3.lastRead,
+       m.enableNotification
 FROM BaseBook b
-LEFT JOIN Metadata m ON b.id == m.bookId;
+         LEFT JOIN Metadata m ON b.id = m.bookId
+         LEFT JOIN (SELECT bookId, COUNT(*) AS totalGroups
+                    FROM `Group` g) subG1 ON subG1.bookId = b.id
+         LEFT JOIN (SELECT bookId, COUNT(*) AS totalUnread
+                    FROM `Group` g
+                    WHERE g.lastRead = g.lastChapter) subG2 ON subG2.bookId = b.id
+         LEFT JOIN (SELECT bookId, COUNT(*) AS lastRead
+                    FROM `Group` g
+                    WHERE g.lastRead != g.lastChapter
+                    ORDER BY g.lastRead
+                    LIMIT 1) subG3 ON subG3.bookId = b.id;
+
 
 -- QUERIES
 
@@ -103,9 +117,9 @@ chapters:
 SELECT *
 FROM `Group`
 WHERE bookId = ?
-ORDER BY CAST(TRIM(SUBSTR(text, 1, INSTR(text, '-') - 1)) AS INTEGER);
+ORDER BY firstChapter;
 
 markAllRead:
 UPDATE `Group`
-SET lastRead = CAST(TRIM(SUBSTR(text, INSTR(text, '-') + 1)) AS INTEGER)
+SET lastRead = lastChapter
 WHERE bookId = ?;

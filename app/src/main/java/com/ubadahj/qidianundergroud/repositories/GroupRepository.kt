@@ -9,10 +9,9 @@ import com.ubadahj.qidianundergroud.api.UndergroundApi
 import com.ubadahj.qidianundergroud.api.WebNovelApi
 import com.ubadahj.qidianundergroud.api.models.underground.UndergroundGroup
 import com.ubadahj.qidianundergroud.api.models.webnovel.WNChapterRemote
+import com.ubadahj.qidianundergroud.models.BaseGroup
 import com.ubadahj.qidianundergroud.models.Book
 import com.ubadahj.qidianundergroud.models.Group
-import com.ubadahj.qidianundergroud.utils.models.firstChapter
-import com.ubadahj.qidianundergroud.utils.models.lastChapter
 import com.ubadahj.qidianundergroud.utils.models.total
 import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.flow.Flow
@@ -67,12 +66,12 @@ class GroupRepository @Inject constructor(
 
             val remoteChapters = remoteGroups.associateBy { it.firstChapter }
             val dbGroupsToUpdate = dbGroups
-                .filter { it.firstChapter in remoteChapters.keys }
-                .filter { it.lastChapter != remoteChapters[it.firstChapter]?.lastChapter }
+                .filter { it.firstChapter.toInt() in remoteChapters.keys }
+                .filter { it.lastChapter.toInt() != remoteChapters[it.firstChapter.toInt()]?.lastChapter }
 
             database.chapterQueries.transaction {
                 for (group in dbGroupsToUpdate) {
-                    val remoteGroup = remoteChapters[group.firstChapter]!!
+                    val remoteGroup = remoteChapters[group.firstChapter.toInt()]!!
                     // We need to delete all the previous chapters to make sure foreign key
                     // doesn't fail
                     database.contentQueries.deleteByGroupLink(group.link)
@@ -105,9 +104,15 @@ class GroupRepository @Inject constructor(
         return database.bookQueries.chapters(book.id).asFlow().mapToList()
     }
 
-    private fun UndergroundGroup.toGroup(book: Book) = Group(book.id, text, link, 0)
+    private fun UndergroundGroup.toGroup(book: Book) = BaseGroup(book.id, text, link, 0)
 
     private fun WNChapterRemote.toGroup(book: Book) =
-        Group(book.id, index.toString(), link, 0)
+        BaseGroup(book.id, index.toString(), link, 0)
+
+    private val BaseGroup.firstChapter: Int
+        get() = text.split("-").first().trim().toInt()
+
+    private val BaseGroup.lastChapter: Int
+        get() = text.split("-").last().trim().toInt()
 
 }

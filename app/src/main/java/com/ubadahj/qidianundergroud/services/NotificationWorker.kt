@@ -18,7 +18,6 @@ import com.ubadahj.qidianundergroud.models.Metadata
 import com.ubadahj.qidianundergroud.repositories.BookRepository
 import com.ubadahj.qidianundergroud.repositories.GroupRepository
 import com.ubadahj.qidianundergroud.repositories.MetadataRepository
-import com.ubadahj.qidianundergroud.utils.models.lastChapter
 import dagger.assisted.Assisted
 import dagger.assisted.AssistedInject
 import kotlinx.coroutines.Dispatchers
@@ -78,7 +77,7 @@ class NotificationWorker @AssistedInject constructor(
     }.flowOn(Dispatchers.IO)
 
     private fun List<Group>.lastChapter(): Int {
-        return maxByOrNull { it.lastChapter }?.lastChapter ?: 0
+        return maxByOrNull { it.lastChapter }?.lastChapter?.toInt() ?: 0
     }
 
     private suspend fun progressNotification(

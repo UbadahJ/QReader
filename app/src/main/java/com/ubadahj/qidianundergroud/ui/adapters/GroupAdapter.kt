@@ -9,7 +9,9 @@ import androidx.recyclerview.widget.RecyclerView
 import com.ubadahj.qidianundergroud.R
 import com.ubadahj.qidianundergroud.databinding.GroupItemBinding
 import com.ubadahj.qidianundergroud.models.Group
-import com.ubadahj.qidianundergroud.utils.models.*
+import com.ubadahj.qidianundergroud.utils.models.contains
+import com.ubadahj.qidianundergroud.utils.models.isRead
+import com.ubadahj.qidianundergroud.utils.models.source
 import com.ubadahj.qidianundergroud.utils.ui.visible
 
 class GroupAdapter(
@@ -63,7 +65,7 @@ class GroupAdapter(
             if (group.isRead()) readColor else defaultColors[group]!!
         )
         holder.binding.readProgress.visible =
-            group.lastRead != 0 && group.lastRead != group.lastChapter
+            group.lastRead != 0 && !group.isRead()
 
         holder.binding.menu.setOnClickListener { menuClick(group) }
     }

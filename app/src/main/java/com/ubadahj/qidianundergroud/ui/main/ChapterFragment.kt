@@ -25,8 +25,6 @@ import com.ubadahj.qidianundergroud.ui.dialog.MenuDialog
 import com.ubadahj.qidianundergroud.ui.listeners.OnGestureListener
 import com.ubadahj.qidianundergroud.ui.models.ContentUIItem
 import com.ubadahj.qidianundergroud.ui.models.MenuDialogItem
-import com.ubadahj.qidianundergroud.utils.models.firstChapter
-import com.ubadahj.qidianundergroud.utils.models.lastChapter
 import com.ubadahj.qidianundergroud.utils.ui.addOnScrollStateListener
 import com.ubadahj.qidianundergroud.utils.ui.linearScroll
 import com.ubadahj.qidianundergroud.utils.ui.preserveState
@@ -214,7 +212,8 @@ class ChapterFragment : Fragment() {
             updateMenu(resource.data)
 
             viewModel.selectedGroup.value?.let { group ->
-                val index = if (group.lastRead != 0) group.lastRead - group.firstChapter else 0
+                val index = (if (group.lastRead != 0) group.lastRead - group.firstChapter else 0)
+                    .toInt()
 
                 viewModel.selectedChapter.value = resource.data[index]
                 binding?.chapterRecyclerView?.linearScroll(index * 2)
@@ -239,7 +238,7 @@ class ChapterFragment : Fragment() {
         return try {
             title.split(':').first().trim().split(" ").last().toInt()
         } catch (e: NoSuchElementException) {
-            viewModel.selectedGroup.value?.lastChapter ?: throw IllegalStateException(
+            viewModel.selectedGroup.value?.lastChapter?.toInt() ?: throw IllegalStateException(
                 "Failed to get lastChapter from ViewModel selectChapterGroup"
             )
         }

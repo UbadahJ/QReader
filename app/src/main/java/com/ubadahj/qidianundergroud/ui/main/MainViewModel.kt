@@ -15,10 +15,8 @@ import com.ubadahj.qidianundergroud.repositories.BookRepository
 import com.ubadahj.qidianundergroud.repositories.ContentRepository
 import com.ubadahj.qidianundergroud.repositories.GroupRepository
 import com.ubadahj.qidianundergroud.repositories.MetadataRepository
-import com.ubadahj.qidianundergroud.utils.models.firstChapter
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.catch
-import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.map
 import javax.inject.Inject
 
@@ -34,7 +32,7 @@ class MainViewModel @Inject constructor(
     val selectedGroup: MutableLiveData<Group?> = MutableLiveData()
     val selectedChapter: MutableLiveData<Content?> = MutableLiveData()
 
-    fun libraryBooks() = liveData {
+    val libraryBooks = liveData {
         emit(Resource.Loading)
         try {
             emitSource(
@@ -51,11 +49,10 @@ class MainViewModel @Inject constructor(
     fun getBooks(refresh: Boolean = false) = liveData {
         emit(Resource.Loading)
         try {
-            val metas = metadataRepo.getAll().first().associateBy { it.bookId }
             emitSource(
                 bookRepo.getBooks(refresh)
                     .catch { Resource.Error(it) }
-                    .map { books -> Resource.Success(books.map { it to metas[it.id] }) }
+                    .map { books -> Resource.Success(books) }
                     .asLiveData()
             )
         } catch (e: Exception) {

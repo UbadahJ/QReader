@@ -11,8 +11,7 @@ import com.ubadahj.qidianundergroud.models.Group
 import com.ubadahj.qidianundergroud.repositories.GroupRepository
 import com.ubadahj.qidianundergroud.ui.adapters.MenuAdapter
 import com.ubadahj.qidianundergroud.ui.models.MenuDialogItem
-import com.ubadahj.qidianundergroud.utils.models.firstChapter
-import com.ubadahj.qidianundergroud.utils.models.lastChapter
+import com.ubadahj.qidianundergroud.utils.models.isRead
 
 class GroupDetailsDialog(
     private val groupRepo: GroupRepository,
@@ -23,7 +22,7 @@ class GroupDetailsDialog(
     private val lastRead: String
         get() = when {
             group.lastRead == 0 -> "Not started reading"
-            group.lastChapter == group.lastRead -> "This group has been read"
+            group.isRead() -> "This group has been read"
             else -> "Currently reading chapter ${group.lastRead}"
         }
     private val downloaded: String
@@ -46,7 +45,7 @@ class GroupDetailsDialog(
             recyclerView.adapter = MenuAdapter(
                 listOf(
                     MenuDialogItem("Mark as read", R.drawable.check) {
-                        groupRepo.updateLastRead(group, group.lastChapter)
+                        groupRepo.updateLastRead(group, group.lastChapter.toInt())
                         dismiss()
                     }
                 )

@@ -7,7 +7,6 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.core.widget.addTextChangedListener
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
-import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.GridLayoutManager
 import com.google.android.material.snackbar.Snackbar
@@ -23,7 +22,6 @@ import com.ubadahj.qidianundergroud.ui.dialog.MenuDialog
 import com.ubadahj.qidianundergroud.ui.models.MenuDialogItem
 import com.ubadahj.qidianundergroud.utils.ui.toDp
 import dagger.hilt.android.AndroidEntryPoint
-import kotlinx.coroutines.flow.first
 import javax.inject.Inject
 
 @AndroidEntryPoint
@@ -37,10 +35,7 @@ class LibraryFragment : Fragment() {
 
     private val viewModel: MainViewModel by activityViewModels()
     private val adapter: LibraryAdapter = LibraryAdapter(
-        listOf(),
-        { groupRepo.getGroups(it).first() },
-        { metadataRepo.getBook(it).first() },
-        lifecycleScope
+        listOf()
     ) {
         viewModel.selectedBook.value = it
         findNavController().navigate(
@@ -94,11 +89,11 @@ class LibraryFragment : Fragment() {
             searchBar.searchEditText.addTextChangedListener { text: Editable? ->
                 adapter.filter.filter((text))
             }
-            viewModel.libraryBooks().observe(viewLifecycleOwner) {
+            viewModel.libraryBooks.observe(viewLifecycleOwner) {
                 when (it) {
                     is Resource.Success -> {
                         progressBar.visibility = View.GONE
-                        adapter.submitList(it.data!!)
+                        adapter.submitList(it.data)
                     }
                     Resource.Loading -> {
                         progressBar.visibility = View.VISIBLE

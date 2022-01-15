@@ -17,7 +17,6 @@ import androidx.work.WorkManager
 import com.ubadahj.qidianundergroud.R
 import com.ubadahj.qidianundergroud.databinding.BookListFragmentBinding
 import com.ubadahj.qidianundergroud.models.Book
-import com.ubadahj.qidianundergroud.models.Metadata
 import com.ubadahj.qidianundergroud.models.Resource
 import com.ubadahj.qidianundergroud.services.IndexService
 import com.ubadahj.qidianundergroud.ui.adapters.BookAdapter
@@ -88,12 +87,12 @@ class BrowseFragment : Fragment() {
                     position: Int,
                     id: Long
                 ) {
-                    adapter.sortBy { it.first.name }
+                    adapter.sortBy { it.name }
                     when (position) {
-                        1 -> adapter.sortBy { it.second?.author }
-                        2 -> adapter.sortBy { it.second?.rating }
-                        3 -> adapter.sortBy { it.first.lastUpdated }
-                        4 -> adapter.sortBy { it.first.completed }
+                        1 -> adapter.sortBy { it.author }
+                        2 -> adapter.sortBy { it.rating }
+                        3 -> adapter.sortBy { it.lastUpdated }
+                        4 -> adapter.sortBy { it.completed }
                     }
                 }
 
@@ -106,7 +105,7 @@ class BrowseFragment : Fragment() {
     }
 
     private fun getBooks(
-        resource: Resource<List<Pair<Book, Metadata?>>>,
+        resource: Resource<List<Book>>,
         isRefresh: Boolean = false
     ) {
         lifecycleScope.launchWhenStarted {
@@ -127,11 +126,11 @@ class BrowseFragment : Fragment() {
                         adapter.submitList(
                             resource.data.run {
                                 val list = when (sortBySpinner.selectedItemPosition) {
-                                    1 -> sortedBy { it.second?.author }
-                                    2 -> sortedBy { it.second?.rating }
-                                    3 -> sortedBy { it.first.lastUpdated }
-                                    4 -> sortedBy { it.first.completed }
-                                    else -> sortedBy { it.first.name }
+                                    1 -> sortedBy { it.author }
+                                    2 -> sortedBy { it.rating }
+                                    3 -> sortedBy { it.lastUpdated }
+                                    4 -> sortedBy { it.completed }
+                                    else -> sortedBy { it.name }
                                 }
 
                                 if (descendingSwitch.isChecked) list.reversed()

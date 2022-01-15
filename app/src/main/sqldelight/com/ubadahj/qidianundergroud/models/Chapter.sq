@@ -1,20 +1,33 @@
 -- TABLE
 
-CREATE TABLE `Group`
+CREATE TABLE BaseGroup
 (
-    bookId   TEXT             NOT NULL,
-    text     TEXT             NOT NULL,
-    link     TEXT PRIMARY KEY NOT NULL,
-    lastRead INTEGER AS Int   NOT NULL DEFAULT 0,
+    bookId       TEXT             NOT NULL,
+    text         TEXT             NOT NULL,
+    link         TEXT PRIMARY KEY NOT NULL,
+    lastRead     INTEGER AS Int   NOT NULL DEFAULT 0,
     CONSTRAINT chapter_group_ibfk
         FOREIGN KEY (bookId)
             REFERENCES BaseBook (id)
             ON DELETE CASCADE
 );
 
-
-CREATE INDEX book_id
-    ON `Group` (bookId);
+CREATE VIEW `Group` AS
+SELECT
+    bookId,
+    text,
+    (CAST(
+        TRIM(SUBSTR(text, 1, INSTR(text, '-') - 1)) AS INTEGER
+    )) firstChapter,
+    (CAST(
+        CASE TRIM(SUBSTR(text, INSTR(text, '-')))
+            WHEN '' THEN TRIM(SUBSTR(text, 1, INSTR(text, '-') - 1))
+            ELSE TRIM(SUBSTR(text, INSTR(text, '-') + 1))
+            END AS INTEGER
+    )) lastChapter,
+   link,
+   lastRead
+FROM BaseGroup;
 
 -- QUERIES
 get:
@@ -29,15 +42,15 @@ WHERE bookId = ?
 ORDER BY CAST(TRIM(SUBSTR(text, 1, INSTR(text, '-') - 1)) AS INTEGER);
 
 insert:
-INSERT OR IGNORE INTO `Group`(bookId, text, link, lastRead)
+INSERT OR IGNORE INTO BaseGroup(bookId, text, link, lastRead)
 VALUES ?;
 
 insertByValues:
-INSERT OR IGNORE INTO `Group`(bookId, text, link)
+INSERT OR IGNORE INTO BaseGroup(bookId, text, link)
 VALUES (?, ?, ?);
 
 update:
-UPDATE `Group`
+UPDATE BaseGroup
 SET text = :updatedText,
     link = :updatedLink
 WHERE
@@ -45,11 +58,11 @@ WHERE
 
 deleteByLink:
 DELETE
-FROM `Group`
+FROM BaseGroup
 WHERE link = ?;
 
 updateLastRead:
-UPDATE `Group`
+UPDATE BaseGroup
 SET lastRead = ?
 WHERE link = ?;
 

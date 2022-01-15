@@ -3,22 +3,19 @@ package com.ubadahj.qidianundergroud.ui.adapters
 import android.view.ViewGroup
 import androidx.recyclerview.widget.DiffUtil
 import com.ubadahj.qidianundergroud.models.Book
-import com.ubadahj.qidianundergroud.models.Metadata
 import com.ubadahj.qidianundergroud.ui.adapters.factories.BookViewHolder
 import com.ubadahj.qidianundergroud.ui.adapters.factories.BookViewHolderFactory
 import com.ubadahj.qidianundergroud.ui.adapters.factories.BookViewHolderType
 
-typealias BookWithMetadata = Pair<Book, Metadata?>
-
 class BookAdapter(
-    books: List<BookWithMetadata>,
+    books: List<Book>,
     private val onClick: (Book) -> Unit
-) : FilterableListAdapter<BookWithMetadata, BookViewHolder>(DiffCallback()) {
+) : FilterableListAdapter<Book, BookViewHolder>(DiffCallback()) {
 
-    override val filterPredicate: (List<BookWithMetadata>, String) -> List<BookWithMetadata> =
-        { list, constraint -> list.filter { it.first.name.contains(constraint, true) } }
+    override val filterPredicate: (List<Book>, String) -> List<Book> =
+        { list, constraint -> list.filter { it.name.contains(constraint, true) } }
 
-    override var bubbleText: ((BookWithMetadata) -> String) = { it.first.name.first().toString() }
+    override var bubbleText: ((Book) -> String) = { it.name.first().toString() }
         private set
 
     init {
@@ -27,14 +24,14 @@ class BookAdapter(
     }
 
     override fun getItemViewType(position: Int): Int =
-        if (getItem(position).second != null) 1 else 0
+        if (getItem(position).novelId != null) 1 else 0
 
     override fun onCreateViewHolder(
         parent: ViewGroup,
         viewType: Int
     ): BookViewHolder {
         return BookViewHolderFactory.get(parent, BookViewHolderType.from(viewType)) {
-            onClick(getItem(it).first)
+            onClick(getItem(it))
         }
     }
 
@@ -42,22 +39,22 @@ class BookAdapter(
         holder.bind(getItem(position))
     }
 
-    fun <R : Comparable<R>> sortBy(predicate: (BookWithMetadata) -> R?) {
+    fun <R : Comparable<R>> sortBy(predicate: (Book) -> R?) {
         submitList(currentList.sortedBy(predicate))
         bubbleText = { predicate(it).toString() }
     }
 
     fun reverse() = submitList(currentList.reversed())
 
-    class DiffCallback : DiffUtil.ItemCallback<BookWithMetadata>() {
+    class DiffCallback : DiffUtil.ItemCallback<Book>() {
         override fun areItemsTheSame(
-            oldItem: BookWithMetadata,
-            newItem: BookWithMetadata
-        ): Boolean = oldItem.first.id == newItem.first.id
+            oldItem: Book,
+            newItem: Book
+        ): Boolean = oldItem.id == newItem.id
 
         override fun areContentsTheSame(
-            oldItem: BookWithMetadata,
-            newItem: BookWithMetadata
+            oldItem: Book,
+            newItem: Book
         ): Boolean = oldItem == newItem
     }
 
