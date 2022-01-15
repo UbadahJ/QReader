@@ -7,16 +7,16 @@ import android.view.ViewGroup
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
 import com.ubadahj.qidianundergroud.R
 import com.ubadahj.qidianundergroud.databinding.GroupInfoMenuBinding
-import com.ubadahj.qidianundergroud.models.ChapterGroup
-import com.ubadahj.qidianundergroud.repositories.ChapterGroupRepository
+import com.ubadahj.qidianundergroud.models.Group
+import com.ubadahj.qidianundergroud.repositories.GroupRepository
 import com.ubadahj.qidianundergroud.ui.adapters.MenuAdapter
 import com.ubadahj.qidianundergroud.ui.models.MenuDialogItem
 import com.ubadahj.qidianundergroud.utils.models.firstChapter
 import com.ubadahj.qidianundergroud.utils.models.lastChapter
 
 class GroupDetailsDialog(
-    private val groupRepo: ChapterGroupRepository,
-    private val group: ChapterGroup
+    private val groupRepo: GroupRepository,
+    private val group: Group
 ) : BottomSheetDialogFragment() {
 
     private var binding: GroupInfoMenuBinding? = null

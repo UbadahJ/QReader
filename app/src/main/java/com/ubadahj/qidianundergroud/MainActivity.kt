@@ -13,7 +13,7 @@ import androidx.work.WorkManager
 import com.github.ajalt.timberkt.Timber
 import com.ubadahj.qidianundergroud.databinding.MainActivityBinding
 import com.ubadahj.qidianundergroud.repositories.BookRepository
-import com.ubadahj.qidianundergroud.repositories.ChapterGroupRepository
+import com.ubadahj.qidianundergroud.repositories.GroupRepository
 import com.ubadahj.qidianundergroud.services.NotificationWorker
 import com.ubadahj.qidianundergroud.services.updater.service.UpdateService
 import com.ubadahj.qidianundergroud.ui.main.MainViewModel
@@ -39,7 +39,7 @@ class MainActivity : AppCompatActivity() {
     lateinit var bookRepo: BookRepository
 
     @Inject
-    lateinit var groupRepo: ChapterGroupRepository
+    lateinit var groupRepo: GroupRepository
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)

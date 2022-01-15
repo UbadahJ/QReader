@@ -1,11 +1,11 @@
 package com.ubadahj.qidianundergroud
 
-import com.ubadahj.qidianundergroud.api.UndergroundApi
+import com.ubadahj.qidianundergroud.api.retrofit.UndergroundApi
 import kotlinx.coroutines.runBlocking
 import org.junit.Assert.assertFalse
 import org.junit.Test
 
-class UndergroundApiTests {
+class UndergroundUndergroundApiTests {
 
     @Test
     fun api_isWorking() {

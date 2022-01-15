@@ -1,4 +1,4 @@
-package com.ubadahj.qidianundergroud.api.models.undeground
+package com.ubadahj.qidianundergroud.api.models.underground
 
 import android.os.Parcelable
 import com.squareup.moshi.Json
@@ -11,7 +11,7 @@ import java.time.format.DateTimeFormatter
 
 @Parcelize
 @JsonClass(generateAdapter = true)
-data class BookJson(
+data class UndergroundBook(
     @Json(name = "ID") val id: String,
     @Json(name = "Name") val name: String,
     @Json(name = "LastUpdated") val _lastUpdated: Int,

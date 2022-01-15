@@ -9,7 +9,7 @@ import coil.load
 import coil.transform.RoundedCornersTransformation
 import com.ubadahj.qidianundergroud.databinding.LibraryBookItemBinding
 import com.ubadahj.qidianundergroud.models.Book
-import com.ubadahj.qidianundergroud.models.ChapterGroup
+import com.ubadahj.qidianundergroud.models.Group
 import com.ubadahj.qidianundergroud.models.Metadata
 import com.ubadahj.qidianundergroud.utils.models.isRead
 import com.ubadahj.qidianundergroud.utils.ui.toDp
@@ -17,7 +17,7 @@ import com.ubadahj.qidianundergroud.utils.ui.visible
 
 class LibraryAdapter(
     books: List<Book>,
-    private val groupSupplier: suspend (Book) -> List<ChapterGroup>,
+    private val groupSupplier: suspend (Book) -> List<Group>,
     private val metadataSupplier: suspend (Book) -> Metadata?,
     private val lifecycleScope: LifecycleCoroutineScope,
     private val onClick: (Book) -> Unit

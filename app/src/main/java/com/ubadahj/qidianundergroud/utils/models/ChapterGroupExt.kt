@@ -1,24 +1,24 @@
 package com.ubadahj.qidianundergroud.utils.models
 
-import com.ubadahj.qidianundergroud.models.ChapterGroup
+import com.ubadahj.qidianundergroud.models.Group
 import java.util.*
 
-val ChapterGroup.firstChapter: Int
+val Group.firstChapter: Int
     get() = text.split("-").first().trim().toInt()
 
-val ChapterGroup.lastChapter: Int
+val Group.lastChapter: Int
     get() = text.split("-").last().trim().toInt()
 
-val ChapterGroup.total: Int
+val Group.total: Int
     get() = lastChapter - firstChapter + 1
 
-fun ChapterGroup.isRead() = lastRead == lastChapter
+fun Group.isRead() = lastRead == lastChapter
 
 
-val ChapterGroup.source: String
+val Group.source: String
     get() {
         val source = link.replace(Regex(".+//|www.|\\..+"), "").capitalize(Locale.ROOT)
         return if ("book/" in source) "WebNovel" else source
     }
 
-operator fun ChapterGroup.contains(chapter: Int): Boolean = chapter in firstChapter..lastChapter
+operator fun Group.contains(chapter: Int): Boolean = chapter in firstChapter..lastChapter

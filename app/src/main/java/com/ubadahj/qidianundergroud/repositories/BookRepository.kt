@@ -6,8 +6,8 @@ import com.squareup.sqldelight.runtime.coroutines.asFlow
 import com.squareup.sqldelight.runtime.coroutines.mapToList
 import com.squareup.sqldelight.runtime.coroutines.mapToOne
 import com.ubadahj.qidianundergroud.Database
-import com.ubadahj.qidianundergroud.api.Api
-import com.ubadahj.qidianundergroud.api.models.undeground.BookJson
+import com.ubadahj.qidianundergroud.api.UndergroundApi
+import com.ubadahj.qidianundergroud.api.models.underground.UndergroundBook
 import com.ubadahj.qidianundergroud.models.Book
 import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.Dispatchers
@@ -22,8 +22,8 @@ import javax.inject.Singleton
 class BookRepository @Inject constructor(
     @ApplicationContext val context: Context,
     private val database: Database,
-    private val api: Api,
-    private val chapterRepo: ChapterRepository
+    private val undergroundApi: UndergroundApi,
+    private val contentRepo: ContentRepository
 ) {
 
     fun getBookById(id: String) = database.bookQueries.getById(id).asFlow().mapToOne()
@@ -33,7 +33,7 @@ class BookRepository @Inject constructor(
         val dbBookIds = dbBooks.map { it.id }
 
         if (refresh || dbBooks.isEmpty()) {
-            val books = api.getBooks().map { it.toBook() }
+            val books = undergroundApi.getBooks().map { it.toBook() }
             val bookIds = books.map { it.id }
 
             val (toUpdate, notAvailable) = dbBooks.partition { it.id in bookIds }
@@ -81,7 +81,7 @@ class BookRepository @Inject constructor(
             var success = false
             while (!success || retries < 0) {
                 try {
-                    chapterRepo.getChaptersContent(factory, group).first()
+                    contentRepo.getContents(factory, group).first()
                     success = true
                 } catch (e: Exception) {
                     if (--retries < 0) throw e
@@ -91,7 +91,7 @@ class BookRepository @Inject constructor(
         }
     }
 
-    private fun BookJson.toBook() = Book(
+    private fun UndergroundBook.toBook() = Book(
         id = id,
         name = name,
         lastUpdated = lastUpdated,

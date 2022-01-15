@@ -7,42 +7,42 @@ import androidx.recyclerview.widget.RecyclerView
 import androidx.viewbinding.ViewBinding
 import com.ubadahj.qidianundergroud.databinding.ChapterBodyItemBinding
 import com.ubadahj.qidianundergroud.databinding.ChapterTitleItemBinding
-import com.ubadahj.qidianundergroud.models.Chapter
+import com.ubadahj.qidianundergroud.models.Content
 import com.ubadahj.qidianundergroud.utils.ui.inflater
 import com.ubadahj.qidianundergroud.utils.ui.visible
 
 
-enum class ChapterViewHolderType {
+enum class ContentViewHolderType {
     TITLE, CONTENTS;
 
     companion object {
-        fun from(viewType: Int): ChapterViewHolderType =
+        fun from(viewType: Int): ContentViewHolderType =
             values().associateBy { it.ordinal }[viewType]
                 ?: throw IllegalArgumentException("Invalid view type $viewType")
     }
 }
 
-abstract class ChapterViewHolder(
+abstract class ContentViewHolder(
     binding: ViewBinding
 ) : RecyclerView.ViewHolder(binding.root) {
-    abstract fun bind(item: Chapter, scaleFactor: Float)
+    abstract fun bind(item: Content, scaleFactor: Float)
 }
 
 object ChapterViewHolderFactory {
 
-    fun get(parent: ViewGroup, type: ChapterViewHolderType) = when (type) {
-        ChapterViewHolderType.TITLE -> ChapterTitleViewHolder(
+    fun get(parent: ViewGroup, type: ContentViewHolderType) = when (type) {
+        ContentViewHolderType.TITLE -> ContentTitleViewHolder(
             ChapterTitleItemBinding.inflate(parent.inflater, parent, false)
         )
-        ChapterViewHolderType.CONTENTS -> ChapterContentsViewHolder(
+        ContentViewHolderType.CONTENTS -> ContentContentsViewHolder(
             ChapterBodyItemBinding.inflate(parent.inflater, parent, false)
         )
     }
 
-    private class ChapterTitleViewHolder(
+    private class ContentTitleViewHolder(
         private val binding: ChapterTitleItemBinding
-    ) : ChapterViewHolder(binding) {
-        override fun bind(item: Chapter, scaleFactor: Float) {
+    ) : ContentViewHolder(binding) {
+        override fun bind(item: Content, scaleFactor: Float) {
             val split = item.title.split(":")
             binding.headerChapterNumber.apply {
                 text = split.first()
@@ -54,10 +54,10 @@ object ChapterViewHolderFactory {
         }
     }
 
-    private class ChapterContentsViewHolder(
+    private class ContentContentsViewHolder(
         private val binding: ChapterBodyItemBinding
-    ) : ChapterViewHolder(binding) {
-        override fun bind(item: Chapter, scaleFactor: Float) {
+    ) : ContentViewHolder(binding) {
+        override fun bind(item: Content, scaleFactor: Float) {
             binding.contents.apply {
                 textSize = 16f * scaleFactor
                 setTextFuture(

@@ -1,41 +1,59 @@
 -- TABLE
 
-CREATE TABLE Chapter
+CREATE TABLE `Group`
 (
-    id         TEXT PRIMARY KEY NOT NULL,
-    groupLink  TEXT             NOT NULL,
-    title      TEXT             NOT NULL,
-    contents   TEXT             NOT NULL,
-    CONSTRAINT chapter_ibfk
-        FOREIGN KEY (groupLink)
-        REFERENCES ChapterGroup(link)
-        ON DELETE CASCADE
+    bookId   TEXT             NOT NULL,
+    text     TEXT             NOT NULL,
+    link     TEXT PRIMARY KEY NOT NULL,
+    lastRead INTEGER AS Int   NOT NULL DEFAULT 0,
+    CONSTRAINT chapter_group_ibfk
+        FOREIGN KEY (bookId)
+            REFERENCES Book (id)
+            ON DELETE CASCADE
 );
 
-CREATE INDEX group_link
-    ON Chapter(groupLink);
 
--- Queries
+CREATE INDEX book_id
+    ON `Group` (bookId);
 
-getByGroupLink:
+-- QUERIES
+get:
 SELECT *
-FROM Chapter
-WHERE groupLink = ?;
+FROM `Group`
+WHERE link = ?;
+
+getByBookId:
+SELECT *
+FROM `Group`
+WHERE bookId = ?
+ORDER BY CAST(TRIM(SUBSTR(text, 1, INSTR(text, '-') - 1)) AS INTEGER);
 
 insert:
-INSERT OR IGNORE INTO Chapter(id, groupLink, title, contents)
+INSERT OR IGNORE INTO `Group`(bookId, text, link, lastRead)
 VALUES ?;
 
 insertByValues:
-INSERT OR IGNORE INTO Chapter(id, groupLink, title, contents)
-VALUES (?, ?, ?, ?);
+INSERT OR IGNORE INTO `Group`(bookId, text, link)
+VALUES (?, ?, ?);
 
-deleteByTitle:
-DELETE
-FROM Chapter
-WHERE title = ?;
+update:
+UPDATE `Group`
+SET text = :updatedText,
+    link = :updatedLink
+WHERE
+    link = :link;
 
-deleteByGroupLink:
+deleteByLink:
 DELETE
-FROM Chapter
+FROM `Group`
+WHERE link = ?;
+
+updateLastRead:
+UPDATE `Group`
+SET lastRead = ?
+WHERE link = ?;
+
+contents:
+SELECT *
+FROM Content
 WHERE groupLink = ?;

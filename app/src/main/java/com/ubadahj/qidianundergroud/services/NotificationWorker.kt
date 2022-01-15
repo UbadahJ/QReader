@@ -13,10 +13,10 @@ import com.github.ajalt.timberkt.e
 import com.ubadahj.qidianundergroud.MainActivity
 import com.ubadahj.qidianundergroud.R
 import com.ubadahj.qidianundergroud.models.Book
-import com.ubadahj.qidianundergroud.models.ChapterGroup
+import com.ubadahj.qidianundergroud.models.Group
 import com.ubadahj.qidianundergroud.models.Metadata
 import com.ubadahj.qidianundergroud.repositories.BookRepository
-import com.ubadahj.qidianundergroud.repositories.ChapterGroupRepository
+import com.ubadahj.qidianundergroud.repositories.GroupRepository
 import com.ubadahj.qidianundergroud.repositories.MetadataRepository
 import com.ubadahj.qidianundergroud.utils.models.lastChapter
 import dagger.assisted.Assisted
@@ -34,7 +34,7 @@ class NotificationWorker @AssistedInject constructor(
     @Assisted context: Context,
     @Assisted params: WorkerParameters,
     private val bookRepo: BookRepository,
-    private val groupRepo: ChapterGroupRepository,
+    private val groupRepo: GroupRepository,
     private val metaRepo: MetadataRepository,
 ) : CoroutineWorker(context, params) {
 
@@ -77,7 +77,7 @@ class NotificationWorker @AssistedInject constructor(
         }
     }.flowOn(Dispatchers.IO)
 
-    private fun List<ChapterGroup>.lastChapter(): Int {
+    private fun List<Group>.lastChapter(): Int {
         return maxByOrNull { it.lastChapter }?.lastChapter ?: 0
     }
 
@@ -115,7 +115,7 @@ class NotificationWorker @AssistedInject constructor(
         val context: Context,
         val book: Book,
         val metadata: Metadata?,
-        val groups: List<ChapterGroup>,
+        val groups: List<Group>,
         val updateCount: Int
     ) {
 
@@ -139,7 +139,7 @@ class NotificationWorker @AssistedInject constructor(
                 .setGroup(groupKey)
                 .build()
 
-        private fun createIntent(group: ChapterGroup? = null) =
+        private fun createIntent(group: Group? = null) =
             PendingIntent.getActivity(
                 context,
                 hashCode() + group.hashCode(),

@@ -1,4 +1,4 @@
-package com.ubadahj.qidianundergroud.api.models.undeground
+package com.ubadahj.qidianundergroud.api.models.underground
 
 import android.os.Parcelable
 import com.squareup.moshi.Json
@@ -7,7 +7,7 @@ import kotlinx.parcelize.Parcelize
 
 @Parcelize
 @JsonClass(generateAdapter = true)
-data class ChapterGroupJson(
+data class UndergroundGroup(
     @Json(name = "Text") val text: String,
     @Json(name = "Href") val link: String
 ) : Parcelable

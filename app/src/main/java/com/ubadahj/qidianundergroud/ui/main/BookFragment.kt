@@ -23,7 +23,7 @@ import com.ubadahj.qidianundergroud.models.Book
 import com.ubadahj.qidianundergroud.models.Metadata
 import com.ubadahj.qidianundergroud.models.Resource
 import com.ubadahj.qidianundergroud.repositories.BookRepository
-import com.ubadahj.qidianundergroud.repositories.ChapterGroupRepository
+import com.ubadahj.qidianundergroud.repositories.GroupRepository
 import com.ubadahj.qidianundergroud.repositories.MetadataRepository
 import com.ubadahj.qidianundergroud.services.DownloadService
 import com.ubadahj.qidianundergroud.ui.adapters.GroupAdapter
@@ -50,7 +50,7 @@ class BookFragment : Fragment() {
     lateinit var bookRepo: BookRepository
 
     @Inject
-    lateinit var groupRepo: ChapterGroupRepository
+    lateinit var groupRepo: GroupRepository
 
     @Inject
     lateinit var metadataRepo: MetadataRepository

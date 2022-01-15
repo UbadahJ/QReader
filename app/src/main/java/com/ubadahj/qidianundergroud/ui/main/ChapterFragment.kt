@@ -12,18 +12,18 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.ubadahj.qidianundergroud.R
 import com.ubadahj.qidianundergroud.databinding.ChapterFragmentBinding
-import com.ubadahj.qidianundergroud.models.Chapter
-import com.ubadahj.qidianundergroud.models.ChapterGroup
+import com.ubadahj.qidianundergroud.models.Content
+import com.ubadahj.qidianundergroud.models.Group
 import com.ubadahj.qidianundergroud.models.Resource
 import com.ubadahj.qidianundergroud.preferences.ReaderPreferences
-import com.ubadahj.qidianundergroud.repositories.ChapterGroupRepository
-import com.ubadahj.qidianundergroud.ui.adapters.ChapterAdapter
+import com.ubadahj.qidianundergroud.repositories.GroupRepository
+import com.ubadahj.qidianundergroud.ui.adapters.ContentAdapter
 import com.ubadahj.qidianundergroud.ui.adapters.MenuAdapter
 import com.ubadahj.qidianundergroud.ui.adapters.decorations.HeaderItemDecoration
-import com.ubadahj.qidianundergroud.ui.adapters.factories.ChapterViewHolderType
+import com.ubadahj.qidianundergroud.ui.adapters.factories.ContentViewHolderType
 import com.ubadahj.qidianundergroud.ui.dialog.MenuDialog
 import com.ubadahj.qidianundergroud.ui.listeners.OnGestureListener
-import com.ubadahj.qidianundergroud.ui.models.ChapterUIItem
+import com.ubadahj.qidianundergroud.ui.models.ContentUIItem
 import com.ubadahj.qidianundergroud.ui.models.MenuDialogItem
 import com.ubadahj.qidianundergroud.utils.models.firstChapter
 import com.ubadahj.qidianundergroud.utils.models.lastChapter
@@ -43,10 +43,10 @@ class ChapterFragment : Fragment() {
     private var menu: MenuDialog = MenuDialog(
         MenuAdapter(listOf(MenuDialogItem("Loading", R.drawable.pulse)))
     )
-    private var adapter: ChapterAdapter = ChapterAdapter(listOf()) { 1f }
+    private var adapter: ContentAdapter = ContentAdapter(listOf()) { 1f }
 
     @Inject
-    lateinit var groupRepo: ChapterGroupRepository
+    lateinit var groupRepo: GroupRepository
 
     @Inject
     lateinit var preferences: ReaderPreferences
@@ -83,10 +83,10 @@ class ChapterFragment : Fragment() {
                 val firstPos =
                     (rc.layoutManager as LinearLayoutManager).findFirstVisibleItemPosition()
                 viewModel.selectedChapter.value = this@ChapterFragment.adapter.currentList
-                    .map { it.chapter }[firstPos]
+                    .map { it.content }[firstPos]
             }
             chapterRecyclerView.addItemDecoration(HeaderItemDecoration(chapterRecyclerView) {
-                adapter.getItemViewType(it) == ChapterViewHolderType.TITLE.ordinal
+                adapter.getItemViewType(it) == ContentViewHolderType.TITLE.ordinal
             })
             configureSwipeGestures()
             configurePreferencesFlow()
@@ -113,7 +113,7 @@ class ChapterFragment : Fragment() {
     }
 
     @SuppressLint("SetJavaScriptEnabled")
-    private fun init(chapters: ChapterGroup) {
+    private fun init(chapters: Group) {
         binding?.apply {
             errorGroup.errorButton.setOnClickListener { getChapterContents(chapters, true) }
         }
@@ -131,7 +131,7 @@ class ChapterFragment : Fragment() {
                 }
         }
 
-    private fun getChapterContents(group: ChapterGroup, refresh: Boolean = false) {
+    private fun getChapterContents(group: Group, refresh: Boolean = false) {
         viewModel
             .getChapterContents(group, refresh)
             .observe(
@@ -143,7 +143,7 @@ class ChapterFragment : Fragment() {
             )
     }
 
-    private fun ChapterFragmentBinding.updateUIIndicators(resource: Resource<List<Chapter>>) {
+    private fun ChapterFragmentBinding.updateUIIndicators(resource: Resource<List<Content>>) {
         when (resource) {
             is Resource.Error -> {
                 progressBar.visibility = View.GONE
@@ -188,7 +188,7 @@ class ChapterFragment : Fragment() {
             }
 
             private fun selectChapterGroup(
-                predicate: (current: ChapterGroup, other: ChapterGroup) -> Boolean
+                predicate: (current: Group, other: Group) -> Boolean
             ) {
                 val group = viewModel.selectedGroup.value
                 viewModel.selectedBook.value?.let { book ->
@@ -202,7 +202,7 @@ class ChapterFragment : Fragment() {
         })
     }
 
-    private fun updateRecyclerAdapter(resource: Resource<List<Chapter>>) {
+    private fun updateRecyclerAdapter(resource: Resource<List<Content>>) {
         val group = viewModel.selectedGroup.value
         val chapter = viewModel.selectedChapter.value
         val hasDataChanged = chapter == null ||
@@ -222,7 +222,7 @@ class ChapterFragment : Fragment() {
         }
     }
 
-    private fun updateMenu(items: List<Chapter>) {
+    private fun updateMenu(items: List<Content>) {
         menu.adapter.submitList(
             items.mapIndexed { i, it ->
                 MenuDialogItem(it.title) {
@@ -235,7 +235,7 @@ class ChapterFragment : Fragment() {
         )
     }
 
-    private fun Chapter.getIndex(): Int {
+    private fun Content.getIndex(): Int {
         return try {
             title.split(':').first().trim().split(" ").last().toInt()
         } catch (e: NoSuchElementException) {
@@ -245,9 +245,9 @@ class ChapterFragment : Fragment() {
         }
     }
 
-    private fun List<Chapter>.toUIModel(): List<ChapterUIItem> = flatMap {
+    private fun List<Content>.toUIModel(): List<ContentUIItem> = flatMap {
         listOf(
-            ChapterUIItem.ChapterUITitleItem(it), ChapterUIItem.ChapterUIContentItem(it)
+            ContentUIItem.ContentUITitleItem(it), ContentUIItem.ContentUIContentItem(it)
         )
     }
 }
