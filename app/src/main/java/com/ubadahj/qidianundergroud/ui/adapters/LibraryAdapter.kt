@@ -8,6 +8,7 @@ import coil.load
 import coil.transform.RoundedCornersTransformation
 import com.ubadahj.qidianundergroud.databinding.LibraryBookItemBinding
 import com.ubadahj.qidianundergroud.models.Book
+import com.ubadahj.qidianundergroud.ui.adapters.generic.FilterableListAdapter
 import com.ubadahj.qidianundergroud.utils.ui.toDp
 import com.ubadahj.qidianundergroud.utils.ui.visible
 

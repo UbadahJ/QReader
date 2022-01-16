@@ -1,4 +1,4 @@
-package com.ubadahj.qidianundergroud.ui.adapters
+package com.ubadahj.qidianundergroud.ui.adapters.generic
 
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.RecyclerView

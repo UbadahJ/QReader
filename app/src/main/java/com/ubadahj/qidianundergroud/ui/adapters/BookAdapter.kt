@@ -6,6 +6,7 @@ import com.ubadahj.qidianundergroud.models.Book
 import com.ubadahj.qidianundergroud.ui.adapters.factories.BookViewHolder
 import com.ubadahj.qidianundergroud.ui.adapters.factories.BookViewHolderFactory
 import com.ubadahj.qidianundergroud.ui.adapters.factories.BookViewHolderType
+import com.ubadahj.qidianundergroud.ui.adapters.generic.SortableListAdapter
 
 class BookAdapter(
     books: List<Book>,

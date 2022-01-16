@@ -9,6 +9,7 @@ import androidx.recyclerview.widget.RecyclerView
 import com.ubadahj.qidianundergroud.R
 import com.ubadahj.qidianundergroud.databinding.GroupItemBinding
 import com.ubadahj.qidianundergroud.models.Group
+import com.ubadahj.qidianundergroud.ui.adapters.generic.FilterableListAdapter
 import com.ubadahj.qidianundergroud.utils.models.contains
 import com.ubadahj.qidianundergroud.utils.models.isRead
 import com.ubadahj.qidianundergroud.utils.models.source

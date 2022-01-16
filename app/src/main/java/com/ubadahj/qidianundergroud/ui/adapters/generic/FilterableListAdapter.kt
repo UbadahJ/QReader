@@ -1,4 +1,4 @@
-package com.ubadahj.qidianundergroud.ui.adapters
+package com.ubadahj.qidianundergroud.ui.adapters.generic
 
 import android.widget.Filter
 import android.widget.Filterable
