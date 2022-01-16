@@ -10,8 +10,9 @@ import com.ubadahj.qidianundergroud.ui.adapters.factories.BookViewHolderType
 class BookAdapter(
     books: List<Book>,
     private val onClick: (Book) -> Unit
-) : FilterableListAdapter<Book, BookViewHolder>(DiffCallback()) {
+) : SortableListAdapter<Book, BookViewHolder>(DiffCallback()) {
 
+    override var sortedBy: (Book) -> Comparable<*>? = Book::name
     override val filterPredicate: (List<Book>, String) -> List<Book> =
         { list, constraint -> list.filter { it.name.contains(constraint, true) } }
 
@@ -38,17 +39,6 @@ class BookAdapter(
     override fun onBindViewHolder(holder: BookViewHolder, position: Int) {
         holder.bind(getItem(position))
     }
-
-    fun <R : Comparable<R>> sortBy(
-        bubbleText: R?.() -> String? = { this?.toString()?.first()?.uppercase() },
-        predicate: (Book) -> R?
-    ) {
-        if (currentList.isEmpty()) return
-        submitList(currentList.sortedBy(predicate))
-        this.bubbleText = { predicate(it).bubbleText() ?: "Unspecified" }
-    }
-
-    fun reverse() = submitList(currentList.reversed())
 
     class DiffCallback : DiffUtil.ItemCallback<Book>() {
         override fun areItemsTheSame(

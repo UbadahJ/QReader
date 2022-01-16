@@ -5,7 +5,6 @@ import android.widget.Filterable
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
-import com.github.ajalt.timberkt.d
 import com.l4digital.fastscroll.FastScroller
 
 abstract class FilterableListAdapter<T, VH : RecyclerView.ViewHolder>(
@@ -39,7 +38,6 @@ abstract class FilterableListAdapter<T, VH : RecyclerView.ViewHolder>(
     }
 
     override fun submitList(list: List<T>?) {
-        d { "listSize: ${list?.size}" }
         submitList(list, false)
     }
 

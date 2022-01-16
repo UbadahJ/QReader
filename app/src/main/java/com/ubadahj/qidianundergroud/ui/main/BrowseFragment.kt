@@ -3,7 +3,6 @@ package com.ubadahj.qidianundergroud.ui.main
 import android.os.Bundle
 import android.text.Editable
 import android.view.*
-import android.widget.AdapterView
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.widget.addTextChangedListener
 import androidx.fragment.app.Fragment
@@ -15,7 +14,6 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.work.ExistingWorkPolicy
 import androidx.work.OneTimeWorkRequestBuilder
 import androidx.work.WorkManager
-import com.github.ajalt.timberkt.d
 import com.ubadahj.qidianundergroud.R
 import com.ubadahj.qidianundergroud.databinding.BookListFragmentBinding
 import com.ubadahj.qidianundergroud.models.Book
@@ -25,6 +23,7 @@ import com.ubadahj.qidianundergroud.ui.adapters.BookAdapter
 import com.ubadahj.qidianundergroud.ui.adapters.MenuAdapter
 import com.ubadahj.qidianundergroud.ui.dialog.MenuDialog
 import com.ubadahj.qidianundergroud.ui.models.MenuDialogItem
+import com.ubadahj.qidianundergroud.utils.ui.onItemSelectedListener
 import com.ubadahj.qidianundergroud.utils.ui.snackBar
 import com.ubadahj.qidianundergroud.utils.ui.visible
 import dagger.hilt.android.AndroidEntryPoint
@@ -80,32 +79,28 @@ class BrowseFragment : Fragment() {
         binding?.apply {
             (requireActivity() as AppCompatActivity).setSupportActionBar(toolbar.appbar)
             toolbar.appbar.title = resources.getText(R.string.browse)
+
             bookListingView.layoutManager = LinearLayoutManager(requireContext())
             bookListingView.adapter = adapter
+
             searchBar.searchEditText.addTextChangedListener { text: Editable? ->
-                adapter.filter.filter((text))
+                adapter.filter.filter(text)
             }
-            sortBySpinner.onItemSelectedListener = object : AdapterView.OnItemSelectedListener {
-                override fun onItemSelected(
-                    parent: AdapterView<*>?,
-                    view: View?,
-                    position: Int,
-                    id: Long
-                ) {
-                    adapter.sortBy { it.name }
-                    when (position) {
-                        1 -> adapter.sortBy { it.author }
-                        2 -> adapter.sortBy({ toString() }) { it.rating }
-                        3 -> adapter.sortBy { it.lastUpdated }
-                        4 -> adapter.sortBy { it.completed }
-                    }
+
+            sortBySpinner.onItemSelectedListener { position ->
+                val sortBy = when (position) {
+                    1 -> Book::author
+                    2 -> Book::rating
+                    3 -> Book::lastRead
+                    4 -> Book::completed
+                    else -> Book::name
                 }
 
-                override fun onNothingSelected(parent: AdapterView<*>?) {
-                }
+                adapter.sortBy(sortBy, descendingSwitch.isChecked)
             }
+
             descendingSwitch.isUseMaterialThemeColors = true
-            descendingSwitch.setOnClickListener { adapter.reverse() }
+            descendingSwitch.setOnClickListener { adapter.sortBy(reverse = true) }
         }
 
         lifecycleScope.launch {
@@ -122,7 +117,6 @@ class BrowseFragment : Fragment() {
     ) {
         when (resource) {
             is Resource.Success -> {
-                d { "getBooks: ${resource.data.size}" }
                 binding?.apply {
                     progressBar.visible = false
                     if (isRefresh) {
@@ -134,23 +128,7 @@ class BrowseFragment : Fragment() {
                     }
                 }
 
-                binding?.apply {
-                    adapter.submitList(
-                        resource.data.run {
-                            val list = when (sortBySpinner.selectedItemPosition) {
-                                1 -> sortedBy { it.author }
-                                2 -> sortedBy { it.rating }
-                                3 -> sortedBy { it.lastUpdated }
-                                4 -> sortedBy { it.completed }
-                                else -> sortedBy { it.name }
-                            }
-
-                            d { "getBooks: list => ${list.size}" }
-                            if (descendingSwitch.isChecked) list.reversed()
-                            else list
-                        }
-                    )
-                } ?: adapter.submitList(resource.data)
+                adapter.submitList(resource.data)
             }
             Resource.Loading -> binding?.progressBar?.visible = true
             is Resource.Error -> {

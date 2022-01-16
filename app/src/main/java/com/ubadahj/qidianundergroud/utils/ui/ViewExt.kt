@@ -5,6 +5,8 @@ import android.util.TypedValue
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.AdapterView
+import android.widget.Spinner
 import androidx.annotation.StringRes
 import androidx.recyclerview.widget.RecyclerView
 import com.google.android.material.snackbar.Snackbar
@@ -16,6 +18,24 @@ fun RecyclerView.addOnScrollStateListener(listener: (RecyclerView, Int) -> Unit)
             listener(recyclerView, newState)
         }
     })
+}
+
+fun Spinner.onItemSelectedListener(onChange: (position: Int) -> Unit) {
+    onItemSelectedListener = object : AdapterView.OnItemSelectedListener {
+        private var init = false
+        override fun onItemSelected(
+            parent: AdapterView<*>?,
+            view: View?,
+            position: Int,
+            id: Long
+        ) {
+            if (init) onChange(position)
+            else init = true
+        }
+
+        override fun onNothingSelected(parent: AdapterView<*>?) {
+        }
+    }
 }
 
 var View.visible: Boolean
