@@ -13,20 +13,17 @@ CREATE TABLE BaseGroup
 );
 
 CREATE VIEW `Group` AS
-SELECT
-    bookId,
-    text,
-    (CAST(
-        TRIM(SUBSTR(text, 1, INSTR(text, '-') - 1)) AS INTEGER
-    )) firstChapter,
-    (CAST(
-        CASE TRIM(SUBSTR(text, INSTR(text, '-')))
-            WHEN '' THEN TRIM(SUBSTR(text, 1, INSTR(text, '-') - 1))
-            ELSE TRIM(SUBSTR(text, INSTR(text, '-') + 1))
-            END AS INTEGER
-    )) lastChapter,
-   link,
-   lastRead
+SELECT bookId,
+       text,
+       CAST(
+           CASE TRIM(SUBSTR(text, 1, INSTR(text, '-') - 1))
+               WHEN '' THEN TRIM(SUBSTR(text, INSTR(text, '-') + 1))
+               ELSE TRIM(SUBSTR(text, 1, INSTR(text, '-') - 1))
+               END AS INTEGER
+       ) firstChapter,
+       CAST(TRIM(SUBSTR(text, INSTR(text, '-') + 1)) AS INTEGER) lastChapter,
+       link,
+       lastRead
 FROM BaseGroup;
 
 -- QUERIES
