@@ -52,7 +52,7 @@ object BookViewHolderFactory {
     ) : BookViewHolder(binding, onClick) {
         override fun bind(item: Book) {
             binding.bookTitle.text = item.name
-            binding.completedText.visible = false
+            binding.completedText.visible = item.completed
         }
     }
 
