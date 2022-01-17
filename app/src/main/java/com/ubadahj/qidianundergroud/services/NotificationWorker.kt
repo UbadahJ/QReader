@@ -55,8 +55,7 @@ class NotificationWorker @AssistedInject constructor(
     }
 
     private fun getNotifications() = flow {
-        val books = bookRepo.getUndergroundBooks(true).first()
-            .filter { it.inLibrary }
+        val books = bookRepo.getLibraryBooks().first()
             .associateWith { metaRepo.getBook(it).first() }
 
         progressNotification(books) { book, metadata ->
