@@ -7,7 +7,6 @@ import com.ubadahj.qidianundergroud.api.retrofit.IWebNovelApi
 import com.ubadahj.qidianundergroud.models.Book
 import com.ubadahj.qidianundergroud.models.Content
 import com.ubadahj.qidianundergroud.models.Group
-import com.ubadahj.qidianundergroud.models.Metadata
 import com.ubadahj.qidianundergroud.utils.md5
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
@@ -38,18 +37,25 @@ class WebNovelApi @Inject constructor(
             ?: return null
 
         val bookPage = webNovelApi.getBook(searchResult.name, searchResult.id)
-        return bookPage.body()?.parseBookPage(searchResult)
+        return bookPage.body()?.parseBookPage(searchResult.link)
     }
 
-    suspend fun getChapter(bookMeta: Metadata): List<WNChapterRemote>? {
-        return webNovelApi.getChaptersLinks(getToken(), bookMeta.id).body()
+    suspend fun getBook(link: String): WNBookRemote? {
+        val (name, id) = link.substringAfterLast("/").split("_")
+        val bookPage = webNovelApi.getBook(name, id)
+
+        return bookPage.body()?.parseBookPage("/book/${name}_${id}")
+    }
+
+    suspend fun getChapter(id: String, link: String): List<WNChapterRemote>? {
+        return webNovelApi.getChaptersLinks(getToken(), id).body()
             ?.data
             ?.volumeItems
             ?.flatMap { it.chapterItems }
             ?.map {
                 WNChapterRemote(
                     it.name,
-                    "${bookMeta.link}/${it.name}_${it.id}".replace("?", ""),
+                    "${link}/${it.name}_${it.id}".replace("?", ""),
                     it.index,
                     it.isVip != 0
                 )
@@ -137,9 +143,15 @@ class WebNovelApi @Inject constructor(
             ""
         }
 
-    private fun ResponseBody.parseBookPage(searchResult: WNSearchResultRemote): WNBookRemote {
+    private fun ResponseBody.parseBookPage(link: String): WNBookRemote {
         val document = Jsoup.parse(string())
         val infoElement = document.getElementsByClass("det-info").first()
+
+        val title = infoElement?.selectFirst("h2")
+            ?.also { it.selectFirst("small")?.remove() }
+            ?.text()
+
+        val rating = infoElement?.selectFirst("._score strong")?.text()?.toFloat() ?: 0.0f
 
         val author = infoElement?.selectFirst("address > p")
             ?.children()
@@ -149,7 +161,7 @@ class WebNovelApi @Inject constructor(
             ?: ""
 
         val coverLink = infoElement?.getElementsByTag("img")
-            ?.last { searchResult.name in it.attr("alt") }
+            ?.last { title.toString() in it.attr("alt") }
             ?.attr("src")
             ?.let { "https:$it" }
             ?: ""
@@ -165,10 +177,10 @@ class WebNovelApi @Inject constructor(
             ?: ""
 
         return WNBookRemote(
-            id = searchResult.id,
-            link = searchResult.link,
-            name = searchResult.name,
-            rating = searchResult.rating,
+            id = link.split("_").last(),
+            link = link,
+            name = title.toString(),
+            rating = rating,
             author = author,
             coverLink = coverLink,
             category = category,

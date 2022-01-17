@@ -1,5 +1,6 @@
 package com.ubadahj.qidianundergroud.ui.main
 
+import android.annotation.SuppressLint
 import android.os.Bundle
 import android.text.Editable
 import android.view.*
@@ -14,6 +15,9 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.work.ExistingWorkPolicy
 import androidx.work.OneTimeWorkRequestBuilder
 import androidx.work.WorkManager
+import com.afollestad.materialdialogs.MaterialDialog
+import com.afollestad.materialdialogs.input.input
+import com.github.ajalt.timberkt.e
 import com.ubadahj.qidianundergroud.R
 import com.ubadahj.qidianundergroud.databinding.BookListFragmentBinding
 import com.ubadahj.qidianundergroud.models.Book
@@ -34,6 +38,8 @@ import kotlinx.coroutines.launch
 class BrowseFragment : Fragment() {
 
     private val viewModel: MainViewModel by activityViewModels()
+
+    @SuppressLint("CheckResult")
     private val menu = MenuDialog(
         MenuAdapter(
             listOf(
@@ -50,6 +56,16 @@ class BrowseFragment : Fragment() {
                     WorkManager.getInstance(requireContext()).enqueueUniqueWork(
                         "index-service", ExistingWorkPolicy.KEEP, work
                     )
+                },
+                MenuDialogItem("Add from WebNovel link", R.drawable.add) {
+                    MaterialDialog(requireActivity()).show {
+                        message(text = "Enter a link")
+                        input { _, text ->
+                            openBookFromLink(text.toString())
+                        }
+                        positiveButton(text = "Show")
+                        negativeButton(text = "Cancel")
+                    }
                 }
             )
         )
@@ -157,6 +173,28 @@ class BrowseFragment : Fragment() {
                 true
             }
             else -> false
+        }
+    }
+
+    private fun openBookFromLink(link: String) {
+        lifecycleScope.launch {
+            viewModel.getWebNovelBook(link).flowWithLifecycle(lifecycle).collect { res ->
+                when (res) {
+                    Resource.Loading -> binding?.apply {
+                        root.snackBar("Loading...")
+                    }
+                    is Resource.Success -> {
+                        viewModel.selectedBook.value = res.data
+                        findNavController().navigate(
+                            BrowseFragmentDirections.actionBrowseFragmentToBookFragment()
+                        )
+                    }
+                    is Resource.Error -> binding?.apply {
+                        e(res.message)
+                        root.snackBar("Failed to open link: ${res.message}")
+                    }
+                }
+            }
         }
     }
 

@@ -7,6 +7,7 @@ import com.squareup.sqldelight.runtime.coroutines.mapToList
 import com.squareup.sqldelight.runtime.coroutines.mapToOne
 import com.ubadahj.qidianundergroud.Database
 import com.ubadahj.qidianundergroud.api.UndergroundApi
+import com.ubadahj.qidianundergroud.api.WebNovelApi
 import com.ubadahj.qidianundergroud.models.Book
 import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.Dispatchers
@@ -22,6 +23,7 @@ class BookRepository @Inject constructor(
     @ApplicationContext val context: Context,
     private val database: Database,
     private val undergroundApi: UndergroundApi,
+    private val webNovelApi: WebNovelApi,
     private val contentRepo: ContentRepository
 ) {
 
@@ -61,6 +63,31 @@ class BookRepository @Inject constructor(
         }
 
         return database.bookQueries.getAll().asFlow().mapToList()
+    }
+
+    suspend fun getWebNovelBook(link: String, refresh: Boolean = false): Flow<Book> {
+        val strippedLink = "/book/${link.trim('/').substringAfterLast("/")}"
+        val dbBook = database.bookQueries.getWebNovelByLink(strippedLink).executeAsOneOrNull()
+        if (dbBook == null || refresh) {
+            val book = webNovelApi.getBook(strippedLink)
+                ?: throw IllegalArgumentException("Invalid link: $strippedLink")
+
+            database.bookQueries.insertWebNovelBook(
+                book.id,
+                book.name,
+                book.link,
+                book.author,
+                book.coverLink,
+                book.category,
+                book.description,
+                book.rating,
+                false
+            )
+        }
+
+        return database.bookQueries.getById(
+            database.bookQueries.getWebNovelByLink(strippedLink).executeAsOne().bookId
+        ).asFlow().mapToOne()
     }
 
     fun getLibraryBooks() = database.bookQueries.getAllLibraryBooks().asFlow().mapToList()

@@ -3,7 +3,6 @@ package com.ubadahj.qidianundergroud.ui.main
 import android.annotation.SuppressLint
 import android.webkit.WebView
 import androidx.lifecycle.ViewModel
-import com.github.ajalt.timberkt.Timber.d
 import com.github.ajalt.timberkt.Timber.e
 import com.ubadahj.qidianundergroud.models.Book
 import com.ubadahj.qidianundergroud.models.Content
@@ -48,7 +47,20 @@ class MainViewModel @Inject constructor(
             emitAll(
                 bookRepo.getUndergroundBooks(refresh)
                     .catch { Resource.Error(it) }
-                    .map { books -> Resource.Success(books.also { d { "getBooks: ${it.size}" } }) }
+                    .map { books -> Resource.Success(books) }
+            )
+        } catch (e: Exception) {
+            emit(Resource.Error(e))
+        }
+    }
+
+    fun getWebNovelBook(link: String, refresh: Boolean = false) = flow {
+        emit(Resource.Loading)
+        try {
+            emitAll(
+                bookRepo.getWebNovelBook(link, refresh)
+                    .catch { Resource.Error(it) }
+                    .map { book -> Resource.Success(book) }
             )
         } catch (e: Exception) {
             emit(Resource.Error(e))

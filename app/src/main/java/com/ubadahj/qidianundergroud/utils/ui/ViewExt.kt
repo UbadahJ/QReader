@@ -54,8 +54,12 @@ fun Number.toDp(context: Context): Number =
         context.resources.displayMetrics
     )
 
-fun View.snackBar(text: String, length: Int = Snackbar.LENGTH_SHORT) =
+fun View.snackBar(text: String, length: Int = Snackbar.LENGTH_SHORT) = try {
     Snackbar.make(this, text, length).show()
+} catch (e: Exception) {
+}
 
-fun View.snackBar(@StringRes text: Int, length: Int = Snackbar.LENGTH_SHORT) =
+fun View.snackBar(@StringRes text: Int, length: Int = Snackbar.LENGTH_SHORT) = try {
     Snackbar.make(this, text, length).show()
+} catch (e: Exception) {
+}

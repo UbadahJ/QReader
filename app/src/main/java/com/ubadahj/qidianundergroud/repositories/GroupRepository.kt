@@ -59,6 +59,40 @@ class GroupRepository @Inject constructor(
         webNovelRefresh: Boolean = false
     ): Flow<List<Group>> {
         val dbGroups = database.bookQueries.chapters(book.id).executeAsList()
+        if (database.bookQueries.getUndergroundById(book.id).executeAsOneOrNull() == null)
+            fetchWebNovelGroups(book, refresh || webNovelRefresh, dbGroups)
+        else
+            fetchUndergroundGroups(book, refresh, webNovelRefresh, dbGroups)
+
+        return database.bookQueries.chapters(book.id).asFlow().mapToList()
+    }
+
+    private suspend fun fetchWebNovelGroups(
+        book: Book,
+        refresh: Boolean,
+        dbGroups: List<Group>
+    ) {
+        if (refresh || dbGroups.isEmpty()) {
+            val remoteWebNovelChapters =
+                database.bookQueries.getWebNovelById(book.id).executeAsOne()
+                    .let { webNovelApi.getChapter(it.id, it.link) }
+                    ?.filter { !it.premium }
+                    ?.map { it.toGroup(book) }
+                    ?: listOf()
+
+            database.groupQueries.transaction {
+                for (chapter in remoteWebNovelChapters)
+                    database.groupQueries.insert(chapter)
+            }
+        }
+    }
+
+    private suspend fun fetchUndergroundGroups(
+        book: Book,
+        refresh: Boolean,
+        webNovelRefresh: Boolean,
+        dbGroups: List<Group>
+    ) {
         if (refresh || dbGroups.isEmpty()) {
             val dbBook = database.bookQueries.getUndergroundById(book.id).executeAsOne()
             val remoteGroups = undergroundApi
@@ -91,7 +125,7 @@ class GroupRepository @Inject constructor(
 
         if (webNovelRefresh || dbGroups.isEmpty()) {
             val remoteWebNovelChapters = metaRepo.getBook(book, refresh).first()
-                ?.let { webNovelApi.getChapter(it) }
+                ?.let { webNovelApi.getChapter(it.id, it.link) }
                 ?.filter { !it.premium }
                 ?.map { it.toGroup(book) }
                 ?: listOf()
@@ -101,8 +135,6 @@ class GroupRepository @Inject constructor(
                     database.groupQueries.insert(chapter)
             }
         }
-
-        return database.bookQueries.chapters(book.id).asFlow().mapToList()
     }
 
     private fun UndergroundGroup.toGroup(book: Book) = BaseGroup(book.id, text, link, 0)

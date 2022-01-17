@@ -129,10 +129,20 @@ SELECT *
 FROM UndergroundBookWithMeta
 WHERE id = ?;
 
+getUndergroundByUid:
+SELECT *
+FROM UndergroundBookWithMeta
+WHERE undergroundId = ?;
+
 getWebNovelById:
 SELECT *
 FROM WebNovelBook
-WHERE id = ?;
+WHERE bookId = ?;
+
+getWebNovelByLink:
+SELECT *
+FROM WebNovelBook
+WHERE link LIKE ?;
 
 getByName:
 SELECT *
