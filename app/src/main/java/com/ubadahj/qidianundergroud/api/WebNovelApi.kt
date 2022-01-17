@@ -151,7 +151,7 @@ class WebNovelApi @Inject constructor(
             ?.also { it.selectFirst("small")?.remove() }
             ?.text()
 
-        val rating = infoElement?.selectFirst("._score strong")?.text()?.toFloat() ?: 0.0f
+        val rating = infoElement?.selectFirst("._score strong")?.text()?.toFloatOrNull() ?: 0.0f
 
         val author = infoElement?.selectFirst("address > p")
             ?.children()
