@@ -6,7 +6,7 @@ CREATE TABLE BaseGroup
     text         TEXT             NOT NULL,
     link         TEXT PRIMARY KEY NOT NULL,
     lastRead     INTEGER AS Int   NOT NULL DEFAULT 0,
-    CONSTRAINT chapter_group_ibfk
+    CONSTRAINT book_ibfk
         FOREIGN KEY (bookId)
             REFERENCES BaseBook (id)
             ON DELETE CASCADE

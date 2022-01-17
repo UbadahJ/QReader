@@ -33,9 +33,9 @@ class MetadataRepository @Inject constructor(
                 if (meta != dbMeta) {
                     database.transaction {
                         database.metadataQueries.insert(meta)
-                        database.chapterQueries.getByBookId(meta.bookId).executeAsList()
+                        database.groupQueries.getByBookId(meta.bookId).executeAsList()
                             .filter { "book" in it.link }
-                            .forEach { database.chapterQueries.deleteByLink(it.link) }
+                            .forEach { database.groupQueries.deleteByLink(it.link) }
                     }
                 }
             }

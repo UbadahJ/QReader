@@ -6,7 +6,7 @@ CREATE TABLE Content
     groupLink  TEXT             NOT NULL,
     title      TEXT             NOT NULL,
     contents   TEXT             NOT NULL,
-    CONSTRAINT chapter_ibfk
+    CONSTRAINT group_ibfk
         FOREIGN KEY (groupLink)
         REFERENCES `Group`(link)
         ON DELETE CASCADE

@@ -27,7 +27,7 @@ class ContentRepository @Inject constructor(
         group: Group,
         refresh: Boolean = false
     ): Flow<List<Content>> {
-        val dbChapters = database.chapterQueries.contents(group.link).executeAsList()
+        val dbChapters = database.groupQueries.contents(group.link).executeAsList()
         if (refresh || dbChapters.isEmpty()) {
             when {
                 "vim" in group.link -> fetchDefaultChapters(webViewFactory, group)
@@ -36,7 +36,7 @@ class ContentRepository @Inject constructor(
             }
         }
 
-        return database.chapterQueries.contents(group.link).asFlow().mapToList()
+        return database.groupQueries.contents(group.link).asFlow().mapToList()
     }
 
     private suspend fun fetchWebNovelChapters(group: Group) {

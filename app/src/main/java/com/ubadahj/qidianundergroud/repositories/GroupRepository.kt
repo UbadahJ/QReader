@@ -33,12 +33,12 @@ class GroupRepository @Inject constructor(
         .asFlow()
         .mapToOne()
 
-    fun getChaptersByBook(group: Group) = database.chapterQueries
+    fun getChaptersByBook(group: Group) = database.groupQueries
         .getByBookId(group.bookId)
         .asFlow()
         .mapToList()
 
-    fun getGroupByLink(link: String) = database.chapterQueries.get(link).asFlow().mapToOne()
+    fun getGroupByLink(link: String) = database.groupQueries.get(link).asFlow().mapToOne()
 
     fun isDownloaded(group: Group): Boolean =
         database.contentQueries
@@ -47,10 +47,10 @@ class GroupRepository @Inject constructor(
             .size == group.total
 
     fun updateLastRead(group: Group, lastRead: Int) {
-        if (database.chapterQueries.get(group.link).executeAsOneOrNull() == null)
+        if (database.groupQueries.get(group.link).executeAsOneOrNull() == null)
             throw IllegalArgumentException("$this chapter group does not exists")
 
-        database.chapterQueries.updateLastRead(lastRead, group.link)
+        database.groupQueries.updateLastRead(lastRead, group.link)
     }
 
     suspend fun getGroups(
@@ -69,13 +69,13 @@ class GroupRepository @Inject constructor(
                 .filter { it.firstChapter.toInt() in remoteChapters.keys }
                 .filter { it.lastChapter.toInt() != remoteChapters[it.firstChapter.toInt()]?.lastChapter }
 
-            database.chapterQueries.transaction {
+            database.groupQueries.transaction {
                 for (group in dbGroupsToUpdate) {
                     val remoteGroup = remoteChapters[group.firstChapter.toInt()]!!
                     // We need to delete all the previous chapters to make sure foreign key
                     // doesn't fail
                     database.contentQueries.deleteByGroupLink(group.link)
-                    database.chapterQueries.update(
+                    database.groupQueries.update(
                         link = group.link,
                         updatedText = remoteGroup.text,
                         updatedLink = remoteGroup.link
@@ -84,7 +84,7 @@ class GroupRepository @Inject constructor(
 
                 // Due to INSERT OR IGNORE, we can ignore same entries
                 for (group in remoteGroups)
-                    database.chapterQueries.insert(group)
+                    database.groupQueries.insert(group)
             }
         }
 
@@ -95,9 +95,9 @@ class GroupRepository @Inject constructor(
                 ?.map { it.toGroup(book) }
                 ?: listOf()
 
-            database.chapterQueries.transaction {
+            database.groupQueries.transaction {
                 for (chapter in remoteWebNovelChapters)
-                    database.chapterQueries.insert(chapter)
+                    database.groupQueries.insert(chapter)
             }
         }
 
