@@ -136,6 +136,9 @@ class BrowseFragment : Fragment() {
                 }
 
                 adapter.submitList(resource.data)
+                binding?.searchBar?.searchEditText?.text?.apply {
+                    if (isNotEmpty()) adapter.filter.filter(this)
+                }
             }
             Resource.Loading -> binding?.progressBar?.visible = true
             is Resource.Error -> {
