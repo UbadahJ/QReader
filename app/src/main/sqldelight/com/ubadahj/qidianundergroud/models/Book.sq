@@ -129,6 +129,11 @@ SELECT *
 FROM UndergroundBookWithMeta
 WHERE id = ?;
 
+getUndergroundByName:
+SELECT *
+FROM UndergroundBookWithMeta
+WHERE name LIKE ?;
+
 getUndergroundByUid:
 SELECT *
 FROM UndergroundBookWithMeta
