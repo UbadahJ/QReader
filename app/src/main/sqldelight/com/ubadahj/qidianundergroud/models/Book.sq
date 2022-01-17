@@ -195,6 +195,6 @@ WHERE bookId = ?
 ORDER BY firstChapter;
 
 markAllRead:
-UPDATE `Group`
-SET lastRead = lastChapter
-WHERE bookId = ?;
+UPDATE BaseGroup
+SET lastRead = (SELECT lastChapter FROM `Group` WHERE bookId = :bookId AND text = BaseGroup.text)
+WHERE bookId = :bookId;
