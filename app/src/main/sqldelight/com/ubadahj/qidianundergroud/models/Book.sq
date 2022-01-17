@@ -89,7 +89,8 @@ FROM CommonBook
     JOIN (SELECT id AS bookId, inLibrary
             FROM BaseBook) bb ON bb.bookId = id
     LEFT JOIN (SELECT bookId, COUNT(*) AS totalGroups
-            FROM `Group` g) subG1 ON subG1.bookId = id
+            FROM `Group` g
+            GROUP BY bookId) subG1 ON subG1.bookId = id
     LEFT JOIN (SELECT bookId, COUNT(*) AS totalUnread
             FROM `Group` g
             WHERE g.lastRead != g.lastChapter
