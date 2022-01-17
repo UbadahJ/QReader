@@ -60,8 +60,9 @@ class GroupRepository @Inject constructor(
     ): Flow<List<Group>> {
         val dbGroups = database.bookQueries.chapters(book.id).executeAsList()
         if (refresh || dbGroups.isEmpty()) {
+            val dbBook = database.bookQueries.getUndergroundById(book.id).executeAsOne()
             val remoteGroups = undergroundApi
-                .getChapters(book.id)
+                .getChapters(dbBook.undergroundId)
                 .map { it.toGroup(book) }
 
             val remoteChapters = remoteGroups.associateBy { it.firstChapter }

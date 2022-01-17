@@ -4,17 +4,27 @@ import java.lang.Boolean;
 
 CREATE TABLE BaseBook
 (
+    id INTEGER AS Int PRIMARY KEY AUTOINCREMENT,
+    inLibrary INTEGER AS Boolean NOT NULL
+);
+
+CREATE TABLE UndergroundBook
+(
     id          TEXT               NOT NULL,
+    bookId      INTEGER AS Int            NOT NULL,
     name        TEXT               NOT NULL,
     lastUpdated TEXT               NOT NULL,
     completed   INTEGER AS Boolean NOT NULL,
-    inLibrary   INTEGER AS Boolean DEFAULT 0 NOT NULL,
-    isAvailable INTEGER AS Boolean DEFAULT 1 NOT NULL,
-    PRIMARY KEY (id)
+    isAvaliable INTEGER AS Boolean NOT NULL,
+    PRIMARY KEY (id),
+    CONSTRAINT ubook_ibfk
+        FOREIGN KEY (bookId) REFERENCES BaseBook(id)
+            ON DELETE CASCADE
 );
 
-CREATE VIEW Book AS
-SELECT b.id,
+CREATE VIEW UndergroundBookWithMeta AS
+SELECT b.bookId AS id,
+       b.id AS undergroundId,
        m.id AS novelId,
        b.name,
        b.lastUpdated,
@@ -24,28 +34,72 @@ SELECT b.id,
        m.coverPath,
        m.category,
        m.description,
-       m.rating,
-       b.isAvailable,
-       b.inLibrary,
-       subG1.totalGroups,
-       subG2.totalUnread,
-       subG3.lastRead,
-       m.enableNotification
-FROM BaseBook b
-         LEFT JOIN Metadata m ON b.id = m.bookId
-         LEFT JOIN (SELECT bookId, COUNT(*) AS totalGroups
-                    FROM `Group` g) subG1 ON subG1.bookId = b.id
-         LEFT JOIN (SELECT bookId, COUNT(*) AS totalUnread
-                    FROM `Group` g
-                    WHERE g.lastRead != g.lastChapter
-                    GROUP BY bookId) subG2 ON subG2.bookId = b.id
-         LEFT JOIN (SELECT bookId, lastRead
-                    FROM `Group` g
-                    WHERE g.lastRead != g.lastChapter
-                    GROUP BY bookId
-                    ORDER BY g.lastRead
-                    LIMIT 1) subG3 ON subG3.bookId = b.id;
+       m.rating
+FROM UndergroundBook b
+         LEFT JOIN Metadata m ON b.id = m.bookId;
 
+CREATE TABLE WebNovelBook
+(
+    id                 TEXT               NOT NULL,
+    bookId             INTEGER AS Int            NOT NULL,
+    name               TEXT               NOT NULL,
+    link               TEXT               NOT NULL,
+    author             TEXT               NOT NULL,
+    coverPath          TEXT               NOT NULL,
+    category           TEXT               NOT NULL,
+    description        TEXT               NOT NULL,
+    rating             REAL AS Float      NOT NULL,
+    completed          INTEGER AS Boolean NOT NULL,
+    PRIMARY KEY (id),
+    CONSTRAINT wbook_ibfk
+        FOREIGN KEY (bookId) REFERENCES BaseBook(id)
+            ON DELETE CASCADE
+);
+
+CREATE VIEW CommonBook AS
+SELECT id,
+       name,
+       link,
+       author,
+       coverPath,
+       category,
+       description,
+       rating,
+       completed
+FROM UndergroundBookWithMeta
+UNION
+SELECT bookId AS id,
+       name,
+       link,
+       author,
+       coverPath,
+       category,
+       description,
+       rating,
+       completed
+FROM WebNovelBook;
+
+CREATE VIEW Book AS
+SELECT CommonBook.*,
+    bb.inLibrary,
+    subG1.totalGroups,
+    subG2.totalUnread,
+    subG3.lastRead
+FROM CommonBook
+    JOIN (SELECT id AS bookId, inLibrary
+            FROM BaseBook) bb ON bb.bookId = id
+    LEFT JOIN (SELECT bookId, COUNT(*) AS totalGroups
+            FROM `Group` g) subG1 ON subG1.bookId = id
+    LEFT JOIN (SELECT bookId, COUNT(*) AS totalUnread
+            FROM `Group` g
+            WHERE g.lastRead != g.lastChapter
+            GROUP BY bookId) subG2 ON subG2.bookId = id
+    LEFT JOIN (SELECT bookId, lastRead
+            FROM `Group` g
+            WHERE g.lastRead != g.lastChapter
+            GROUP BY bookId
+            ORDER BY g.lastRead
+            LIMIT 1) subG3 ON subG3.bookId = id;
 
 -- QUERIES
 
@@ -53,14 +107,30 @@ getAll:
 SELECT *
 FROM Book;
 
+getAllUndergroundBooks:
+SELECT *
+FROM UndergroundBookWithMeta;
+
 getAllLibraryBooks:
 SELECT *
 FROM Book
-WHERE inLibrary = 1;
+WHERE id IN (
+    SELECT id FROM BaseBook WHERE inLibrary = 1
+);
 
 getById:
 SELECT *
 FROM Book
+WHERE id = ?;
+
+getUndergroundById:
+SELECT *
+FROM UndergroundBookWithMeta
+WHERE id = ?;
+
+getWebNovelById:
+SELECT *
+FROM WebNovelBook
 WHERE id = ?;
 
 getByName:
@@ -68,41 +138,33 @@ SELECT *
 FROM Book
 WHERE name LIKE ?;
 
-insert:
-INSERT OR IGNORE INTO BaseBook(id, name, lastUpdated, completed, inLibrary, isAvailable)
-VALUES ?;
+insertUndergroundBook {
+    INSERT INTO BaseBook(inLibrary) VALUES (0);
 
-insertByValues:
-INSERT INTO BaseBook(id, name, lastUpdated, completed)
-VALUES (? , ?, ?, ?);
+    INSERT INTO UndergroundBook(id, bookId, name, lastUpdated, completed, isAvaliable)
+    VALUES (? , (SELECT id FROM BaseBook ORDER BY id DESC LIMIT 1), ?, ?, ?, 0);
+}
 
-update:
-UPDATE BaseBook
+insertWebNovelBook {
+    INSERT INTO BaseBook(inLibrary) VALUES (0);
+
+    INSERT INTO WebNovelBook(id, bookId, name, link, author, coverPath, category, description, rating, completed)
+    VALUES (?, (SELECT id FROM BaseBook ORDER BY id DESC LIMIT 1), ?, ?, ?, ?, ?, ?, ?, ?);
+}
+
+setUndergroundBookAvaliability:
+UPDATE UndergroundBook
+SET isAvaliable = ?
+WHERE id = ?;
+
+updateUndergroundBook:
+UPDATE UndergroundBook
 SET name = ?, lastUpdated = ?, completed = ?
 WHERE id = ?;
 
-setAvailable:
-UPDATE BaseBook
-SET isAvailable = ?
-WHERE id = ?;
-
-overwrite:
-UPDATE BaseBook
-SET name = ?, lastUpdated = ?, completed = ?, inLibrary = ?, lastUpdated = ?
-WHERE id = ?;
-
-upsert {
-    UPDATE BaseBook
-    SET name = :name, lastUpdated = :lastUpdated, completed = :completed
-    WHERE id = :id;
-
-    INSERT OR IGNORE INTO BaseBook(id, name, lastUpdated, completed)
-    VALUES (:id, :name, :lastUpdated, :completed);
-}
-
 deleteById:
 DELETE
-FROM BaseBook
+FROM UndergroundBook
 WHERE id = ?;
 
 addToLibrary:

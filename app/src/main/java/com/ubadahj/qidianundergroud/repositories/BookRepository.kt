@@ -7,8 +7,6 @@ import com.squareup.sqldelight.runtime.coroutines.mapToList
 import com.squareup.sqldelight.runtime.coroutines.mapToOne
 import com.ubadahj.qidianundergroud.Database
 import com.ubadahj.qidianundergroud.api.UndergroundApi
-import com.ubadahj.qidianundergroud.api.models.underground.UndergroundBook
-import com.ubadahj.qidianundergroud.models.BaseBook
 import com.ubadahj.qidianundergroud.models.Book
 import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.Dispatchers
@@ -27,25 +25,38 @@ class BookRepository @Inject constructor(
     private val contentRepo: ContentRepository
 ) {
 
-    fun getBookById(id: String) = database.bookQueries.getById(id).asFlow().mapToOne()
+    fun getBookById(id: Int) = database.bookQueries.getById(id).asFlow().mapToOne()
 
-    suspend fun getBooks(refresh: Boolean = false): Flow<List<Book>> {
-        val dbBooks = database.bookQueries.getAll().executeAsList()
-        val dbBookIds = dbBooks.map { it.id }
+    suspend fun getUndergroundBooks(refresh: Boolean = false): Flow<List<Book>> {
+        val dbBooks = database.bookQueries.getAllUndergroundBooks().executeAsList()
+        val dbBookIds = dbBooks.map { it.undergroundId }
 
         if (refresh || dbBooks.isEmpty()) {
-            val books = undergroundApi.getBooks().map { it.toBook() }
+            val books = undergroundApi.getBooks()
             val bookIds = books.map { it.id }
 
-            val (toUpdate, notAvailable) = dbBooks.partition { it.id in bookIds }
+            val (toUpdate, notAvailable) = dbBooks.partition { it.undergroundId in bookIds }
             val toInsert = books.filter { it.id !in dbBookIds }
 
             database.bookQueries.transaction {
                 toUpdate.forEach {
-                    database.bookQueries.update(it.name, it.lastUpdated, it.completed, it.id)
+                    database.bookQueries.updateUndergroundBook(
+                        it.name, it.lastUpdated, it.completed, it.undergroundId
+                    )
                 }
-                notAvailable.forEach { database.bookQueries.setAvailable(false, it.id) }
-                toInsert.forEach { database.bookQueries.insert(it) }
+                notAvailable.forEach {
+                    database.bookQueries.setUndergroundBookAvaliability(
+                        false, it.undergroundId
+                    )
+                }
+                toInsert.forEach {
+                    database.bookQueries.insertUndergroundBook(
+                        it.id,
+                        it.name,
+                        it.lastUpdated,
+                        it.completed
+                    )
+                }
             }
         }
 
@@ -91,14 +102,5 @@ class BookRepository @Inject constructor(
             emit(group)
         }
     }
-
-    private fun UndergroundBook.toBook() = BaseBook(
-        id = id,
-        name = name,
-        lastUpdated = lastUpdated,
-        completed = completed,
-        inLibrary = false,
-        isAvailable = true
-    )
 
 }

@@ -8,7 +8,7 @@ CREATE TABLE Content
     contents   TEXT             NOT NULL,
     CONSTRAINT group_ibfk
         FOREIGN KEY (groupLink)
-        REFERENCES `Group`(link)
+        REFERENCES BaseGroup(link)
         ON DELETE CASCADE
 );
 

@@ -26,7 +26,7 @@ class BookAdapter(
     }
 
     override fun getItemViewType(position: Int): Int =
-        if (getItem(position).novelId != null) 1 else 0
+        if (getItem(position).author != null) 1 else 0
 
     override fun onCreateViewHolder(
         parent: ViewGroup,

@@ -2,7 +2,7 @@
 
 CREATE TABLE BaseGroup
 (
-    bookId       TEXT             NOT NULL,
+    bookId       INTEGER AS Int   NOT NULL,
     text         TEXT             NOT NULL,
     link         TEXT PRIMARY KEY NOT NULL,
     lastRead     INTEGER AS Int   NOT NULL DEFAULT 0,

@@ -50,7 +50,7 @@ class MainActivity : AppCompatActivity() {
             Timber.plant(Timber.DebugTree())
 
         lifecycleScope.launch {
-            val book = intent.extras?.getString("book")?.apply {
+            val book = intent.extras?.getInt("book")?.apply {
                 viewModel.selectedBook.value = bookRepo.getBookById(this).first()
                 viewModel.selectedChapter.value = null
             }

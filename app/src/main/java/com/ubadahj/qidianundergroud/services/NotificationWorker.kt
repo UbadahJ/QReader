@@ -55,7 +55,7 @@ class NotificationWorker @AssistedInject constructor(
     }
 
     private fun getNotifications() = flow {
-        val books = bookRepo.getBooks(true).first()
+        val books = bookRepo.getUndergroundBooks(true).first()
             .filter { it.inLibrary }
             .associateWith { metaRepo.getBook(it).first() }
 
@@ -123,7 +123,7 @@ class NotificationWorker @AssistedInject constructor(
 
         private val groupKey = "com.ubadahj.qidianunderground.CHAPTER_UPDATES"
 
-        val id: Int = book.id.toCharArray().sumOf { it.toInt() }
+        val id: Int = book.id
 
         suspend fun createNotification(): Notification =
             NotificationCompat.Builder(context, CHANNEL_ID)

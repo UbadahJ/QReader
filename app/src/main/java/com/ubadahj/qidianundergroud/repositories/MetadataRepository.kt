@@ -9,6 +9,7 @@ import com.ubadahj.qidianundergroud.api.WebNovelApi
 import com.ubadahj.qidianundergroud.api.models.webnovel.WNBookRemote
 import com.ubadahj.qidianundergroud.models.Book
 import com.ubadahj.qidianundergroud.models.Metadata
+import com.ubadahj.qidianundergroud.models.UndergroundBookWithMeta
 import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
@@ -27,13 +28,14 @@ class MetadataRepository @Inject constructor(
         database.metadataQueries.selectAll().asFlow().mapToList()
 
     suspend fun getBook(book: Book, refresh: Boolean = false): Flow<Metadata?> {
-        val dbMeta = database.metadataQueries.select(book.id).executeAsOneOrNull()
+        val dbBook = database.bookQueries.getUndergroundById(book.id).executeAsOne()
+        val dbMeta = database.metadataQueries.select(dbBook.undergroundId).executeAsOneOrNull()
         if (refresh || dbMeta == null) {
-            webNovelApi.getBook(book)?.toMetadata(book)?.also { meta ->
+            webNovelApi.getBook(book)?.toMetadata(dbBook)?.also { meta ->
                 if (meta != dbMeta) {
                     database.transaction {
                         database.metadataQueries.insert(meta)
-                        database.groupQueries.getByBookId(meta.bookId).executeAsList()
+                        database.groupQueries.getByBookId(book.id).executeAsList()
                             .filter { "book" in it.link }
                             .forEach { database.groupQueries.deleteByLink(it.link) }
                     }
@@ -41,14 +43,24 @@ class MetadataRepository @Inject constructor(
             }
         }
 
-        return database.metadataQueries.select(book.id).asFlow().mapToOneNotNull()
+        return database.metadataQueries.select(dbBook.undergroundId).asFlow().mapToOneNotNull()
     }
 
     suspend fun setNotifications(book: Book, enable: Boolean) = withContext(Dispatchers.IO) {
-        database.metadataQueries.updateNotify(enable, book.id)
+        // TODO: Rewrite implementation for notification dismiss
     }
 
-    private fun WNBookRemote.toMetadata(book: Book): Metadata =
-        Metadata(id, book.id, link, author, coverLink, category, description, rating, true)
+    private fun WNBookRemote.toMetadata(book: UndergroundBookWithMeta): Metadata =
+        Metadata(
+            id = id,
+            bookId = book.undergroundId,
+            link = link,
+            author = author,
+            coverPath = coverLink,
+            category = category,
+            description = description,
+            rating = rating,
+            enableNotification = true
+        )
 
 }

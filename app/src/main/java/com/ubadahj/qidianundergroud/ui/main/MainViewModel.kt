@@ -46,7 +46,7 @@ class MainViewModel @Inject constructor(
         emit(Resource.Loading)
         try {
             emitAll(
-                bookRepo.getBooks(refresh)
+                bookRepo.getUndergroundBooks(refresh)
                     .catch { Resource.Error(it) }
                     .map { books -> Resource.Success(books.also { d { "getBooks: ${it.size}" } }) }
             )

@@ -12,7 +12,7 @@ CREATE TABLE Metadata
     PRIMARY KEY (id),
     CONSTRAINT metadata_ibfk
         FOREIGN KEY (bookId)
-            REFERENCES BaseBook (id)
+            REFERENCES UndergroundBook (id)
             ON DELETE CASCADE
 );
 

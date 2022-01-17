@@ -87,7 +87,8 @@ class BookFragment : Fragment() {
             bookTitle.text = book.name
             bookImage.load(R.drawable.placeholder_600_800)
 
-            if (book.isAvailable || ignoreAvaliable) {
+            // TODO: Add availability check
+            if (true || ignoreAvaliable) {
                 configureLibraryButton(book)
                 configureDownloadButton(book)
                 configureMenuButton()
@@ -147,7 +148,7 @@ class BookFragment : Fragment() {
             val work = OneTimeWorkRequestBuilder<DownloadService>().apply {
                 setInputData(
                     Data.Builder().apply {
-                        putString("book_id", book.id)
+                        putInt("book_id", book.id)
                     }.build()
                 )
             }.build()
