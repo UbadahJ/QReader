@@ -72,6 +72,11 @@ class BookRepository @Inject constructor(
             val book = webNovelApi.getBook(strippedLink)
                 ?: throw IllegalArgumentException("Invalid link: $strippedLink")
 
+            val uBook = database.bookQueries.getByName(book.name).executeAsOneOrNull()
+            if (uBook != null) {
+                return database.bookQueries.getById(uBook.id).asFlow().mapToOne()
+            }
+
             database.bookQueries.insertWebNovelBook(
                 book.id,
                 book.name,
