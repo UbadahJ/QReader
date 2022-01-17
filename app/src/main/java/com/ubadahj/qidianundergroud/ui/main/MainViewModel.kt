@@ -3,6 +3,7 @@ package com.ubadahj.qidianundergroud.ui.main
 import android.annotation.SuppressLint
 import android.webkit.WebView
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
 import com.github.ajalt.timberkt.Timber.e
 import com.ubadahj.qidianundergroud.models.Book
 import com.ubadahj.qidianundergroud.models.Content
@@ -13,7 +14,9 @@ import com.ubadahj.qidianundergroud.repositories.ContentRepository
 import com.ubadahj.qidianundergroud.repositories.GroupRepository
 import com.ubadahj.qidianundergroud.repositories.MetadataRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.*
+import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 @HiltViewModel
@@ -24,7 +27,10 @@ class MainViewModel @Inject constructor(
     private val metadataRepo: MetadataRepository
 ) : ViewModel() {
 
-    val selectedBook: MutableStateFlow<Book?> = MutableStateFlow(null)
+    private var selectedBookJob: Job? = null
+    private val _selectedBook: MutableStateFlow<Book?> = MutableStateFlow(null)
+    val selectedBook: StateFlow<Book?> = _selectedBook
+
     val selectedGroup: MutableStateFlow<Group?> = MutableStateFlow(null)
     val selectedChapter: MutableStateFlow<Content?> = MutableStateFlow(null)
 
@@ -117,6 +123,15 @@ class MainViewModel @Inject constructor(
             e(e) { "Failed loading content" }
             emit(Resource.Error(e))
         }
+    }
+
+    fun setSelectedBook(book: Book) {
+        setSelectedBook(book.id)
+    }
+
+    fun setSelectedBook(id: Int) {
+        selectedBookJob?.cancel()
+        selectedBookJob = viewModelScope.launch { _selectedBook.emitAll(bookRepo.getBookById(id)) }
     }
 
 }

@@ -41,7 +41,7 @@ class LibraryFragment : Fragment() {
     private val adapter: LibraryAdapter = LibraryAdapter(
         listOf()
     ) {
-        viewModel.selectedBook.value = it
+        viewModel.setSelectedBook(it)
         findNavController().navigate(
             LibraryFragmentDirections.actionLibraryFragmentToBookFragment()
         )

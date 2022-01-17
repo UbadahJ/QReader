@@ -51,7 +51,7 @@ class MainActivity : AppCompatActivity() {
 
         lifecycleScope.launch {
             val book = intent.extras?.getInt("book")?.apply {
-                viewModel.selectedBook.value = bookRepo.getBookById(this).first()
+                viewModel.setSelectedBook(this)
                 viewModel.selectedChapter.value = null
             }
             val groups = intent.extras?.getString("group")?.apply {

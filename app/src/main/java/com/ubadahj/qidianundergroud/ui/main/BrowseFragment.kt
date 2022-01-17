@@ -31,6 +31,7 @@ import com.ubadahj.qidianundergroud.utils.ui.onItemSelectedListener
 import com.ubadahj.qidianundergroud.utils.ui.snackBar
 import com.ubadahj.qidianundergroud.utils.ui.visible
 import dagger.hilt.android.AndroidEntryPoint
+import kotlinx.coroutines.cancel
 import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.launch
 
@@ -73,7 +74,7 @@ class BrowseFragment : Fragment() {
 
     private var binding: BookListFragmentBinding? = null
     private val adapter: BookAdapter = BookAdapter(listOf()) {
-        viewModel.selectedBook.value = it
+        viewModel.setSelectedBook(it)
         findNavController().navigate(
             BrowseFragmentDirections.actionBrowseFragmentToBookFragment()
         )
@@ -184,10 +185,11 @@ class BrowseFragment : Fragment() {
                         root.snackBar("Loading...")
                     }
                     is Resource.Success -> {
-                        viewModel.selectedBook.value = res.data
+                        viewModel.setSelectedBook(res.data)
                         findNavController().navigate(
                             BrowseFragmentDirections.actionBrowseFragmentToBookFragment()
                         )
+                        cancel()
                     }
                     is Resource.Error -> binding?.apply {
                         e(res.message)

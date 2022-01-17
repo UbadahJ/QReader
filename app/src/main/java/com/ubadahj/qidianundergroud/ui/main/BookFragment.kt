@@ -21,7 +21,6 @@ import com.google.android.material.snackbar.Snackbar
 import com.ubadahj.qidianundergroud.R
 import com.ubadahj.qidianundergroud.databinding.BookFragmentBinding
 import com.ubadahj.qidianundergroud.models.Book
-import com.ubadahj.qidianundergroud.models.Metadata
 import com.ubadahj.qidianundergroud.models.Resource
 import com.ubadahj.qidianundergroud.repositories.BookRepository
 import com.ubadahj.qidianundergroud.repositories.GroupRepository
@@ -77,8 +76,6 @@ class BookFragment : Fragment() {
 
     override fun onResume() {
         super.onResume()
-        if (viewModel.selectedBook.value == null)
-            findNavController().popBackStack()
     }
 
     private fun init(book: Book, ignoreAvaliable: Boolean = false) {
@@ -105,14 +102,13 @@ class BookFragment : Fragment() {
                 }
             }
 
-            lifecycleScope.launch {
-                viewModel.getMetadata(book).flowWithLifecycle(lifecycle).collect {
-                    configureMetadata(it, book)
-                }
-            }
-        }
+            if (book.author == null)
+                loadGroups(book, true, true)
+            else
+                loadGroups(book)
 
-        loadGroups(book)
+            configureMetadata(book)
+        }
     }
 
     private fun BookFragmentBinding.configureLibraryButton(book: Book) {
@@ -133,10 +129,6 @@ class BookFragment : Fragment() {
                     bookRepo.addToLibrary(book)
                     root.snackBar("Added book to the library")
                 }
-
-                bookRepo
-                    .getBookById(book.id)
-                    .collect { viewModel.selectedBook.value = it }
             }
         }
     }
@@ -180,38 +172,19 @@ class BookFragment : Fragment() {
     }
 
     private fun BookFragmentBinding.configureMetadata(
-        it: Resource<Metadata?>,
         book: Book
     ) {
-        when (it) {
-            Resource.Loading -> {
-                metaProgress.visible = true
-                notificationDisabled.visible = false
-            }
-            is Resource.Success -> {
-                metaProgress.visible = false
-                it.data?.apply {
-                    bookImage.load(coverPath)
-                    bookAuthor.text = author
-                    bookDesc.text = description
-                    bookRatingBar.rating = rating
-                    bookRating.text = rating.toString()
-                    bookGenre.text = category
-                    bookGenre.visible = true
-                    notificationDisabled.visible = !enableNotification
-
-                    configureMenu(book, this)
-                }
-            }
-            is Resource.Error -> {
-                metaProgress.visible = false
-                notificationDisabled.visible = false
-                root.snackBar("Failed to load metadata")
-            }
-        }
+        book.coverPath?.let { bookImage.load(it) }
+        bookAuthor.text = book.author ?: "Unknown"
+        bookDesc.text = book.description ?: "No description"
+        bookRatingBar.rating = book.rating ?: 0.0f
+        bookRating.text = book.rating?.toString() ?: "0.0"
+        bookGenre.text = book.category ?: "Unknown"
+        bookGenre.visible = true
+        configureMenu(book)
     }
 
-    private fun configureMenu(book: Book, metadata: Metadata? = null) {
+    private fun configureMenu(book: Book) {
         val menuItems: MutableList<MenuDialogItem> = mutableListOf(
             MenuDialogItem("Check for updates", R.drawable.refresh) {
                 lifecycleScope.launch {
@@ -220,13 +193,11 @@ class BookFragment : Fragment() {
             },
             MenuDialogItem("Reload book data", R.drawable.cloud_download) {
                 lifecycleScope.launch {
-                    viewModel.getMetadata(book, true)
+                    viewModel.getChapters(book, true)
                         .flowWithLifecycle(lifecycle)
                         .collect {
-                            binding?.configureMetadata(it, book)
-                            (it as? Resource.Success<Metadata?>)?.data?.apply {
-                                configureMenu(book, this)
-                            }
+                            binding?.configureMetadata(book)
+                            configureMenu(book)
                         }
                 }
             },
@@ -237,25 +208,18 @@ class BookFragment : Fragment() {
             }
         )
 
-        if (metadata != null) {
-            val (action, drawable) = if (metadata.enableNotification) ("Disable" to R.drawable.bell_slash)
-            else ("Enable" to R.drawable.bell)
-
-            menuItems.addAll(listOf(
-                MenuDialogItem("$action notifications", drawable) {
-                    lifecycleScope.launch {
-                        metadataRepo.setNotifications(book, !metadata.enableNotification)
-                    }
-                },
-                MenuDialogItem("Open Webnovel Page", R.drawable.info) {
-                    try {
-                        requireActivity().startActivity(
-                            Intent(
-                                Intent.ACTION_VIEW,
-                                "https://webnovel.com${metadata.link}".toUri()
+        if (book.link != null) {
+            menuItems.addAll(
+                listOf(
+                    MenuDialogItem("Open Webnovel Page", R.drawable.info) {
+                        try {
+                            requireActivity().startActivity(
+                                Intent(
+                                    Intent.ACTION_VIEW,
+                                    "https://webnovel.com${book.link}".toUri()
+                                )
                             )
-                        )
-                    } catch (e: Exception) {
+                        } catch (e: Exception) {
                         binding?.root?.snackBar("Failed to open link")
                     }
                 }
