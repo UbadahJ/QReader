@@ -12,5 +12,5 @@
         android:icon="@drawable/menu_dots"
         android:title=""
         app:iconTint="?android:attr/textColorPrimary"
-        app:showAsAction="ifRoom" />
+        app:showAsAction="always" />
 </menu>

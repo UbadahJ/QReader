@@ -57,16 +57,6 @@ class BrowseFragment : Fragment() {
                     WorkManager.getInstance(requireContext()).enqueueUniqueWork(
                         "index-service", ExistingWorkPolicy.KEEP, work
                     )
-                },
-                MenuDialogItem("Add from WebNovel link", R.drawable.add) {
-                    MaterialDialog(requireActivity()).show {
-                        message(text = "Enter a link")
-                        input { _, text ->
-                            openBookFromLink(text.toString())
-                        }
-                        positiveButton(text = "Show")
-                        negativeButton(text = "Cancel")
-                    }
                 }
             )
         )
@@ -173,6 +163,17 @@ class BrowseFragment : Fragment() {
                 menu.show(requireActivity().supportFragmentManager, null)
                 true
             }
+            R.id.add -> {
+                MaterialDialog(requireActivity()).show {
+                    message(text = "Enter a link")
+                    input { _, text ->
+                        openBookFromLink(text.toString())
+                    }
+                    positiveButton(text = "Show")
+                    negativeButton(text = "Cancel")
+                }
+                true
+            }
             else -> false
         }
     }
@@ -201,7 +202,7 @@ class BrowseFragment : Fragment() {
     }
 
     override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater) {
-        inflater.inflate(R.menu.search_menu, menu)
+        inflater.inflate(R.menu.browse_menu, menu)
     }
 
     override fun onDestroyView() {
