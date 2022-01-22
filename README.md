@@ -20,7 +20,8 @@ A simple application intended provide extension to the capabilities of the websi
 | -------- | ---------------------------------------------------------- | ------------------------------------------------------------ |
 | Library  | ![library_view_dark](images/library_view_dark.png)         | ![library_view_light](images/library_view_light.png)         |
 | Book     | ![book_view_dark](images/book_view_dark.png)               | ![book_view_light](images/book_view_light.png)               |
-| Chapters | ![chapter_contents_dark](images/chapter_contents_dark.png) | ![chapter_contents_light](images/chapter_contents_light.png) |
+| Chapters | ![chapters_view_dark](images/chapters_view_dark.png)       | ![chapters_view_light](images/chapters_view_light.png)       |
+| Article  | ![text_view_dark](images/text_view_dark.png)               | ![text_view_light](images/text_view_light.png)               |
 
 ## Project Milestones
 
