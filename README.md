@@ -2,8 +2,6 @@
   <img width="200" src="https://user-images.githubusercontent.com/47380312/150648680-ee0cb8e7-0e1d-4d6e-94fb-49f0cbe7ce08.svg" alt="QReader logo">
 </p>
 
-<h3 align="center">QReader</h3>
-
 A simple application intended provide extension to the capabilities of the website <https://toc.qidianunderground.org/>
 
 ## Features :sparkles:
