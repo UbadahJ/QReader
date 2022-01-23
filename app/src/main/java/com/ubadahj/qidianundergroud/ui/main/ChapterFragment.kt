@@ -42,7 +42,8 @@ class ChapterFragment : Fragment() {
     private var menu: MenuDialog = MenuDialog(
         MenuAdapter(listOf(MenuDialogItem("Loading", R.drawable.pulse)))
     )
-    private var adapter: ContentAdapter = ContentAdapter(listOf()) { 1f }
+    private var adapter: ContentAdapter = ContentAdapter { header?.hide() }
+    private var header: HeaderItemDecoration? = null
 
     @Inject
     lateinit var groupRepo: GroupRepository
@@ -90,9 +91,9 @@ class ChapterFragment : Fragment() {
                     this@ChapterFragment.adapter.currentList.map { it.content }[firstPos]
                 )
             }
-            chapterRecyclerView.addItemDecoration(HeaderItemDecoration(chapterRecyclerView) {
+            header = HeaderItemDecoration(chapterRecyclerView) {
                 adapter.getItemViewType(it) == ContentViewHolderType.TITLE.ordinal
-            })
+            }.also { chapterRecyclerView.addItemDecoration(it) }
             configureSwipeGestures()
             configurePreferencesFlow()
         }

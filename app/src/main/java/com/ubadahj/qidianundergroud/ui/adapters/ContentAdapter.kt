@@ -10,8 +10,9 @@ import com.ubadahj.qidianundergroud.ui.adapters.factories.ContentViewHolderType
 import com.ubadahj.qidianundergroud.ui.models.ContentUIItem
 
 class ContentAdapter(
-    items: List<ContentUIItem>,
-    var scaleFactor: () -> Float
+    items: List<ContentUIItem> = listOf(),
+    var scaleFactor: () -> Float = { 1f },
+    val onClick: (ContentUIItem) -> Unit
 ) : ListAdapter<ContentUIItem, ContentViewHolder>(DiffCallback()),
     FastScroller.SectionIndexer {
 
@@ -26,7 +27,7 @@ class ContentAdapter(
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ContentViewHolder {
-        return ChapterViewHolderFactory.get(parent, ContentViewHolderType.from(viewType))
+        return ChapterViewHolderFactory.get(parent, ContentViewHolderType.from(viewType)) { onClick(getItem(it)) }
     }
 
     override fun onBindViewHolder(holder: ContentViewHolder, position: Int) {

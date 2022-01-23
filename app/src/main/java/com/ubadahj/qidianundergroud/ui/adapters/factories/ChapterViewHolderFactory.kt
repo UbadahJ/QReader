@@ -30,12 +30,12 @@ abstract class ContentViewHolder(
 
 object ChapterViewHolderFactory {
 
-    fun get(parent: ViewGroup, type: ContentViewHolderType) = when (type) {
+    fun get(parent: ViewGroup, type: ContentViewHolderType, onClick: (Int) -> Unit) = when (type) {
         ContentViewHolderType.TITLE -> ContentTitleViewHolder(
             ChapterTitleItemBinding.inflate(parent.inflater, parent, false)
         )
         ContentViewHolderType.CONTENTS -> ContentContentsViewHolder(
-            ChapterBodyItemBinding.inflate(parent.inflater, parent, false)
+            ChapterBodyItemBinding.inflate(parent.inflater, parent, false), onClick
         )
     }
 
@@ -55,8 +55,15 @@ object ChapterViewHolderFactory {
     }
 
     private class ContentContentsViewHolder(
-        private val binding: ChapterBodyItemBinding
+        private val binding: ChapterBodyItemBinding,
+        onClick: (Int) -> Unit
     ) : ContentViewHolder(binding) {
+        init {
+            listOf(binding.root, binding.contents).forEach {
+                it.setOnClickListener { onClick(absoluteAdapterPosition) }
+            }
+        }
+
         override fun bind(item: Content, scaleFactor: Float) {
             binding.contents.apply {
                 textSize = 16f * scaleFactor

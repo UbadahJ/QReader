@@ -9,12 +9,13 @@ import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
 
 class HeaderItemDecoration(
-    parent: RecyclerView,
+    private val parent: RecyclerView,
     private val shouldFadeOutHeader: Boolean = true,
     private val isHeader: (itemPosition: Int) -> Boolean
 ) : RecyclerView.ItemDecoration() {
 
     private var currentHeader: Pair<Int, RecyclerView.ViewHolder>? = null
+    private var isHidden = false
 
     init {
         parent.adapter?.registerAdapterDataObserver(object : RecyclerView.AdapterDataObserver() {
@@ -43,6 +44,7 @@ class HeaderItemDecoration(
 
     override fun onDrawOver(c: Canvas, parent: RecyclerView, state: RecyclerView.State) {
         super.onDrawOver(c, parent, state)
+        if (isHidden) return
         //val topChild = parent.getChildAt(0) ?: return
         val topChild = parent.findChildViewUnder(
             parent.paddingLeft.toFloat(),
@@ -171,6 +173,12 @@ class HeaderItemDecoration(
             currentPosition -= 1
         } while (currentPosition >= 0)
         return headerPosition
+    }
+
+    fun hide() {
+        isHidden = !isHidden
+
+        parent.invalidate()
     }
 }
 
