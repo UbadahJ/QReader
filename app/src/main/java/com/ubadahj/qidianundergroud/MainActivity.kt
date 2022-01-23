@@ -50,13 +50,13 @@ class MainActivity : AppCompatActivity() {
             Timber.plant(Timber.DebugTree())
 
         lifecycleScope.launch {
-            val book = intent.extras?.getInt("book")?.apply {
-                viewModel.setSelectedBook(this)
-                viewModel.selectedChapter.value = null
+            val book = intent.extras?.getInt("book")?.let {
+                viewModel.setSelectedBook(it)
             }
-            val groups = intent.extras?.getString("group")?.apply {
-                viewModel.selectedGroup.value = groupRepo.getGroupByLink(this).first()
-            }
+
+            val groups = intent.extras?.getString("group")
+                ?.let { groupRepo.getGroupByLink(it).first() }
+                .also { viewModel.selectedGroup.value = it }
 
             if (book != null) {
                 val navHost = binding.navHostFragment.findNavController()
