@@ -17,9 +17,9 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="@+id/book_title" />
 
-    <TextView
+    <com.google.android.material.textview.MaterialTextView
         android:id="@+id/book_title"
-        style="@style/TextAppearance.MaterialComponents.Subtitle1"
+        android:textAppearance="@style/TextAppearance.MyTheme.Subtitle1"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_marginStart="24dp"
@@ -27,10 +27,11 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toEndOf="@+id/book_cover"
         app:layout_constraintTop_toTopOf="parent"
-        tools:text="My House of Horrors" />
+        tools:text="My House of Horrors"/>
 
-    <TextView
+    <com.google.android.material.textview.MaterialTextView
         android:id="@+id/author_name"
+        android:textAppearance="@style/TextAppearance.MyTheme.Subtitle2"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_marginTop="8dp"
@@ -38,28 +39,28 @@
         app:layout_constraintEnd_toStartOf="@+id/rating_text"
         app:layout_constraintStart_toStartOf="@+id/book_title"
         app:layout_constraintTop_toBottomOf="@+id/book_title"
-        tools:text="I Fix Air-Conditioner" />
+        tools:text="I Fix Air-Conditioner"/>
 
-    <TextView
+    <com.google.android.material.textview.MaterialTextView
         android:id="@+id/rating_text"
+        android:textAppearance="@style/TextAppearance.MyTheme.Body1"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         app:layout_constraintBottom_toBottomOf="@+id/author_name"
         app:layout_constraintEnd_toEndOf="@+id/book_title"
         app:layout_constraintTop_toTopOf="@+id/author_name"
-        tools:text="★ 4.4" />
+        tools:text="★ 4.4"/>
 
-    <TextView
+    <com.google.android.material.textview.MaterialTextView
+        android:text="Completed"
         android:id="@+id/completed_text"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginTop="8dp"
-        android:text="COMPLETED"
-        android:textAllCaps="false"
         android:textAppearance="@style/TextAppearance.MyTheme.Body2"
         android:textStyle="italic"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintStart_toStartOf="@+id/author_name"
-        app:layout_constraintTop_toBottomOf="@+id/author_name" />
+        app:layout_constraintTop_toBottomOf="@+id/author_name"/>
 
 </androidx.constraintlayout.widget.ConstraintLayout>

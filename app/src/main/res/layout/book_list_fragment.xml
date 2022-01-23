@@ -87,13 +87,14 @@
             android:focusable="true"
             android:text="@string/browse"
             android:textAppearance="@style/TextAppearance.MyTheme.Body1"
-            android:textColor="@android:color/white"
+            android:backgroundTint="?attr/colorPrimary"
+            android:textColor="?attr/colorOnPrimary"
             android:visibility="gone"
             app:icon="@drawable/browse"
-            app:iconTint="@android:color/white"
+            app:iconTint="?attr/colorOnPrimary"
             app:layout_behavior="com.google.android.material.behavior.HideBottomViewOnScrollBehavior"
             app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintEnd_toEndOf="parent" />
+            app:layout_constraintEnd_toEndOf="parent"/>
 
     </androidx.coordinatorlayout.widget.CoordinatorLayout>
 

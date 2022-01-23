@@ -1,29 +1,37 @@
 <?xml version="1.0" encoding="utf-8"?>
-<com.google.android.material.card.MaterialCardView xmlns:android="http://schemas.android.com/apk/res/android"
+<FrameLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
+    android:background="@drawable/dark_gradient"
+    android:paddingVertical="8dp"
     android:layout_width="match_parent"
     android:layout_height="wrap_content">
-
-    <androidx.appcompat.widget.LinearLayoutCompat
+    <com.google.android.material.card.MaterialCardView
+        style="?attr/materialCardViewFilledStyle"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_margin="8dp"
-        android:background="?android:attr/colorBackground"
-        android:orientation="vertical">
+        android:layout_height="wrap_content">
 
-        <com.google.android.material.textview.MaterialTextView
-            android:id="@+id/header_chapter_number"
-            style="@style/TextAppearance.MyTheme.Subtitle1"
+        <androidx.appcompat.widget.LinearLayoutCompat
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:paddingStart="4dp"
-            tools:text="Chapter 123" />
+            android:layout_margin="16dp"
+            android:orientation="vertical">
 
-        <com.google.android.material.textview.MaterialTextView
-            android:id="@+id/header_chapter_info"
-            style="@style/TextAppearance.MyTheme.Headline5"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            tools:text="The execution of Gu Lun" />
-    </androidx.appcompat.widget.LinearLayoutCompat>
-</com.google.android.material.card.MaterialCardView>
+            <com.google.android.material.textview.MaterialTextView
+                android:id="@+id/header_chapter_number"
+                style="@style/TextAppearance.MyTheme.Subtitle2"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:paddingStart="6dp"
+                tools:text="Chapter 123"/>
+
+            <com.google.android.material.textview.MaterialTextView
+                android:id="@+id/header_chapter_info"
+                style="@style/TextAppearance.MyTheme.Headline5"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                tools:text="The execution of Gu Lun"/>
+        </androidx.appcompat.widget.LinearLayoutCompat>
+    </com.google.android.material.card.MaterialCardView>
+
+</FrameLayout>

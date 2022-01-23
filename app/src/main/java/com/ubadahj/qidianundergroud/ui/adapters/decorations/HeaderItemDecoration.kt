@@ -10,7 +10,7 @@ import androidx.recyclerview.widget.RecyclerView
 
 class HeaderItemDecoration(
     parent: RecyclerView,
-    private val shouldFadeOutHeader: Boolean = false,
+    private val shouldFadeOutHeader: Boolean = true,
     private val isHeader: (itemPosition: Int) -> Boolean
 ) : RecyclerView.ItemDecoration() {
 
