@@ -56,7 +56,7 @@ class MainActivity : AppCompatActivity() {
 
             val groups = intent.extras?.getString("group")
                 ?.let { groupRepo.getGroupByLink(it).first() }
-                .also { viewModel.selectedGroup.value = it }
+                .also { viewModel.setSelectedGroup(it) }
 
             if (book != null) {
                 val navHost = binding.navHostFragment.findNavController()

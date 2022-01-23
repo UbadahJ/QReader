@@ -64,8 +64,8 @@ class ChapterFragment : Fragment() {
                     }
                 }
                 launch {
-                    viewModel.selectedChapter.flowWithLifecycle(lifecycle).collect { chapter ->
-                        chapter?.apply {
+                    viewModel.selectedContent.flowWithLifecycle(lifecycle).collect { content ->
+                        content?.apply {
                             viewModel.selectedGroup.value?.run {
                                 groupRepo.updateLastRead(this, getIndex())
                             }
@@ -85,10 +85,10 @@ class ChapterFragment : Fragment() {
                 if (state != RecyclerView.SCROLL_STATE_IDLE)
                     return@addOnScrollStateListener
 
-                val firstPos =
-                    (rc.layoutManager as LinearLayoutManager).findFirstVisibleItemPosition()
-                viewModel.selectedChapter.value = this@ChapterFragment.adapter.currentList
-                    .map { it.content }[firstPos]
+                val firstPos = (rc.layoutManager as LinearLayoutManager).findFirstVisibleItemPosition()
+                viewModel.setSelectedContent(
+                    this@ChapterFragment.adapter.currentList.map { it.content }[firstPos]
+                )
             }
             chapterRecyclerView.addItemDecoration(HeaderItemDecoration(chapterRecyclerView) {
                 adapter.getItemViewType(it) == ContentViewHolderType.TITLE.ordinal
@@ -200,7 +200,7 @@ class ChapterFragment : Fragment() {
                     lifecycleScope.launch {
                         groupRepo.getGroups(book).first()
                             .firstOrNull { other -> group?.let { predicate(it, other) } == true }
-                            ?.let { viewModel.selectedGroup.value = it }
+                            ?.let { viewModel.setSelectedGroup(it) }
                     }
                 }
             }
@@ -209,7 +209,7 @@ class ChapterFragment : Fragment() {
 
     private fun updateRecyclerAdapter(resource: Resource<List<Content>>) {
         val group = viewModel.selectedGroup.value
-        val chapter = viewModel.selectedChapter.value
+        val chapter = viewModel.selectedContent.value
         val hasDataChanged = chapter == null ||
                 adapter.currentList.isEmpty() ||
                 chapter.groupLink != group?.link
@@ -222,7 +222,7 @@ class ChapterFragment : Fragment() {
                 val index = (if (group.lastRead != 0) group.lastRead - group.firstChapter else 0)
                     .toInt()
 
-                viewModel.selectedChapter.value = resource.data[index]
+                viewModel.setSelectedContent(resource.data[index])
                 binding?.chapterRecyclerView?.linearScroll(index * 2)
             }
         }
@@ -233,7 +233,7 @@ class ChapterFragment : Fragment() {
             items.mapIndexed { i, it ->
                 MenuDialogItem(it.title) {
                     binding?.apply {
-                        viewModel.selectedChapter.value = it
+                        viewModel.setSelectedContent(it)
                         chapterRecyclerView.linearScroll(i)
                     }
                 }

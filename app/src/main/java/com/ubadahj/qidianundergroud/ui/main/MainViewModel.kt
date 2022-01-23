@@ -29,10 +29,12 @@ class MainViewModel @Inject constructor(
 
     private var selectedBookJob: Job? = null
     private val _selectedBook: MutableStateFlow<Book?> = MutableStateFlow(null)
-    val selectedBook: StateFlow<Book?> = _selectedBook
+    private val _selectedGroup: MutableStateFlow<Group?> = MutableStateFlow(null)
+    private val _selectedContent: MutableStateFlow<Content?> = MutableStateFlow(null)
 
-    val selectedGroup: MutableStateFlow<Group?> = MutableStateFlow(null)
-    val selectedChapter: MutableStateFlow<Content?> = MutableStateFlow(null)
+    val selectedBook: StateFlow<Book?> = _selectedBook
+    val selectedGroup: StateFlow<Group?> = _selectedGroup
+    val selectedContent: StateFlow<Content?> = _selectedContent
 
     val libraryBooks = flow {
         emit(Resource.Loading)
@@ -132,6 +134,14 @@ class MainViewModel @Inject constructor(
     fun setSelectedBook(id: Int) {
         selectedBookJob?.cancel()
         selectedBookJob = viewModelScope.launch { _selectedBook.emitAll(bookRepo.getBookById(id)) }
+    }
+
+    fun setSelectedGroup(group: Group?) {
+        _selectedGroup.value = group
+    }
+
+    fun setSelectedContent(content: Content?) {
+        _selectedContent.value = content
     }
 
 }

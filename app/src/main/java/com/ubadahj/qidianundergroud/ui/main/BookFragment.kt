@@ -16,11 +16,10 @@ import androidx.work.ExistingWorkPolicy
 import androidx.work.OneTimeWorkRequestBuilder
 import androidx.work.WorkManager
 import coil.load
-import com.github.ajalt.timberkt.e
-import com.google.android.material.snackbar.Snackbar
 import com.ubadahj.qidianundergroud.R
 import com.ubadahj.qidianundergroud.databinding.BookFragmentBinding
 import com.ubadahj.qidianundergroud.models.Book
+import com.ubadahj.qidianundergroud.models.Group
 import com.ubadahj.qidianundergroud.models.Resource
 import com.ubadahj.qidianundergroud.repositories.BookRepository
 import com.ubadahj.qidianundergroud.repositories.GroupRepository
@@ -35,6 +34,7 @@ import com.ubadahj.qidianundergroud.utils.models.isRead
 import com.ubadahj.qidianundergroud.utils.ui.snackBar
 import com.ubadahj.qidianundergroud.utils.ui.visible
 import dagger.hilt.android.AndroidEntryPoint
+import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.launch
 import javax.inject.Inject
@@ -43,8 +43,9 @@ import javax.inject.Inject
 class BookFragment : Fragment() {
 
     private val viewModel: MainViewModel by activityViewModels()
+    private var groupJob: Job? = null
     private var binding: BookFragmentBinding? = null
-    private var menuAdapter = MenuAdapter(listOf())
+    private val menuAdapter = MenuAdapter(listOf())
 
     @Inject
     lateinit var bookRepo: BookRepository
@@ -94,7 +95,7 @@ class BookFragment : Fragment() {
             } else {
                 errorGroup.apply {
                     root.visible = true
-                    errorText.text = "The book is not longer avaliable"
+                    errorText.text = "The book is not longer available"
                     errorButton.text = "Continue"
                     errorButton.setOnClickListener {
                         init(book, true)
@@ -103,7 +104,7 @@ class BookFragment : Fragment() {
             }
 
             if (book.author == null)
-                loadGroups(book, true, true)
+                loadGroups(book, refresh = true, webNovelRefresh = true)
             else
                 loadGroups(book)
 
@@ -160,7 +161,7 @@ class BookFragment : Fragment() {
         chapterListView.adapter = GroupAdapter(
             listOf(),
             {
-                viewModel.selectedGroup.value = it
+                viewModel.setSelectedGroup(it)
                 findNavController().navigate(
                     BookFragmentDirections.actionBookFragmentToChapterFragment()
                 )
@@ -209,21 +210,20 @@ class BookFragment : Fragment() {
         )
 
         if (book.link != null) {
-            menuItems.addAll(
-                listOf(
-                    MenuDialogItem("Open Webnovel Page", R.drawable.info) {
-                        try {
-                            requireActivity().startActivity(
-                                Intent(
-                                    Intent.ACTION_VIEW,
-                                    "https://webnovel.com${book.link}".toUri()
-                                )
+            menuItems.add(
+                MenuDialogItem("Open Webnovel Page", R.drawable.info) {
+                    try {
+                        requireActivity().startActivity(
+                            Intent(
+                                Intent.ACTION_VIEW,
+                                "https://webnovel.com${book.link}".toUri()
                             )
-                        } catch (e: Exception) {
+                        )
+                    } catch (e: Exception) {
                         binding?.root?.snackBar("Failed to open link")
                     }
                 }
-            ))
+            )
         }
 
         menuAdapter.submitList(menuItems)
@@ -234,51 +234,57 @@ class BookFragment : Fragment() {
         refresh: Boolean = false,
         webNovelRefresh: Boolean = false
     ) {
-        lifecycleScope.launch {
-            viewModel.getChapters(book, refresh, webNovelRefresh)
-                .flowWithLifecycle(lifecycle)
-                .collect { resource ->
-                    binding?.apply {
-                        when (resource) {
-                            is Resource.Success -> {
-                                materialCardView.visibility = View.VISIBLE
-                                loadingProgress.visibility = View.GONE
-                                (chapterListView.adapter as? GroupAdapter)?.submitList(resource.data)
-                                binding?.readLatestButton?.apply {
-                                    val latestChapter = resource.data
-                                        .filter { !it.isRead() }
-                                        .minByOrNull { it.firstChapter }
-                                        ?.also { group ->
-                                            text = "Read chapter ${group.lastRead}"
-                                            setOnClickListener {
-                                                viewModel.selectedGroup.value = group
-                                                findNavController().navigate(
-                                                    BookFragmentDirections.actionBookFragmentToChapterFragment()
-                                                )
-                                            }
-                                        }
+        groupJob?.cancel()
+        groupJob = lifecycleScope.launch {
+            viewModel.getChapters(book, refresh, webNovelRefresh).collect {
+                binding?.configureGroups(it)
+            }
+        }
+    }
 
-                                    visible = latestChapter != null
-                                }
+    private fun BookFragmentBinding.configureGroups(resource: Resource<List<Group>>) {
+        when (resource) {
+            Resource.Loading -> {
+                loadingProgress.visible = true
+                materialCardView.visible = false
+            }
+            is Resource.Success -> {
+                loadingProgress.visible = false
+                materialCardView.visible = true
+                (chapterListView.adapter as? GroupAdapter)?.submitList(resource.data)
+
+                readLatestButton.apply {
+                    val latestChapter = resource.data
+                        .filter { !it.isRead() }
+                        .minByOrNull { it.firstChapter }
+                        ?.also { group ->
+                            text = when {
+                                group.lastRead != 0 -> "Read chapter ${group.lastRead}"
+                                else -> "Read chapter ${group.firstChapter}"
                             }
-                            Resource.Loading -> {
-                                loadingProgress.visibility = View.VISIBLE
-                                materialCardView.visibility = View.GONE
-                            }
-                            is Resource.Error -> {
-                                e(resource.message)
-                                loadingProgress.visibility = View.GONE
-                                materialCardView.visibility = View.GONE
-                                Snackbar.make(
-                                    root,
-                                    R.string.error_refreshing,
-                                    Snackbar.LENGTH_SHORT
+                            setOnClickListener {
+                                viewModel.setSelectedGroup(group)
+                                findNavController().navigate(
+                                    BookFragmentDirections.actionBookFragmentToChapterFragment()
                                 )
-                                    .show()
                             }
                         }
+
+                    visible = latestChapter != null
+                }
+            }
+            is Resource.Error -> {
+                loadingProgress.visible = false
+                materialCardView.visible = false
+                errorGroup.apply {
+                    root.visible = true
+                    errorText.setText(R.string.error_refreshing)
+                    errorButton.text = "Retry"
+                    errorButton.setOnClickListener {
+                        loadGroups(viewModel.selectedBook.value!!, refresh = true)
                     }
                 }
+            }
         }
     }
 
