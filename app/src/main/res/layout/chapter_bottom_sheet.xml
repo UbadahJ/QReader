@@ -7,16 +7,25 @@
     android:orientation="vertical"
     app:layout_behavior="com.google.android.material.bottomsheet.BottomSheetBehavior">
 
-    <com.google.android.material.textview.MaterialTextView
+    <androidx.appcompat.widget.LinearLayoutCompat
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:drawablePadding="16dp"
-        android:paddingHorizontal="30dp"
-        android:paddingTop="16dp"
-        android:text="Settings"
-        android:textAppearance="@style/TextAppearance.MyTheme.Headline5"
-        app:drawableStartCompat="@drawable/settings"
-        app:drawableTint="?attr/colorAccent" />
+        android:layout_marginTop="16dp"
+        android:gravity="center_vertical"
+        android:paddingHorizontal="16dp">
+
+        <ImageView
+            android:layout_width="56dp"
+            android:layout_height="24dp"
+            android:src="@drawable/settings"
+            app:tint="?attr/colorAccent" />
+
+        <com.google.android.material.textview.MaterialTextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Settings"
+            android:textAppearance="@style/TextAppearance.MyTheme.Headline5" />
+    </androidx.appcompat.widget.LinearLayoutCompat>
 
     <FrameLayout
         android:id="@+id/standard_bottom_sheet"
