@@ -69,7 +69,7 @@ object ChapterViewHolderFactory {
                 visible = split.first() != split.last()
             }
             binding.headerChapterInfo.apply {
-                text = split.last()
+                text = split.last().trim()
             }
             binding.headerMenu.setOnClickListener { config.onMenuPressed(item) }
         }
