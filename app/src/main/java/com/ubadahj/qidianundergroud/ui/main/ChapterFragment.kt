@@ -26,6 +26,7 @@ import com.ubadahj.qidianundergroud.ui.models.ContentUIItem
 import com.ubadahj.qidianundergroud.utils.ui.addOnScrollStateListener
 import com.ubadahj.qidianundergroud.utils.ui.linearScroll
 import com.ubadahj.qidianundergroud.utils.ui.preserveState
+import com.ubadahj.qidianundergroud.utils.ui.showSystemBar
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.flow.first
@@ -107,6 +108,7 @@ class ChapterFragment : Fragment() {
     override fun onDestroyView() {
         super.onDestroyView()
         binding = null
+        requireActivity().showSystemBar(true)
     }
 
     @SuppressLint("SetJavaScriptEnabled")
@@ -117,8 +119,8 @@ class ChapterFragment : Fragment() {
         getChapterContents(chapters)
     }
 
-    private fun ChapterFragmentBinding.configurePreferencesFlow() =
-        lifecycleScope.launch {
+    private fun ChapterFragmentBinding.configurePreferencesFlow() = lifecycleScope.launch {
+        launch {
             preferences.fontScale.asFlow().flowWithLifecycle(lifecycle, Lifecycle.State.RESUMED)
                 .collect {
                     baseAdapter.scaleFactor = { it.toFloat() / 10 }
@@ -127,6 +129,13 @@ class ChapterFragment : Fragment() {
                     }
                 }
         }
+        launch {
+            preferences.immersiveMode.asFlow().flowWithLifecycle(lifecycle, Lifecycle.State.RESUMED)
+                .collect {
+                    requireActivity().showSystemBar(!it)
+                }
+        }
+    }
 
     private fun getChapterContents(group: Group, refresh: Boolean = false) {
         lifecycleScope.launch {

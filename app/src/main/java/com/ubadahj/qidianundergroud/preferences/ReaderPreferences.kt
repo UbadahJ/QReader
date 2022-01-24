@@ -14,6 +14,10 @@ class ReaderPreferences @Inject constructor(
 
     private val flowPreferences = FlowSharedPreferences(preferences)
 
+    val immersiveMode = flowPreferences.getBoolean(
+        context.getString(R.string.pref_immersive_mode), true
+    )
+
     val fontScale = flowPreferences.getInt(
         context.getString(R.string.pref_scale_factor), 10
     )

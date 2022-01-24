@@ -1,5 +1,6 @@
 package com.ubadahj.qidianundergroud.utils.ui
 
+import android.app.Activity
 import android.content.Context
 import android.util.TypedValue
 import android.view.LayoutInflater
@@ -8,8 +9,13 @@ import android.view.ViewGroup
 import android.widget.AdapterView
 import android.widget.Spinner
 import androidx.annotation.StringRes
+import androidx.core.view.ViewCompat
+import androidx.core.view.WindowCompat
+import androidx.core.view.WindowInsetsCompat
+import androidx.core.view.WindowInsetsControllerCompat
 import androidx.recyclerview.widget.RecyclerView
 import com.google.android.material.snackbar.Snackbar
+
 
 fun RecyclerView.addOnScrollStateListener(listener: (RecyclerView, Int) -> Unit) {
     addOnScrollListener(object : RecyclerView.OnScrollListener() {
@@ -35,6 +41,21 @@ fun Spinner.onItemSelectedListener(onChange: (position: Int) -> Unit) {
 
         override fun onNothingSelected(parent: AdapterView<*>?) {
         }
+    }
+}
+
+fun Activity.showSystemBar(enable: Boolean) {
+    if (!enable) {
+        WindowCompat.setDecorFitsSystemWindows(window, false)
+        ViewCompat.getWindowInsetsController(window.decorView)?.let { controller ->
+            controller.hide(WindowInsetsCompat.Type.systemBars())
+            controller.systemBarsBehavior =
+                WindowInsetsControllerCompat.BEHAVIOR_SHOW_TRANSIENT_BARS_BY_SWIPE
+        }
+    } else {
+        WindowCompat.setDecorFitsSystemWindows(window, true)
+        ViewCompat.getWindowInsetsController(window.decorView)
+            ?.show(WindowInsetsCompat.Type.systemBars())
     }
 }
 
