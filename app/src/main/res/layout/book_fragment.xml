@@ -83,7 +83,7 @@
                 app:layout_constraintStart_toStartOf="@+id/book_rating_bar"
                 app:layout_constraintTop_toBottomOf="@+id/book_rating_bar" />
 
-            <Button
+            <com.google.android.material.button.MaterialButton
                 android:id="@+id/read_latest_button"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
