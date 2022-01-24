@@ -10,7 +10,6 @@ import androidx.lifecycle.flowWithLifecycle
 import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
-import com.ubadahj.qidianundergroud.R
 import com.ubadahj.qidianundergroud.databinding.ChapterFragmentBinding
 import com.ubadahj.qidianundergroud.models.Content
 import com.ubadahj.qidianundergroud.models.Group
@@ -18,14 +17,12 @@ import com.ubadahj.qidianundergroud.models.Resource
 import com.ubadahj.qidianundergroud.preferences.ReaderPreferences
 import com.ubadahj.qidianundergroud.repositories.GroupRepository
 import com.ubadahj.qidianundergroud.ui.adapters.ContentAdapter
-import com.ubadahj.qidianundergroud.ui.adapters.MenuAdapter
 import com.ubadahj.qidianundergroud.ui.adapters.decorations.StickyHeaderManager
 import com.ubadahj.qidianundergroud.ui.adapters.factories.ChapterViewHolderFactory
-import com.ubadahj.qidianundergroud.ui.dialog.MenuDialog
+import com.ubadahj.qidianundergroud.ui.dialog.ContentPreferencesDialog
 import com.ubadahj.qidianundergroud.ui.listeners.OnGestureListener
 import com.ubadahj.qidianundergroud.ui.models.ContentHeaderConfig
 import com.ubadahj.qidianundergroud.ui.models.ContentUIItem
-import com.ubadahj.qidianundergroud.ui.models.MenuDialogItem
 import com.ubadahj.qidianundergroud.utils.ui.addOnScrollStateListener
 import com.ubadahj.qidianundergroud.utils.ui.linearScroll
 import com.ubadahj.qidianundergroud.utils.ui.preserveState
@@ -34,15 +31,14 @@ import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
 import javax.inject.Inject
+import kotlin.math.roundToInt
 
 @AndroidEntryPoint
 class ChapterFragment : Fragment() {
 
     private val viewModel: MainViewModel by activityViewModels()
     private var binding: ChapterFragmentBinding? = null
-    private var menu: MenuDialog = MenuDialog(
-        MenuAdapter(listOf(MenuDialogItem("Loading", R.drawable.pulse)))
-    )
+    private var menu = ContentPreferencesDialog()
     private val headerConfig = ContentHeaderConfig(
         onBackPressed = { requireActivity().onBackPressed() },
         onMenuPressed = { menu.show(requireActivity().supportFragmentManager, null) }
@@ -108,20 +104,6 @@ class ChapterFragment : Fragment() {
         }
     }
 
-    override fun onOptionsItemSelected(item: MenuItem): Boolean {
-        return when (item.itemId) {
-            R.id.menu -> {
-                menu.show(requireActivity().supportFragmentManager, null)
-                true
-            }
-            else -> false
-        }
-    }
-
-    override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater) {
-        inflater.inflate(R.menu.simple_menu, menu)
-    }
-
     override fun onDestroyView() {
         super.onDestroyView()
         binding = null
@@ -139,7 +121,7 @@ class ChapterFragment : Fragment() {
         lifecycleScope.launch {
             preferences.fontScale.asFlow().flowWithLifecycle(lifecycle, Lifecycle.State.RESUMED)
                 .collect {
-                    baseAdapter.scaleFactor = { it }
+                    baseAdapter.scaleFactor = { it.toFloat() / 10 }
                     chapterRecyclerView.preserveState {
                         adapter = baseAdapter
                     }
@@ -164,10 +146,6 @@ class ChapterFragment : Fragment() {
                 progressBar.visibility = View.GONE
                 chapterRecyclerView.visibility = View.GONE
                 errorGroup.root.visibility = View.VISIBLE
-
-                menu.adapter.submitList(
-                    listOf(MenuDialogItem("Error", R.drawable.unlink))
-                )
             }
             Resource.Loading -> {
                 chapterRecyclerView.visibility = View.GONE
@@ -199,7 +177,8 @@ class ChapterFragment : Fragment() {
             }
 
             override fun onScaleView(scale: Float) {
-                preferences.fontScale.set(scale)
+                if (!preferences.lockFontScale.get())
+                    preferences.fontScale.set((scale * 10).roundToInt())
             }
 
             private fun selectChapterGroup(
@@ -226,8 +205,6 @@ class ChapterFragment : Fragment() {
 
         if (hasDataChanged && resource is Resource.Success) {
             baseAdapter.submitList(resource.data.toUIModel())
-            updateMenu(resource.data)
-
             viewModel.selectedGroup.value?.let { group ->
                 val index = (if (group.lastRead != 0) group.lastRead - group.firstChapter else 0)
                     .toInt()
@@ -236,19 +213,6 @@ class ChapterFragment : Fragment() {
                 binding?.chapterRecyclerView?.linearScroll(index * 2)
             }
         }
-    }
-
-    private fun updateMenu(items: List<Content>) {
-        menu.adapter.submitList(
-            items.mapIndexed { i, it ->
-                MenuDialogItem(it.title) {
-                    binding?.apply {
-                        viewModel.setSelectedContent(it)
-                        chapterRecyclerView.linearScroll(i)
-                    }
-                }
-            }
-        )
     }
 
     private fun Content.getIndex(): Int {

@@ -2,6 +2,7 @@ package com.ubadahj.qidianundergroud.di.modules
 
 import android.content.Context
 import android.content.SharedPreferences
+import androidx.preference.PreferenceManager
 import com.squareup.moshi.Moshi
 import com.squareup.moshi.kotlin.reflect.KotlinJsonAdapterFactory
 import com.ubadahj.qidianundergroud.Database
@@ -34,7 +35,7 @@ object DataModule {
     @Provides
     @Singleton
     fun providesPreferences(@ApplicationContext context: Context): SharedPreferences {
-        return context.getSharedPreferences("commons", Context.MODE_PRIVATE);
+        return PreferenceManager.getDefaultSharedPreferences(context);
     }
 
 }

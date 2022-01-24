@@ -29,6 +29,8 @@
     <string name="update_notification">Application updates</string>
     <string name="index_name">Show current book indexing progress</string>
     <string name="webnovel_url_hint">https://www.webnovel.com/book/lord-of-mysteries_11022733006234505</string>
+    <string name="pref_lock_font_scale">lockScaleFactor</string>
+    <string name="pref_scale_factor">scaleFactor</string>
 
     <string-array name="browse_sort_by">
         <item>Name</item>
