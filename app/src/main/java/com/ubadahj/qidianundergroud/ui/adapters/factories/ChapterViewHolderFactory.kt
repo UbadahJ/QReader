@@ -9,6 +9,7 @@ import com.ubadahj.qidianundergroud.databinding.ChapterBodyItemBinding
 import com.ubadahj.qidianundergroud.databinding.ChapterTitleItemBinding
 import com.ubadahj.qidianundergroud.models.Content
 import com.ubadahj.qidianundergroud.ui.adapters.decorations.StickyViewHolder
+import com.ubadahj.qidianundergroud.ui.models.ContentHeaderConfig
 import com.ubadahj.qidianundergroud.ui.models.ContentUIItem
 import com.ubadahj.qidianundergroud.utils.ui.inflater
 import com.ubadahj.qidianundergroud.utils.ui.visible
@@ -34,12 +35,17 @@ object ChapterViewHolderFactory {
 
     fun header(
         binding: ChapterTitleItemBinding,
-        onClick: (Int) -> Unit
-    ): StickyViewHolder<ContentUIItem> = ContentTitleViewHolder(binding)
+        config: ContentHeaderConfig
+    ): StickyViewHolder<ContentUIItem> = ContentTitleViewHolder(binding, config)
 
-    fun get(parent: ViewGroup, type: ContentViewHolderType, onClick: (Int) -> Unit) = when (type) {
+    fun get(
+        parent: ViewGroup,
+        type: ContentViewHolderType,
+        config: ContentHeaderConfig,
+        onClick: (Int) -> Unit
+    ) = when (type) {
         ContentViewHolderType.TITLE -> ContentTitleViewHolder(
-            ChapterTitleItemBinding.inflate(parent.inflater, parent, false)
+            ChapterTitleItemBinding.inflate(parent.inflater, parent, false), config
         )
         ContentViewHolderType.CONTENTS -> ContentContentsViewHolder(
             ChapterBodyItemBinding.inflate(parent.inflater, parent, false), onClick
@@ -47,8 +53,12 @@ object ChapterViewHolderFactory {
     }
 
     private class ContentTitleViewHolder(
-        private val binding: ChapterTitleItemBinding
+        private val binding: ChapterTitleItemBinding,
+        private val config: ContentHeaderConfig
     ) : ContentViewHolder(binding), StickyViewHolder<ContentUIItem> {
+        init {
+            binding.headerBack.setOnClickListener { config.onBackPressed() }
+        }
         override val type: Int = ContentViewHolderType.TITLE.ordinal
         override val root = binding.root
         override fun bind(item: ContentUIItem) = bind(item.content, 1f)
@@ -61,6 +71,7 @@ object ChapterViewHolderFactory {
             binding.headerChapterInfo.apply {
                 text = split.last()
             }
+            binding.headerMenu.setOnClickListener { config.onMenuPressed(item) }
         }
     }
 

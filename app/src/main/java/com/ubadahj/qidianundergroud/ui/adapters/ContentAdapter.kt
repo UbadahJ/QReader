@@ -7,11 +7,13 @@ import com.l4digital.fastscroll.FastScroller
 import com.ubadahj.qidianundergroud.ui.adapters.factories.ChapterViewHolderFactory
 import com.ubadahj.qidianundergroud.ui.adapters.factories.ContentViewHolder
 import com.ubadahj.qidianundergroud.ui.adapters.factories.ContentViewHolderType
+import com.ubadahj.qidianundergroud.ui.models.ContentHeaderConfig
 import com.ubadahj.qidianundergroud.ui.models.ContentUIItem
 
 class ContentAdapter(
     items: List<ContentUIItem> = listOf(),
     var scaleFactor: () -> Float = { 1f },
+    val headerConfig: ContentHeaderConfig,
     val onClick: (ContentUIItem) -> Unit
 ) : ListAdapter<ContentUIItem, ContentViewHolder>(DiffCallback()),
     FastScroller.SectionIndexer {
@@ -27,7 +29,11 @@ class ContentAdapter(
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ContentViewHolder {
-        return ChapterViewHolderFactory.get(parent, ContentViewHolderType.from(viewType)) { onClick(getItem(it)) }
+        return ChapterViewHolderFactory.get(
+            parent,
+            ContentViewHolderType.from(viewType),
+            headerConfig
+        ) { onClick(getItem(it)) }
     }
 
     override fun onBindViewHolder(holder: ContentViewHolder, position: Int) {

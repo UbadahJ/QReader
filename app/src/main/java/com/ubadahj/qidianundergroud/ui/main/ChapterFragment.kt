@@ -23,6 +23,7 @@ import com.ubadahj.qidianundergroud.ui.adapters.decorations.StickyHeaderManager
 import com.ubadahj.qidianundergroud.ui.adapters.factories.ChapterViewHolderFactory
 import com.ubadahj.qidianundergroud.ui.dialog.MenuDialog
 import com.ubadahj.qidianundergroud.ui.listeners.OnGestureListener
+import com.ubadahj.qidianundergroud.ui.models.ContentHeaderConfig
 import com.ubadahj.qidianundergroud.ui.models.ContentUIItem
 import com.ubadahj.qidianundergroud.ui.models.MenuDialogItem
 import com.ubadahj.qidianundergroud.utils.ui.addOnScrollStateListener
@@ -42,7 +43,11 @@ class ChapterFragment : Fragment() {
     private var menu: MenuDialog = MenuDialog(
         MenuAdapter(listOf(MenuDialogItem("Loading", R.drawable.pulse)))
     )
-    private var baseAdapter = ContentAdapter {
+    private val headerConfig = ContentHeaderConfig(
+        onBackPressed = { requireActivity().onBackPressed() },
+        onMenuPressed = { menu.show(requireActivity().supportFragmentManager, null) }
+    )
+    private var baseAdapter = ContentAdapter(headerConfig = headerConfig) {
         stickyManager?.toggleVisibility()
     }
     private var stickyManager: StickyHeaderManager<ContentUIItem>? = null
@@ -96,7 +101,7 @@ class ChapterFragment : Fragment() {
             stickyManager = StickyHeaderManager(
                 chapterRecyclerView,
                 baseAdapter,
-                ChapterViewHolderFactory.header(chapterStickyGroup) {}
+                ChapterViewHolderFactory.header(chapterStickyGroup, headerConfig)
             )
             configureSwipeGestures()
             configurePreferencesFlow()
