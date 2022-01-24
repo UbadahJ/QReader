@@ -13,13 +13,22 @@
         android:layout_marginStart="16dp"
         android:layout_marginEnd="16dp"
         android:layout_marginBottom="16dp"
-        app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
         app:bubbleSize="small"
         app:bubbleTextSize="14sp"
+        app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
+
+    <include
+        android:id="@+id/chapter_sticky_group"
+        layout="@layout/chapter_title_item"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        app:layout_constraintEnd_toEndOf="@+id/chapter_recycler_view"
+        app:layout_constraintStart_toStartOf="@+id/chapter_recycler_view"
+        app:layout_constraintTop_toTopOf="@+id/chapter_recycler_view" />
 
     <ProgressBar
         android:id="@+id/progress_bar"

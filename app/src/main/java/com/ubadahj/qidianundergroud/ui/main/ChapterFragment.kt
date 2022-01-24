@@ -19,8 +19,8 @@ import com.ubadahj.qidianundergroud.preferences.ReaderPreferences
 import com.ubadahj.qidianundergroud.repositories.GroupRepository
 import com.ubadahj.qidianundergroud.ui.adapters.ContentAdapter
 import com.ubadahj.qidianundergroud.ui.adapters.MenuAdapter
-import com.ubadahj.qidianundergroud.ui.adapters.decorations.HeaderItemDecoration
-import com.ubadahj.qidianundergroud.ui.adapters.factories.ContentViewHolderType
+import com.ubadahj.qidianundergroud.ui.adapters.decorations.StickyHeaderManager
+import com.ubadahj.qidianundergroud.ui.adapters.factories.ChapterViewHolderFactory
 import com.ubadahj.qidianundergroud.ui.dialog.MenuDialog
 import com.ubadahj.qidianundergroud.ui.listeners.OnGestureListener
 import com.ubadahj.qidianundergroud.ui.models.ContentUIItem
@@ -42,8 +42,10 @@ class ChapterFragment : Fragment() {
     private var menu: MenuDialog = MenuDialog(
         MenuAdapter(listOf(MenuDialogItem("Loading", R.drawable.pulse)))
     )
-    private var adapter: ContentAdapter = ContentAdapter { header?.hide() }
-    private var header: HeaderItemDecoration? = null
+    private var baseAdapter = ContentAdapter {
+        stickyManager?.toggleVisibility()
+    }
+    private var stickyManager: StickyHeaderManager<ContentUIItem>? = null
 
     @Inject
     lateinit var groupRepo: GroupRepository
@@ -81,19 +83,21 @@ class ChapterFragment : Fragment() {
         super.onViewCreated(view, savedInstanceState)
         setHasOptionsMenu(true)
         binding?.apply {
-            chapterRecyclerView.adapter = adapter
+            chapterRecyclerView.adapter = baseAdapter
             chapterRecyclerView.addOnScrollStateListener { rc, state ->
                 if (state != RecyclerView.SCROLL_STATE_IDLE)
                     return@addOnScrollStateListener
 
-                val firstPos = (rc.layoutManager as LinearLayoutManager).findFirstVisibleItemPosition()
-                viewModel.setSelectedContent(
-                    this@ChapterFragment.adapter.currentList.map { it.content }[firstPos]
-                )
+                val firstPos =
+                    (rc.layoutManager as LinearLayoutManager).findFirstVisibleItemPosition()
+                if (firstPos != RecyclerView.NO_POSITION)
+                    viewModel.setSelectedContent(baseAdapter.currentList.map { it.content }[firstPos])
             }
-            header = HeaderItemDecoration(chapterRecyclerView) {
-                adapter.getItemViewType(it) == ContentViewHolderType.TITLE.ordinal
-            }.also { chapterRecyclerView.addItemDecoration(it) }
+            stickyManager = StickyHeaderManager(
+                chapterRecyclerView,
+                baseAdapter,
+                ChapterViewHolderFactory.header(chapterStickyGroup) {}
+            )
             configureSwipeGestures()
             configurePreferencesFlow()
         }
@@ -130,9 +134,9 @@ class ChapterFragment : Fragment() {
         lifecycleScope.launch {
             preferences.fontScale.asFlow().flowWithLifecycle(lifecycle, Lifecycle.State.RESUMED)
                 .collect {
-                    adapter.scaleFactor = { it }
+                    baseAdapter.scaleFactor = { it }
                     chapterRecyclerView.preserveState {
-                        adapter = this@ChapterFragment.adapter
+                        adapter = baseAdapter
                     }
                 }
         }
@@ -212,11 +216,11 @@ class ChapterFragment : Fragment() {
         val group = viewModel.selectedGroup.value
         val chapter = viewModel.selectedContent.value
         val hasDataChanged = chapter == null ||
-                adapter.currentList.isEmpty() ||
+                baseAdapter.currentList.isEmpty() ||
                 chapter.groupLink != group?.link
 
         if (hasDataChanged && resource is Resource.Success) {
-            adapter.submitList(resource.data.toUIModel())
+            baseAdapter.submitList(resource.data.toUIModel())
             updateMenu(resource.data)
 
             viewModel.selectedGroup.value?.let { group ->

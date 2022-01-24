@@ -8,6 +8,8 @@ import androidx.viewbinding.ViewBinding
 import com.ubadahj.qidianundergroud.databinding.ChapterBodyItemBinding
 import com.ubadahj.qidianundergroud.databinding.ChapterTitleItemBinding
 import com.ubadahj.qidianundergroud.models.Content
+import com.ubadahj.qidianundergroud.ui.adapters.decorations.StickyViewHolder
+import com.ubadahj.qidianundergroud.ui.models.ContentUIItem
 import com.ubadahj.qidianundergroud.utils.ui.inflater
 import com.ubadahj.qidianundergroud.utils.ui.visible
 
@@ -30,6 +32,11 @@ abstract class ContentViewHolder(
 
 object ChapterViewHolderFactory {
 
+    fun header(
+        binding: ChapterTitleItemBinding,
+        onClick: (Int) -> Unit
+    ): StickyViewHolder<ContentUIItem> = ContentTitleViewHolder(binding)
+
     fun get(parent: ViewGroup, type: ContentViewHolderType, onClick: (Int) -> Unit) = when (type) {
         ContentViewHolderType.TITLE -> ContentTitleViewHolder(
             ChapterTitleItemBinding.inflate(parent.inflater, parent, false)
@@ -41,7 +48,10 @@ object ChapterViewHolderFactory {
 
     private class ContentTitleViewHolder(
         private val binding: ChapterTitleItemBinding
-    ) : ContentViewHolder(binding) {
+    ) : ContentViewHolder(binding), StickyViewHolder<ContentUIItem> {
+        override val type: Int = ContentViewHolderType.TITLE.ordinal
+        override val root = binding.root
+        override fun bind(item: ContentUIItem) = bind(item.content, 1f)
         override fun bind(item: Content, scaleFactor: Float) {
             val split = item.title.split(":")
             binding.headerChapterNumber.apply {
