@@ -24,11 +24,10 @@ import com.ubadahj.qidianundergroud.ui.dialog.ContentPreferencesDialog
 import com.ubadahj.qidianundergroud.ui.listeners.OnGestureListener
 import com.ubadahj.qidianundergroud.ui.models.ContentHeaderConfig
 import com.ubadahj.qidianundergroud.ui.models.ContentUIItem
-import com.ubadahj.qidianundergroud.utils.ui.addOnScrollStateListener
-import com.ubadahj.qidianundergroud.utils.ui.linearScroll
-import com.ubadahj.qidianundergroud.utils.ui.preserveState
-import com.ubadahj.qidianundergroud.utils.ui.showSystemBar
+import com.ubadahj.qidianundergroud.utils.collectNotNull
+import com.ubadahj.qidianundergroud.utils.ui.*
 import dagger.hilt.android.AndroidEntryPoint
+import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
@@ -39,6 +38,7 @@ import kotlin.math.roundToInt
 class ChapterFragment : Fragment() {
 
     private val viewModel: MainViewModel by activityViewModels()
+    private var contentJob: Job? = null
     private var binding: ChapterFragmentBinding? = null
     private var menu = ContentPreferencesDialog()
     private val headerConfig = ContentHeaderConfig(
@@ -65,18 +65,17 @@ class ChapterFragment : Fragment() {
             binding = this
             lifecycleScope.launch {
                 launch {
-                    viewModel.selectedGroup.flowWithLifecycle(lifecycle).collect { group ->
-                        group?.apply { init(this) }
+                    viewModel.selectedGroup.flowWithLifecycle(lifecycle).collectNotNull { group ->
+                        init(group)
                     }
                 }
                 launch {
-                    viewModel.selectedContent.flowWithLifecycle(lifecycle).collect { content ->
-                        content?.apply {
+                    viewModel.selectedContent.flowWithLifecycle(lifecycle)
+                        .collectNotNull { content ->
                             viewModel.selectedGroup.value?.run {
-                                groupRepo.updateLastRead(this, getIndex())
+                                groupRepo.updateLastRead(this, content.getIndex())
                             }
                         }
-                    }
                 }
             }
         }.root
@@ -139,10 +138,10 @@ class ChapterFragment : Fragment() {
     }
 
     private fun getChapterContents(group: Group, refresh: Boolean = false) {
-        lifecycleScope.launch {
+        contentJob?.cancel()
+        contentJob = lifecycleScope.launch {
             viewModel
                 .getChapterContents(group, refresh)
-                .flowWithLifecycle(lifecycle)
                 .collect {
                     updateRecyclerAdapter(it)
                     binding?.updateUIIndicators(it)
@@ -153,19 +152,19 @@ class ChapterFragment : Fragment() {
     private fun ChapterFragmentBinding.updateUIIndicators(resource: Resource<List<Content>>) {
         when (resource) {
             is Resource.Error -> {
-                progressBar.visibility = View.GONE
-                chapterRecyclerView.visibility = View.GONE
-                errorGroup.root.visibility = View.VISIBLE
+                progressBar.visible = false
+                chapterRecyclerView.visible = false
+                errorGroup.root.visible = true
             }
             Resource.Loading -> {
-                chapterRecyclerView.visibility = View.GONE
-                errorGroup.root.visibility = View.GONE
-                progressBar.visibility = View.VISIBLE
+                chapterRecyclerView.visible = false
+                errorGroup.root.visible = false
+                progressBar.visible = true
             }
             is Resource.Success -> {
-                progressBar.visibility = View.GONE
-                errorGroup.root.visibility = View.GONE
-                chapterRecyclerView.visibility = View.VISIBLE
+                progressBar.visible = false
+                errorGroup.root.visible = false
+                chapterRecyclerView.visible = true
             }
         }
     }
@@ -185,7 +184,7 @@ class ChapterFragment : Fragment() {
 
         if (hasDataChanged && resource is Resource.Success) {
             baseAdapter.submitList(resource.data.toUIModel())
-            viewModel.selectedGroup.value?.let { group ->
+            group?.let {
                 val index = (if (group.lastRead != 0) group.lastRead - group.firstChapter else 0)
                     .toInt()
 

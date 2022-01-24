@@ -6,6 +6,7 @@ import androidx.core.view.get
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
 import com.ubadahj.qidianundergroud.utils.setListener
+import com.ubadahj.qidianundergroud.utils.ui.onDataChangeListener
 import com.ubadahj.qidianundergroud.utils.ui.visible
 
 interface StickyViewHolder<T> {
@@ -27,24 +28,20 @@ class StickyHeaderManager<T>(
         }
     }
 
-    private val dataObserver = object : RecyclerView.AdapterDataObserver() {
-        override fun onChanged() {
-            super.onChanged()
+    private var hidden: Boolean = false
+
+    init {
+        recyclerView.addOnScrollListener(scrollListener)
+        recyclerView.onDataChangeListener {
             if (ViewCompat.isLaidOut(header.root)) bind()
             else header.root.post { bind() }
         }
     }
 
-    private var hidden: Boolean = false
-
-    init {
-        recyclerView.addOnScrollListener(scrollListener)
-        adapter.registerAdapterDataObserver(dataObserver)
-    }
-
     fun toggleVisibility() {
         if (hidden) {
-            hidden = (!hidden).updateVisibility()
+            hidden = false
+            bind()
             header.root.animate()
                 .alpha(1f)
                 .setListener(null)
