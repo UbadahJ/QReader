@@ -30,6 +30,7 @@ import com.ubadahj.qidianundergroud.ui.adapters.MenuAdapter
 import com.ubadahj.qidianundergroud.ui.dialog.GroupDetailsDialog
 import com.ubadahj.qidianundergroud.ui.dialog.MenuDialog
 import com.ubadahj.qidianundergroud.ui.models.MenuDialogItem
+import com.ubadahj.qidianundergroud.utils.collectNotNull
 import com.ubadahj.qidianundergroud.utils.models.isRead
 import com.ubadahj.qidianundergroud.utils.ui.snackBar
 import com.ubadahj.qidianundergroud.utils.ui.visible
@@ -69,9 +70,7 @@ class BookFragment : Fragment() {
         super.onViewCreated(view, savedInstanceState)
         binding?.readLatestButton?.visible = false
         lifecycleScope.launch {
-            viewModel.selectedBook.flowWithLifecycle(lifecycle).collect { value ->
-                value?.apply { init(this) }
-            }
+            viewModel.selectedBook.flowWithLifecycle(lifecycle).collectNotNull { init(it) }
         }
     }
 
