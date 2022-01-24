@@ -10,10 +10,13 @@
     <com.google.android.material.textview.MaterialTextView
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:drawablePadding="16dp"
+        android:paddingHorizontal="30dp"
         android:paddingTop="16dp"
         android:text="Settings"
-        android:textAlignment="center"
-        android:textAppearance="@style/TextAppearance.MyTheme.Headline5" />
+        android:textAppearance="@style/TextAppearance.MyTheme.Headline5"
+        app:drawableStartCompat="@drawable/settings"
+        app:drawableTint="?attr/colorAccent" />
 
     <FrameLayout
         android:id="@+id/standard_bottom_sheet"
