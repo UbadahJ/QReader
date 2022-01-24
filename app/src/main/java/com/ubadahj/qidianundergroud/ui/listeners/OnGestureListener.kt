@@ -5,8 +5,7 @@ import android.view.GestureDetector
 import android.view.GestureDetector.SimpleOnGestureListener
 import android.view.MotionEvent
 import android.view.ScaleGestureDetector
-import android.view.View
-import android.view.View.OnTouchListener
+import androidx.recyclerview.widget.RecyclerView
 import kotlin.math.abs
 import kotlin.math.max
 import kotlin.math.min
@@ -17,7 +16,7 @@ private const val SWIPE_VELOCITY_THRESHOLD = 160
 /**
  * Detects left and right swipes across a view.
  */
-open class OnGestureListener(context: Context) : OnTouchListener {
+open class OnGestureListener(context: Context) : RecyclerView.OnItemTouchListener {
     private val gestureDetector: GestureDetector
     private val scaleDetector: ScaleGestureDetector
 
@@ -30,11 +29,13 @@ open class OnGestureListener(context: Context) : OnTouchListener {
     open fun onSwipeRight() {}
     open fun onScaleView(scale: Float) {}
 
-    override fun onTouch(v: View?, event: MotionEvent?): Boolean {
-        v?.performClick()
-        scaleDetector.onTouchEvent(event)
-        return gestureDetector.onTouchEvent(event)
+    override fun onInterceptTouchEvent(rv: RecyclerView, e: MotionEvent): Boolean {
+        gestureDetector.onTouchEvent(e) && scaleDetector.onTouchEvent(e)
+        return false
     }
+
+    override fun onTouchEvent(rv: RecyclerView, e: MotionEvent) {}
+    override fun onRequestDisallowInterceptTouchEvent(disallowIntercept: Boolean) {}
 
     private inner class SwipeListener : SimpleOnGestureListener() {
         override fun onDown(e: MotionEvent): Boolean {

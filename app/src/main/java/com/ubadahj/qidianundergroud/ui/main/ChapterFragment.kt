@@ -1,6 +1,7 @@
 package com.ubadahj.qidianundergroud.ui.main
 
 import android.annotation.SuppressLint
+import android.content.Context
 import android.os.Bundle
 import android.view.*
 import androidx.fragment.app.Fragment
@@ -172,37 +173,7 @@ class ChapterFragment : Fragment() {
 
     @SuppressLint("ClickableViewAccessibility")
     private fun ChapterFragmentBinding.configureSwipeGestures() {
-        chapterRecyclerView.setOnTouchListener(object : OnGestureListener(requireContext()) {
-            override fun onSwipeLeft() {
-                selectChapterGroup { current, other ->
-                    current.lastChapter == other.firstChapter - 1
-                }
-            }
-
-            override fun onSwipeRight() {
-                selectChapterGroup { current, other ->
-                    current.firstChapter == other.lastChapter + 1
-                }
-            }
-
-            override fun onScaleView(scale: Float) {
-                if (!preferences.lockFontScale.get())
-                    preferences.fontScale.set((scale * 10).roundToInt())
-            }
-
-            private fun selectChapterGroup(
-                predicate: (current: Group, other: Group) -> Boolean
-            ) {
-                val group = viewModel.selectedGroup.value
-                viewModel.selectedBook.value?.let { book ->
-                    lifecycleScope.launch {
-                        groupRepo.getGroups(book).first()
-                            .firstOrNull { other -> group?.let { predicate(it, other) } == true }
-                            ?.let { viewModel.setSelectedGroup(it) }
-                    }
-                }
-            }
-        })
+        chapterRecyclerView.addOnItemTouchListener(ReaderGestures(requireContext()))
     }
 
     private fun updateRecyclerAdapter(resource: Resource<List<Content>>) {
@@ -218,7 +189,7 @@ class ChapterFragment : Fragment() {
                 val index = (if (group.lastRead != 0) group.lastRead - group.firstChapter else 0)
                     .toInt()
 
-                viewModel.setSelectedContent(resource.data[index])
+                viewModel.setSelectedContent(resource.data.run { getOrNull(index) ?: first() })
                 binding?.chapterRecyclerView?.linearScroll(index * 2)
             }
         }
@@ -238,5 +209,37 @@ class ChapterFragment : Fragment() {
         listOf(
             ContentUIItem.ContentUITitleItem(it), ContentUIItem.ContentUIContentItem(it)
         )
+    }
+
+    private inner class ReaderGestures(context: Context) : OnGestureListener(context) {
+        override fun onSwipeLeft() {
+            selectChapterGroup { current, other ->
+                current.lastChapter == other.firstChapter - 1
+            }
+        }
+
+        override fun onSwipeRight() {
+            selectChapterGroup { current, other ->
+                current.firstChapter == other.lastChapter + 1
+            }
+        }
+
+        override fun onScaleView(scale: Float) {
+            if (!preferences.lockFontScale.get())
+                preferences.fontScale.set((scale * 10).roundToInt())
+        }
+
+        private fun selectChapterGroup(
+            predicate: (current: Group, other: Group) -> Boolean
+        ) {
+            val group = viewModel.selectedGroup.value
+            viewModel.selectedBook.value?.let { book ->
+                lifecycleScope.launch {
+                    groupRepo.getGroups(book).first()
+                        .firstOrNull { other -> group?.let { predicate(it, other) } == true }
+                        ?.let { viewModel.setSelectedGroup(it) }
+                }
+            }
+        }
     }
 }
