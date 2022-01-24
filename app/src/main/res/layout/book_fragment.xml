@@ -130,11 +130,10 @@
 
             <ImageView
                 android:id="@+id/download_image_view"
-                android:layout_width="40dp"
-                android:layout_height="40dp"
+                android:layout_width="32dp"
+                android:layout_height="32dp"
                 android:layout_marginTop="16dp"
                 android:contentDescription="Download Chapters"
-                android:padding="10dp"
                 android:src="@drawable/download"
                 android:tooltipText="Download Chapters"
                 app:layout_constraintEnd_toStartOf="@+id/v_guideline_90"
@@ -151,15 +150,15 @@
                 android:textAppearance="@style/TextAppearance.MyTheme.Subtitle2"
                 app:layout_constraintEnd_toEndOf="@+id/download_image_view"
                 app:layout_constraintStart_toStartOf="@+id/download_image_view"
-                app:layout_constraintTop_toBottomOf="@+id/download_image_view" />
+                app:layout_constraintTop_toBottomOf="@+id/download_image_view"
+                app:tint="?attr/colorPrimary" />
 
             <ImageView
                 android:id="@+id/menu_image_view"
-                android:layout_width="40dp"
-                android:layout_height="40dp"
+                android:layout_width="32dp"
+                android:layout_height="32dp"
                 android:layout_marginTop="16dp"
                 android:contentDescription="Download Chapters"
-                android:padding="10dp"
                 android:src="@drawable/menu_dots"
                 android:tooltipText="Download Chapters"
                 app:layout_constraintEnd_toStartOf="@+id/v_guideline_90"

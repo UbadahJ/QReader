@@ -3,7 +3,7 @@
     xmlns:app="http://schemas.android.com/apk/res-auto">
     <item
         android:id="@+id/add"
-        android:icon="@drawable/add"
+        android:icon="@drawable/external_link"
         android:title="Add book from link"
         app:iconTint="?android:attr/textColorPrimary"
         app:showAsAction="ifRoom" />

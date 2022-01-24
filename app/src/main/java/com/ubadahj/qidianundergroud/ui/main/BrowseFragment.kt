@@ -171,7 +171,7 @@ class BrowseFragment : Fragment() {
                     InputBottomSheetConfig(
                         "Add book from link",
                         "Add a new book from directly entering a link from WebNovel website",
-                        R.drawable.add,
+                        R.drawable.external_link,
                         { openBookFromLink(it) },
                         "Open"
                     )
