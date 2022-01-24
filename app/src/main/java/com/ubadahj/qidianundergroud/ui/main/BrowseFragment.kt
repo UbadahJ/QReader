@@ -15,8 +15,6 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.work.ExistingWorkPolicy
 import androidx.work.OneTimeWorkRequestBuilder
 import androidx.work.WorkManager
-import com.afollestad.materialdialogs.MaterialDialog
-import com.afollestad.materialdialogs.input.input
 import com.github.ajalt.timberkt.e
 import com.ubadahj.qidianundergroud.R
 import com.ubadahj.qidianundergroud.databinding.BookListFragmentBinding
@@ -25,6 +23,8 @@ import com.ubadahj.qidianundergroud.models.Resource
 import com.ubadahj.qidianundergroud.services.IndexService
 import com.ubadahj.qidianundergroud.ui.adapters.BookAdapter
 import com.ubadahj.qidianundergroud.ui.adapters.MenuAdapter
+import com.ubadahj.qidianundergroud.ui.dialog.InputBottomSheet
+import com.ubadahj.qidianundergroud.ui.dialog.InputBottomSheetConfig
 import com.ubadahj.qidianundergroud.ui.dialog.MenuDialog
 import com.ubadahj.qidianundergroud.ui.models.MenuDialogItem
 import com.ubadahj.qidianundergroud.utils.ui.onItemSelectedListener
@@ -167,14 +167,15 @@ class BrowseFragment : Fragment() {
                 true
             }
             R.id.add -> {
-                MaterialDialog(requireActivity()).show {
-                    message(text = "Enter a link")
-                    input { _, text ->
-                        openBookFromLink(text.toString())
-                    }
-                    positiveButton(text = "Show")
-                    negativeButton(text = "Cancel")
-                }
+                InputBottomSheet(
+                    InputBottomSheetConfig(
+                        "Add book from link",
+                        "Add a new book from directly entering a link from WebNovel website",
+                        R.drawable.add,
+                        { openBookFromLink(it) },
+                        "Open"
+                    )
+                ).show(requireActivity().supportFragmentManager, null)
                 true
             }
             else -> false

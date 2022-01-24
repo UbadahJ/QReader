@@ -118,7 +118,6 @@ dependencies {
 
     // Theming
     implementation("com.google.android.material:material:1.6.0-alpha02")
-    implementation 'com.afollestad.material-dialogs:input:3.3.0'
 
     // Custom tabs
     implementation("androidx.browser:browser:1.4.0")
