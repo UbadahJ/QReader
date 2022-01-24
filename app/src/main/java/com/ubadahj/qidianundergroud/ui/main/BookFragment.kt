@@ -16,6 +16,7 @@ import androidx.work.ExistingWorkPolicy
 import androidx.work.OneTimeWorkRequestBuilder
 import androidx.work.WorkManager
 import coil.load
+import coil.transform.RoundedCornersTransformation
 import com.ubadahj.qidianundergroud.R
 import com.ubadahj.qidianundergroud.databinding.BookFragmentBinding
 import com.ubadahj.qidianundergroud.models.Book
@@ -33,6 +34,7 @@ import com.ubadahj.qidianundergroud.ui.models.MenuDialogItem
 import com.ubadahj.qidianundergroud.utils.collectNotNull
 import com.ubadahj.qidianundergroud.utils.models.isRead
 import com.ubadahj.qidianundergroud.utils.ui.snackBar
+import com.ubadahj.qidianundergroud.utils.ui.toDp
 import com.ubadahj.qidianundergroud.utils.ui.visible
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.Job
@@ -174,7 +176,11 @@ class BookFragment : Fragment() {
     private fun BookFragmentBinding.configureMetadata(
         book: Book
     ) {
-        book.coverPath?.let { bookImage.load(it) }
+        book.coverPath?.let {
+            bookImage.load(it) {
+                transformations(RoundedCornersTransformation(4.toDp(requireContext()).toFloat()))
+            }
+        }
         bookAuthor.text = book.author ?: "Unknown"
         bookDesc.text = book.description ?: "No description"
         bookRatingBar.rating = book.rating ?: 0.0f
