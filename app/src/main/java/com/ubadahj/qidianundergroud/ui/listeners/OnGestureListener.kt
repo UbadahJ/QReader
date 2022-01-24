@@ -47,8 +47,10 @@ open class OnGestureListener(context: Context) : OnTouchListener {
             velocityX: Float,
             velocityY: Float
         ): Boolean {
-            val distanceX = (e2?.x ?: 0f) - (e1?.x ?: 0f)
-            val distanceY = (e2?.y ?: 0f) - (e1?.y ?: 0f)
+            e1 ?: return false
+            e2 ?: return false
+            val distanceX = e2.x - e1.x
+            val distanceY = e2.y - e1.y
             if (abs(distanceX) > abs(distanceY) &&
                 abs(distanceX) > SWIPE_DISTANCE_THRESHOLD &&
                 abs(velocityX) > SWIPE_VELOCITY_THRESHOLD
