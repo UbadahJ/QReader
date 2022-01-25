@@ -16,8 +16,6 @@ import com.ubadahj.qidianundergroud.R
 import com.ubadahj.qidianundergroud.databinding.BookListFragmentBinding
 import com.ubadahj.qidianundergroud.models.Resource
 import com.ubadahj.qidianundergroud.preferences.LibraryPreferences
-import com.ubadahj.qidianundergroud.repositories.GroupRepository
-import com.ubadahj.qidianundergroud.repositories.MetadataRepository
 import com.ubadahj.qidianundergroud.ui.adapters.LibraryAdapter
 import com.ubadahj.qidianundergroud.ui.adapters.MenuAdapter
 import com.ubadahj.qidianundergroud.ui.adapters.decorations.GridItemOffsetDecoration
@@ -31,12 +29,6 @@ import javax.inject.Inject
 
 @AndroidEntryPoint
 class LibraryFragment : Fragment() {
-
-    @Inject
-    lateinit var groupRepo: GroupRepository
-
-    @Inject
-    lateinit var metadataRepo: MetadataRepository
 
     @Inject
     lateinit var pref: LibraryPreferences

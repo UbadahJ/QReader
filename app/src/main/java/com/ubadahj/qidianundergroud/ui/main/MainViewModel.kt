@@ -75,19 +75,6 @@ class MainViewModel @Inject constructor(
         }
     }
 
-    fun getMetadata(book: Book, refresh: Boolean = false) = flow {
-        emit(Resource.Loading)
-        try {
-            emitAll(
-                metadataRepo.getBook(book, refresh)
-                    .catch { Resource.Error(it) }
-                    .map { Resource.Success(it) }
-            )
-        } catch (e: Exception) {
-            emit(Resource.Error(e))
-        }
-    }
-
     fun getChapters(
         book: Book,
         refresh: Boolean = false,

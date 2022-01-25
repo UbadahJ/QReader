@@ -21,8 +21,6 @@ import com.ubadahj.qidianundergroud.models.Book
 import com.ubadahj.qidianundergroud.models.Group
 import com.ubadahj.qidianundergroud.models.Resource
 import com.ubadahj.qidianundergroud.repositories.BookRepository
-import com.ubadahj.qidianundergroud.repositories.GroupRepository
-import com.ubadahj.qidianundergroud.repositories.MetadataRepository
 import com.ubadahj.qidianundergroud.services.DownloadService
 import com.ubadahj.qidianundergroud.ui.adapters.MenuAdapter
 import com.ubadahj.qidianundergroud.ui.dialog.MenuDialog
@@ -49,12 +47,6 @@ class BookFragment : Fragment() {
 
     @Inject
     lateinit var bookRepo: BookRepository
-
-    @Inject
-    lateinit var groupRepo: GroupRepository
-
-    @Inject
-    lateinit var metadataRepo: MetadataRepository
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -121,9 +113,7 @@ class BookFragment : Fragment() {
         }
     }
 
-    private fun BookFragmentBinding.configureDownloadButton(
-        book: Book
-    ) {
+    private fun BookFragmentBinding.configureDownloadButton(book: Book) {
         downloadImageView.setOnClickListener {
             val work = OneTimeWorkRequestBuilder<DownloadService>().apply {
                 setInputData(
@@ -144,9 +134,7 @@ class BookFragment : Fragment() {
         }
     }
 
-    private fun BookFragmentBinding.configureMetadata(
-        book: Book
-    ) {
+    private fun BookFragmentBinding.configureMetadata(book: Book) {
         book.coverPath?.let {
             bookImage.load(it) {
                 placeholder(R.drawable.placeholder)

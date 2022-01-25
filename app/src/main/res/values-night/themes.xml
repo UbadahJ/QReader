@@ -48,7 +48,7 @@
         <item name="handleColor">?attr/colorPrimary</item>
         <item name="bubbleTextColor">?attr/colorOnPrimary</item>
 
-        <item name="toolbarStyle">@style/Widget.MaterialComponents.Toolbar.Surface</item>
+        <item name="toolbarStyle">@style/Widget.Material3.Toolbar.Surface</item>
         <item name="android:statusBarColor" tools:ignore="NewApi">?android:attr/colorBackground
         </item>
         <item name="android:windowLightStatusBar" tools:ignore="NewApi">?attr/isLightTheme</item>
@@ -64,5 +64,7 @@
 
     <style name="PreferenceTheme" parent="@style/PreferenceThemeOverlay">
         <item name="android:tint">?attr/colorPrimary</item>
+        <item name="iconSpaceReserved">false</item>
+        <item name="android:iconSpaceReserved" tools:targetApi="o">false</item>
     </style>
 </resources>
