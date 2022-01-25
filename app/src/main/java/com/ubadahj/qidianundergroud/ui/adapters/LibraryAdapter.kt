@@ -6,6 +6,7 @@ import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.RecyclerView
 import coil.load
 import coil.transform.RoundedCornersTransformation
+import com.ubadahj.qidianundergroud.R
 import com.ubadahj.qidianundergroud.databinding.LibraryBookItemBinding
 import com.ubadahj.qidianundergroud.models.Book
 import com.ubadahj.qidianundergroud.ui.adapters.generic.FilterableListAdapter
@@ -42,9 +43,10 @@ class LibraryAdapter(
             bookTitle.text = book.name
             book.coverPath?.let {
                 bookCover.load(it) {
+                    placeholder(R.drawable.placeholder)
                     transformations(RoundedCornersTransformation(4.toDp(context).toFloat()))
                 }
-            }
+            } ?: bookCover.load(R.drawable.placeholder)
             val totalUnread = book.totalUnread ?: 0
             unreadCount.apply {
                 if (totalUnread > 0) {

@@ -85,7 +85,7 @@ class BookFragment : Fragment() {
         configureMenu(book)
         binding?.apply {
             bookTitle.text = book.name
-            bookImage.load(R.drawable.placeholder_600_800)
+            bookImage.load(R.drawable.placeholder)
 
             configureLibraryButton(book)
             configureDownloadButton(book)
@@ -150,6 +150,7 @@ class BookFragment : Fragment() {
     ) {
         book.coverPath?.let {
             bookImage.load(it) {
+                placeholder(R.drawable.placeholder)
                 transformations(RoundedCornersTransformation(4.toDp(requireContext()).toFloat()))
             }
         }
