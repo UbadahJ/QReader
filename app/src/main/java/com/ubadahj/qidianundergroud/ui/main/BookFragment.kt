@@ -157,16 +157,6 @@ class BookFragment : Fragment() {
                     loadGroups(book, true)
                 }
             },
-            MenuDialogItem("Reload book data", R.drawable.cloud_download) {
-                lifecycleScope.launch {
-                    viewModel.getChapters(book, true)
-                        .flowWithLifecycle(lifecycle)
-                        .collect {
-                            binding?.configureMetadata(book)
-                            configureMenu(book)
-                        }
-                }
-            },
             MenuDialogItem("Mark all chapters as read", R.drawable.check) {
                 lifecycleScope.launch {
                     bookRepo.markAllRead(book)
