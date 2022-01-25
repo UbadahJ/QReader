@@ -50,7 +50,11 @@ class LibraryFragment : Fragment() {
         MenuAdapter(
             listOf(
                 MenuDialogItem("History", R.drawable.archive),
-                MenuDialogItem("Settings", R.drawable.settings),
+                MenuDialogItem("Settings", R.drawable.settings) {
+                    findNavController().navigate(
+                        LibraryFragmentDirections.actionLibraryFragmentToSettingFragment()
+                    )
+                },
                 MenuDialogItem("About", R.drawable.info) {
                     com.mikepenz.aboutlibraries.LibsBuilder().start(requireContext())
                 }

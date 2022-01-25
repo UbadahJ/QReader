@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="utf-8"?>
+<PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android"
+    android:title="Settings">
+
+    <Preference
+        android:icon="@drawable/library"
+        android:key="@string/pkey_open_library"
+        android:title="Library" />
+
+    <Preference
+        android:icon="@drawable/book"
+        android:key="@string/pkey_open_reader"
+        android:title="Reader" />
+
+    <Preference
+        android:icon="@drawable/request"
+        android:key="@string/pkey_open_network"
+        android:title="Network" />
+
+</PreferenceScreen>

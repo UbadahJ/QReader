@@ -24,6 +24,13 @@
             app:exitAnim="@anim/slide_down"
             app:popEnterAnim="@anim/slide_up"
             app:popExitAnim="@anim/bottom_sheet_slide_out" />
+        <action
+            android:id="@+id/action_libraryFragment_to_settingFragment"
+            app:destination="@id/settingFragment"
+            app:enterAnim="@anim/bottom_sheet_slide_in"
+            app:exitAnim="@anim/slide_down"
+            app:popEnterAnim="@anim/slide_up"
+            app:popExitAnim="@anim/bottom_sheet_slide_out" />
     </fragment>
     <fragment
         android:id="@+id/browseFragment"
@@ -76,4 +83,9 @@
             app:popEnterAnim="@anim/slide_up"
             app:popExitAnim="@anim/bottom_sheet_slide_out" />
     </fragment>
+    <fragment
+        android:id="@+id/settingFragment"
+        android:name="com.ubadahj.qidianundergroud.ui.main.SettingFragment"
+        android:label="SettingFragment"
+        tools:layout="@layout/setting_base_fragment" />
 </navigation>

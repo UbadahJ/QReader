@@ -33,6 +33,9 @@
     <string name="pref_scale_factor">scaleFactor</string>
     <string name="pref_immersive_mode">enableImmersiveMode</string>
     <string name="pref_line_spacing_multiplier">lineSpacingMultiplier</string>
+    <string name="pkey_open_reader">showReaderPreferences</string>
+    <string name="pkey_open_network">showNetworkPreferences</string>
+    <string name="pkey_open_library">showLibraryPreferences</string>
 
     <string-array name="browse_sort_by">
         <item>Name</item>

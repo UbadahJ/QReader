@@ -60,5 +60,11 @@
         <item name="android:navigationBarDividerColor" tools:ignore="NewApi">
             ?attr/colorControlHighlight
         </item>
+
+        <item name="preferenceTheme">@style/PreferenceTheme</item>
+    </style>
+
+    <style name="PreferenceTheme" parent="@style/PreferenceThemeOverlay.v14.Material">
+        <item name="android:tint">?attr/colorPrimary</item>
     </style>
 </resources>
