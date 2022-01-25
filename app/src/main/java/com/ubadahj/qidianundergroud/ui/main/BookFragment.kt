@@ -1,11 +1,9 @@
 package com.ubadahj.qidianundergroud.ui.main
 
-import android.content.Intent
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import androidx.core.net.toUri
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import androidx.lifecycle.flowWithLifecycle
@@ -31,6 +29,7 @@ import com.ubadahj.qidianundergroud.ui.dialog.MenuDialog
 import com.ubadahj.qidianundergroud.ui.models.MenuDialogItem
 import com.ubadahj.qidianundergroud.utils.collectNotNull
 import com.ubadahj.qidianundergroud.utils.models.isRead
+import com.ubadahj.qidianundergroud.utils.ui.openLink
 import com.ubadahj.qidianundergroud.utils.ui.snackBar
 import com.ubadahj.qidianundergroud.utils.ui.toDp
 import com.ubadahj.qidianundergroud.utils.ui.visible
@@ -190,16 +189,7 @@ class BookFragment : Fragment() {
         if (book.link != null) {
             menuItems.add(
                 MenuDialogItem("Open Webnovel Page", R.drawable.info) {
-                    try {
-                        requireActivity().startActivity(
-                            Intent(
-                                Intent.ACTION_VIEW,
-                                "https://webnovel.com${book.link}".toUri()
-                            )
-                        )
-                    } catch (e: Exception) {
-                        binding?.root?.snackBar("Failed to open link")
-                    }
+                    requireActivity().openLink("https://webnovel.com${book.link}")
                 }
             )
         }

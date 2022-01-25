@@ -2,13 +2,16 @@ package com.ubadahj.qidianundergroud.utils.ui
 
 import android.app.Activity
 import android.content.Context
+import android.content.Intent
 import android.util.TypedValue
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.AdapterView
 import android.widget.Spinner
+import android.widget.Toast
 import androidx.annotation.StringRes
+import androidx.core.net.toUri
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowCompat
 import androidx.core.view.WindowInsetsCompat
@@ -44,6 +47,12 @@ fun Spinner.onItemSelectedListener(onChange: (position: Int) -> Unit) {
     }
 }
 
+fun Activity.openLink(link: String) = try {
+    startActivity(Intent(Intent.ACTION_VIEW, link.toUri()))
+} catch (e: Exception) {
+    toast("Failed to open link")
+}
+
 fun Activity.showSystemBar(enable: Boolean) {
     if (!enable) {
         WindowCompat.setDecorFitsSystemWindows(window, false)
@@ -74,6 +83,16 @@ fun Number.toDp(context: Context): Number =
         this.toFloat(),
         context.resources.displayMetrics
     )
+
+fun Context.toast(text: String, length: Int = Toast.LENGTH_SHORT) = try {
+    Toast.makeText(this, text, length).show()
+} catch (e: Exception) {
+}
+
+fun Context.toast(@StringRes text: Int, length: Int = Toast.LENGTH_SHORT) = try {
+    Toast.makeText(this, text, length).show()
+} catch (e: Exception) {
+}
 
 fun View.snackBar(text: String, length: Int = Snackbar.LENGTH_SHORT) = try {
     Snackbar.make(this, text, length).show()

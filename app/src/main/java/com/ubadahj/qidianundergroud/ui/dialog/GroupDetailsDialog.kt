@@ -12,6 +12,7 @@ import com.ubadahj.qidianundergroud.repositories.GroupRepository
 import com.ubadahj.qidianundergroud.ui.adapters.MenuAdapter
 import com.ubadahj.qidianundergroud.ui.models.MenuDialogItem
 import com.ubadahj.qidianundergroud.utils.models.isRead
+import com.ubadahj.qidianundergroud.utils.ui.openLink
 import dagger.hilt.android.AndroidEntryPoint
 import javax.inject.Inject
 
@@ -52,7 +53,11 @@ class GroupDetailsDialog(
                     MenuDialogItem("Mark as read", R.drawable.check) {
                         groupRepo.updateLastRead(group, group.lastChapter.toInt())
                         dismiss()
-                    }
+                    },
+                    MenuDialogItem("Open in browser", R.drawable.external_link) {
+                        requireActivity().openLink(group.link)
+                        dismiss()
+                    },
                 )
             )
         }.root
