@@ -8,6 +8,7 @@ import androidx.viewbinding.ViewBinding
 import com.ubadahj.qidianundergroud.databinding.ChapterBodyItemBinding
 import com.ubadahj.qidianundergroud.databinding.ChapterTitleItemBinding
 import com.ubadahj.qidianundergroud.models.Content
+import com.ubadahj.qidianundergroud.ui.adapters.ContentAdapterPreferences
 import com.ubadahj.qidianundergroud.ui.adapters.decorations.StickyViewHolder
 import com.ubadahj.qidianundergroud.ui.models.ContentHeaderConfig
 import com.ubadahj.qidianundergroud.ui.models.ContentUIItem
@@ -28,7 +29,7 @@ enum class ContentViewHolderType {
 abstract class ContentViewHolder(
     binding: ViewBinding
 ) : RecyclerView.ViewHolder(binding.root) {
-    abstract fun bind(item: Content, scaleFactor: Float)
+    abstract fun bind(item: Content, preferences: ContentAdapterPreferences)
 }
 
 object ChapterViewHolderFactory {
@@ -56,13 +57,18 @@ object ChapterViewHolderFactory {
         private val binding: ChapterTitleItemBinding,
         private val config: ContentHeaderConfig
     ) : ContentViewHolder(binding), StickyViewHolder<ContentUIItem> {
+        companion object {
+            private val PREF = ContentAdapterPreferences()
+        }
+
         init {
             binding.headerBack.setOnClickListener { config.onBackPressed() }
         }
+
         override val type: Int = ContentViewHolderType.TITLE.ordinal
         override val root = binding.root
-        override fun bind(item: ContentUIItem) = bind(item.content, 1f)
-        override fun bind(item: Content, scaleFactor: Float) {
+        override fun bind(item: ContentUIItem) = bind(item.content, PREF)
+        override fun bind(item: Content, preferences: ContentAdapterPreferences) {
             val split = item.title.split(":")
             binding.headerChapterNumber.apply {
                 text = split.first()
@@ -85,9 +91,10 @@ object ChapterViewHolderFactory {
             }
         }
 
-        override fun bind(item: Content, scaleFactor: Float) {
+        override fun bind(item: Content, preferences: ContentAdapterPreferences) {
             binding.contents.apply {
-                textSize = 16f * scaleFactor
+                textSize = 16f * preferences.scaleFactor
+                setLineSpacing(0f, preferences.lineSpacing)
                 setTextFuture(
                     PrecomputedTextCompat.getTextFuture(
                         item.contents,

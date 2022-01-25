@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
-<PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android">
+<PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
     <PreferenceCategory android:title="General">
         <SwitchPreference
             android:defaultValue="true"
@@ -13,7 +14,14 @@
             android:key="@string/pref_scale_factor"
             android:max="50"
             android:summary="The current scale applied to the font size"
-            android:title="Current scale factor" />
+            android:title="Font scale factor" />
+        <SeekBarPreference
+            android:defaultValue="10"
+            android:key="@string/pref_line_spacing_multiplier"
+            android:max="25"
+            android:summary="The current line spacing applied to the text"
+            android:title="Line spacing multiplier"
+            app:min="10" />
     </PreferenceCategory>
     <PreferenceCategory android:title="Gestures">
         <SwitchPreference

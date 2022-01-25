@@ -18,6 +18,7 @@ import com.ubadahj.qidianundergroud.models.Resource
 import com.ubadahj.qidianundergroud.preferences.ReaderPreferences
 import com.ubadahj.qidianundergroud.repositories.GroupRepository
 import com.ubadahj.qidianundergroud.ui.adapters.ContentAdapter
+import com.ubadahj.qidianundergroud.ui.adapters.ContentAdapterPreferences
 import com.ubadahj.qidianundergroud.ui.adapters.decorations.StickyHeaderManager
 import com.ubadahj.qidianundergroud.ui.adapters.factories.ChapterViewHolderFactory
 import com.ubadahj.qidianundergroud.ui.dialog.ContentPreferencesDialog
@@ -30,6 +31,7 @@ import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 import kotlin.math.roundToInt
@@ -121,16 +123,24 @@ class ChapterFragment : Fragment() {
 
     private fun ChapterFragmentBinding.configurePreferencesFlow() = lifecycleScope.launch {
         launch {
-            preferences.fontScale.asFlow().flowWithLifecycle(lifecycle, Lifecycle.State.RESUMED)
+            preferences.fontScale.asFlow()
+                .flowWithLifecycle(lifecycle, Lifecycle.State.RESUMED)
+                .map { it.toFloat() / 10 }
                 .collect {
-                    baseAdapter.scaleFactor = { it.toFloat() / 10 }
-                    chapterRecyclerView.preserveState {
-                        adapter = baseAdapter
-                    }
+                    updateAdapterPreferences { copy(scaleFactor = it) }
                 }
         }
         launch {
-            preferences.immersiveMode.asFlow().flowWithLifecycle(lifecycle, Lifecycle.State.RESUMED)
+            preferences.lineSpacingMultiplier.asFlow()
+                .flowWithLifecycle(lifecycle, Lifecycle.State.RESUMED)
+                .map { it.toFloat() / 10 }
+                .collect {
+                    updateAdapterPreferences { copy(lineSpacing = it) }
+                }
+        }
+        launch {
+            preferences.immersiveMode.asFlow()
+                .flowWithLifecycle(lifecycle, Lifecycle.State.RESUMED)
                 .collect {
                     requireActivity().showSystemBar(!it)
                 }
@@ -201,6 +211,15 @@ class ChapterFragment : Fragment() {
             viewModel.selectedGroup.value?.lastChapter?.toInt() ?: throw IllegalStateException(
                 "Failed to get lastChapter from ViewModel selectChapterGroup"
             )
+        }
+    }
+
+    private fun updateAdapterPreferences(
+        action: ContentAdapterPreferences.() -> ContentAdapterPreferences
+    ) {
+        baseAdapter.preferences = baseAdapter.preferences.run(action)
+        binding?.chapterRecyclerView?.preserveState {
+            adapter = baseAdapter
         }
     }
 

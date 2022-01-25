@@ -10,9 +10,14 @@ import com.ubadahj.qidianundergroud.ui.adapters.factories.ContentViewHolderType
 import com.ubadahj.qidianundergroud.ui.models.ContentHeaderConfig
 import com.ubadahj.qidianundergroud.ui.models.ContentUIItem
 
+data class ContentAdapterPreferences(
+    val scaleFactor: Float = 1f,
+    val lineSpacing: Float = 1f
+)
+
 class ContentAdapter(
     items: List<ContentUIItem> = listOf(),
-    var scaleFactor: () -> Float = { 1f },
+    var preferences: ContentAdapterPreferences = ContentAdapterPreferences(),
     val headerConfig: ContentHeaderConfig,
     val onClick: (ContentUIItem) -> Unit
 ) : ListAdapter<ContentUIItem, ContentViewHolder>(DiffCallback()),
@@ -37,7 +42,7 @@ class ContentAdapter(
     }
 
     override fun onBindViewHolder(holder: ContentViewHolder, position: Int) {
-        holder.bind(getItem(position).content, scaleFactor())
+        holder.bind(getItem(position).content, preferences)
     }
 
     class DiffCallback : DiffUtil.ItemCallback<ContentUIItem>() {

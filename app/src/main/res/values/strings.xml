@@ -32,6 +32,7 @@
     <string name="pref_lock_font_scale">lockScaleFactor</string>
     <string name="pref_scale_factor">scaleFactor</string>
     <string name="pref_immersive_mode">enableImmersiveMode</string>
+    <string name="pref_line_spacing_multiplier">lineSpacingMultiplier</string>
 
     <string-array name="browse_sort_by">
         <item>Name</item>

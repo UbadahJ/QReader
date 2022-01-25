@@ -22,6 +22,10 @@ class ReaderPreferences @Inject constructor(
         context.getString(R.string.pref_scale_factor), 10
     )
 
+    val lineSpacingMultiplier = flowPreferences.getInt(
+        context.getString(R.string.pref_line_spacing_multiplier), 4
+    )
+
     val lockFontScale = flowPreferences.getBoolean(
         context.getString(R.string.pref_lock_font_scale), false
     )
