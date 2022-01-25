@@ -3,6 +3,8 @@ package com.ubadahj.qidianundergroud
 import android.os.Bundle
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
+import androidx.appcompat.app.AppCompatDelegate
+import androidx.lifecycle.flowWithLifecycle
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.ActivityNavigator
 import androidx.navigation.findNavController
@@ -12,12 +14,14 @@ import androidx.work.PeriodicWorkRequestBuilder
 import androidx.work.WorkManager
 import com.github.ajalt.timberkt.Timber
 import com.ubadahj.qidianundergroud.databinding.MainActivityBinding
+import com.ubadahj.qidianundergroud.preferences.AppearancePreferences
 import com.ubadahj.qidianundergroud.repositories.BookRepository
 import com.ubadahj.qidianundergroud.repositories.GroupRepository
 import com.ubadahj.qidianundergroud.services.NotificationWorker
 import com.ubadahj.qidianundergroud.services.updater.service.UpdateService
 import com.ubadahj.qidianundergroud.ui.main.MainViewModel
 import dagger.hilt.android.AndroidEntryPoint
+import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
 import java.util.concurrent.TimeUnit
@@ -34,6 +38,8 @@ class MainActivity : AppCompatActivity() {
 
     private lateinit var binding: MainActivityBinding
 
+    @Inject
+    lateinit var pref: AppearancePreferences
 
     @Inject
     lateinit var bookRepo: BookRepository
@@ -65,6 +71,18 @@ class MainActivity : AppCompatActivity() {
                     startDestination =
                         if (groups != null) R.id.chapterFragment else R.id.bookFragment
                 }
+            }
+        }
+
+        lifecycleScope.launch {
+            pref.nightMode.asFlow().flowWithLifecycle(lifecycle).collect {
+                AppCompatDelegate.setDefaultNightMode(
+                    when (it) {
+                        "0" -> AppCompatDelegate.MODE_NIGHT_NO
+                        "1" -> AppCompatDelegate.MODE_NIGHT_YES
+                        else -> AppCompatDelegate.MODE_NIGHT_FOLLOW_SYSTEM
+                    }
+                )
             }
         }
 

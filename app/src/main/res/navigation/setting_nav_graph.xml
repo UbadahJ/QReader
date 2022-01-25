@@ -29,6 +29,13 @@
             app:exitAnim="@android:anim/fade_out"
             app:popEnterAnim="@android:anim/fade_in"
             app:popExitAnim="@android:anim/fade_out" />
+        <action
+            android:id="@+id/action_to_appearanceSettingFragment"
+            app:destination="@id/appearanceSettingFragment"
+            app:enterAnim="@android:anim/fade_in"
+            app:exitAnim="@android:anim/fade_out"
+            app:popEnterAnim="@android:anim/fade_in"
+            app:popExitAnim="@android:anim/fade_out" />
     </fragment>
     <fragment
         android:id="@+id/readerSettingFragment"
@@ -42,4 +49,8 @@
         android:id="@+id/librarySettingFragment"
         android:name="com.ubadahj.qidianundergroud.ui.preferences.LibrarySettingFragment"
         android:label="Library" />
+    <fragment
+        android:id="@+id/appearanceSettingFragment"
+        android:name="com.ubadahj.qidianundergroud.ui.preferences.AppearanceSettingFragment"
+        android:label="Appearance" />
 </navigation>

@@ -39,6 +39,8 @@
     <string name="pref_column_count">columnCount</string>
     <string name="pref_use_proxy">useProxy</string>
     <string name="pref_request_timeout">webViewTimeout</string>
+    <string name="pkey_open_appearance">showAppearancePreferences</string>
+    <string name="pref_night_mode">nightMode</string>
 
     <string-array name="browse_sort_by">
         <item>Name</item>
@@ -46,5 +48,15 @@
         <item>Rating</item>
         <item>Last Updated</item>
         <item>Completed</item>
+    </string-array>
+    <string-array name="night_mode_options">
+        <item>Disable</item>
+        <item>Enable</item>
+        <item>Follow System</item>
+    </string-array>
+    <string-array name="night_mode_options_value">
+        <item>0</item>
+        <item>1</item>
+        <item>2</item>
     </string-array>
 </resources>

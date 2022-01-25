@@ -23,6 +23,10 @@ class GeneralSettingFragment : ThemedPreferenceCompat() {
             R.string.pkey_open_network,
             GeneralSettingFragmentDirections.actionToNetworkSettingFragment()
         )
+        setNavigation(
+            R.string.pkey_open_appearance,
+            GeneralSettingFragmentDirections.actionToAppearanceSettingFragment()
+        )
     }
 
     private fun setNavigation(@StringRes key: Int, direction: NavDirections) =

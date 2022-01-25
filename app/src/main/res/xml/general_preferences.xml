@@ -8,6 +8,11 @@
         android:title="Library" />
 
     <Preference
+        android:icon="@drawable/appearance"
+        android:key="@string/pkey_open_appearance"
+        android:title="Appearance" />
+
+    <Preference
         android:icon="@drawable/book"
         android:key="@string/pkey_open_reader"
         android:title="Reader" />
