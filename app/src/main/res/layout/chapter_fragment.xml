@@ -45,9 +45,10 @@
         layout="@layout/error_layout"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        app:layout_constraintBottom_toTopOf="@+id/guideline"
+        app:layout_constraintBottom_toBottomOf="@+id/chapter_recycler_view"
         app:layout_constraintEnd_toEndOf="@+id/chapter_recycler_view"
-        app:layout_constraintStart_toStartOf="@+id/chapter_recycler_view" />
+        app:layout_constraintStart_toStartOf="@+id/chapter_recycler_view"
+        app:layout_constraintTop_toTopOf="parent" />
 
     <androidx.constraintlayout.widget.Guideline
         android:id="@+id/guideline"
