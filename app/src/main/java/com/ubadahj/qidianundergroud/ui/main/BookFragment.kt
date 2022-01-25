@@ -83,7 +83,7 @@ class BookFragment : Fragment() {
             configureMenuButton()
 
             if (book.author == null)
-                loadGroups(book, refresh = true, webNovelRefresh = true)
+                loadGroups(book, refresh = true)
             else
                 loadGroups(book)
 
@@ -154,7 +154,7 @@ class BookFragment : Fragment() {
         val menuItems: MutableList<MenuDialogItem> = mutableListOf(
             MenuDialogItem("Check for updates", R.drawable.refresh) {
                 lifecycleScope.launch {
-                    loadGroups(book, true, true)
+                    loadGroups(book, true)
                 }
             },
             MenuDialogItem("Reload book data", R.drawable.cloud_download) {
@@ -185,14 +185,10 @@ class BookFragment : Fragment() {
         menuAdapter.submitList(menuItems)
     }
 
-    private fun loadGroups(
-        book: Book,
-        refresh: Boolean = false,
-        webNovelRefresh: Boolean = false
-    ) {
+    private fun loadGroups(book: Book, refresh: Boolean = false) {
         groupJob?.cancel()
         groupJob = lifecycleScope.launch {
-            viewModel.getChapters(book, refresh, webNovelRefresh).collect {
+            viewModel.getChapters(book, refresh).collect {
                 binding?.configureGroups(it)
             }
         }

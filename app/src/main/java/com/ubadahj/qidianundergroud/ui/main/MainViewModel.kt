@@ -77,13 +77,12 @@ class MainViewModel @Inject constructor(
 
     fun getChapters(
         book: Book,
-        refresh: Boolean = false,
-        webNovelRefresh: Boolean = false
+        refresh: Boolean = false
     ) = flow {
         emit(Resource.Loading)
         try {
             emitAll(
-                groupRepo.getGroups(book, refresh, webNovelRefresh)
+                groupRepo.getGroups(book, refresh)
                     .catch { Resource.Error(it) }
                     .map { it.sortedByDescending(Group::firstChapter) }
                     .map { Resource.Success(it) }

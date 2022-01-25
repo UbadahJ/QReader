@@ -55,14 +55,13 @@ class GroupRepository @Inject constructor(
 
     suspend fun getGroups(
         book: Book,
-        refresh: Boolean = false,
-        webNovelRefresh: Boolean = false
+        refresh: Boolean = false
     ): Flow<List<Group>> {
         val dbGroups = database.bookQueries.chapters(book.id).executeAsList()
         if (database.bookQueries.getUndergroundById(book.id).executeAsOneOrNull() == null)
-            fetchWebNovelGroups(book, refresh || webNovelRefresh, dbGroups)
+            fetchWebNovelGroups(book, refresh, dbGroups)
         else
-            fetchUndergroundGroups(book, refresh, webNovelRefresh, dbGroups)
+            fetchUndergroundGroups(book, refresh, dbGroups)
 
         return database.bookQueries.chapters(book.id).asFlow().mapToList()
     }
@@ -90,7 +89,6 @@ class GroupRepository @Inject constructor(
     private suspend fun fetchUndergroundGroups(
         book: Book,
         refresh: Boolean,
-        webNovelRefresh: Boolean,
         dbGroups: List<Group>
     ) {
         if (refresh || dbGroups.isEmpty()) {
@@ -103,6 +101,12 @@ class GroupRepository @Inject constructor(
             val dbGroupsToUpdate = dbGroups
                 .filter { it.firstChapter.toInt() in remoteChapters.keys }
                 .filter { it.lastChapter.toInt() != remoteChapters[it.firstChapter.toInt()]?.lastChapter }
+
+            val remoteWebNovelChapters = metaRepo.getBook(book, refresh).first()
+                ?.let { webNovelApi.getChapter(it.id, it.link) }
+                ?.filter { !it.premium }
+                ?.map { it.toGroup(book) }
+                ?: listOf()
 
             database.groupQueries.transaction {
                 for (group in dbGroupsToUpdate) {
@@ -120,17 +124,7 @@ class GroupRepository @Inject constructor(
                 // Due to INSERT OR IGNORE, we can ignore same entries
                 for (group in remoteGroups)
                     database.groupQueries.insert(group)
-            }
-        }
 
-        if (webNovelRefresh || dbGroups.isEmpty()) {
-            val remoteWebNovelChapters = metaRepo.getBook(book, refresh).first()
-                ?.let { webNovelApi.getChapter(it.id, it.link) }
-                ?.filter { !it.premium }
-                ?.map { it.toGroup(book) }
-                ?: listOf()
-
-            database.groupQueries.transaction {
                 for (chapter in remoteWebNovelChapters)
                     database.groupQueries.insert(chapter)
             }
