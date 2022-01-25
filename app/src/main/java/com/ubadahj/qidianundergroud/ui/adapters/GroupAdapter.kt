@@ -16,7 +16,7 @@ import com.ubadahj.qidianundergroud.utils.models.source
 import com.ubadahj.qidianundergroud.utils.ui.visible
 
 class GroupAdapter(
-    groups: List<Group>,
+    groups: List<Group> = listOf(),
     private val onClick: (Group) -> Unit,
     private val menuClick: (Group) -> Unit
 ) : FilterableListAdapter<Group, GroupAdapter.ViewHolder>(DiffCallback()) {

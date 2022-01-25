@@ -26,9 +26,7 @@ import com.ubadahj.qidianundergroud.repositories.BookRepository
 import com.ubadahj.qidianundergroud.repositories.GroupRepository
 import com.ubadahj.qidianundergroud.repositories.MetadataRepository
 import com.ubadahj.qidianundergroud.services.DownloadService
-import com.ubadahj.qidianundergroud.ui.adapters.GroupAdapter
 import com.ubadahj.qidianundergroud.ui.adapters.MenuAdapter
-import com.ubadahj.qidianundergroud.ui.dialog.GroupDetailsDialog
 import com.ubadahj.qidianundergroud.ui.dialog.MenuDialog
 import com.ubadahj.qidianundergroud.ui.models.MenuDialogItem
 import com.ubadahj.qidianundergroud.utils.collectNotNull
@@ -70,39 +68,28 @@ class BookFragment : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        binding?.readLatestButton?.visible = false
+        binding?.apply {
+            readLatestButton.visible = false
+            materialCardView.setOnClickListener {
+                findNavController().navigate(
+                    BookFragmentDirections.actionBookFragmentToBookChaptersFragment()
+                )
+            }
+        }
         lifecycleScope.launch {
             viewModel.selectedBook.flowWithLifecycle(lifecycle).collectNotNull { init(it) }
         }
     }
 
-    override fun onResume() {
-        super.onResume()
-    }
-
-    private fun init(book: Book, ignoreAvaliable: Boolean = false) {
+    private fun init(book: Book) {
         configureMenu(book)
         binding?.apply {
             bookTitle.text = book.name
             bookImage.load(R.drawable.placeholder_600_800)
 
-            // TODO: Add availability check
-            if (true || ignoreAvaliable) {
-                configureLibraryButton(book)
-                configureDownloadButton(book)
-                configureMenuButton()
-
-                configureGroupAdapter()
-            } else {
-                errorGroup.apply {
-                    root.visible = true
-                    errorText.text = "The book is not longer available"
-                    errorButton.text = "Continue"
-                    errorButton.setOnClickListener {
-                        init(book, true)
-                    }
-                }
-            }
+            configureLibraryButton(book)
+            configureDownloadButton(book)
+            configureMenuButton()
 
             if (book.author == null)
                 loadGroups(book, refresh = true, webNovelRefresh = true)
@@ -155,21 +142,6 @@ class BookFragment : Fragment() {
     private fun BookFragmentBinding.configureMenuButton() {
         menuImageView.setOnClickListener {
             MenuDialog(menuAdapter).show(requireActivity().supportFragmentManager, null)
-        }
-    }
-
-    private fun BookFragmentBinding.configureGroupAdapter() {
-        chapterListView.adapter = GroupAdapter(
-            listOf(),
-            {
-                viewModel.setSelectedGroup(it)
-                findNavController().navigate(
-                    BookFragmentDirections.actionBookFragmentToChapterFragment()
-                )
-            }
-        ) {
-            GroupDetailsDialog(groupRepo, it)
-                .show(requireActivity().supportFragmentManager, null)
         }
     }
 
@@ -256,8 +228,6 @@ class BookFragment : Fragment() {
             is Resource.Success -> {
                 loadingProgress.visible = false
                 materialCardView.visible = true
-                (chapterListView.adapter as? GroupAdapter)?.submitList(resource.data)
-
                 readLatestButton.apply {
                     val latestChapter = resource.data
                         .filter { !it.isRead() }
@@ -277,18 +247,13 @@ class BookFragment : Fragment() {
 
                     visible = latestChapter != null
                 }
+                previewText.text = "Latest: ${
+                    resource.data.sortedByDescending { it.firstChapter }.first().text
+                }"
             }
             is Resource.Error -> {
                 loadingProgress.visible = false
                 materialCardView.visible = false
-                errorGroup.apply {
-                    root.visible = true
-                    errorText.setText(R.string.error_refreshing)
-                    errorButton.text = "Retry"
-                    errorButton.setOnClickListener {
-                        loadGroups(viewModel.selectedBook.value!!, refresh = true)
-                    }
-                }
             }
         }
     }

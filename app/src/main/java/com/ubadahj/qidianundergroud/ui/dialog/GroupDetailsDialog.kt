@@ -12,11 +12,16 @@ import com.ubadahj.qidianundergroud.repositories.GroupRepository
 import com.ubadahj.qidianundergroud.ui.adapters.MenuAdapter
 import com.ubadahj.qidianundergroud.ui.models.MenuDialogItem
 import com.ubadahj.qidianundergroud.utils.models.isRead
+import dagger.hilt.android.AndroidEntryPoint
+import javax.inject.Inject
 
+@AndroidEntryPoint
 class GroupDetailsDialog(
-    private val groupRepo: GroupRepository,
     private val group: Group
 ) : BottomSheetDialogFragment() {
+
+    @Inject
+    lateinit var groupRepo: GroupRepository
 
     private var binding: GroupInfoMenuBinding? = null
     private val lastRead: String

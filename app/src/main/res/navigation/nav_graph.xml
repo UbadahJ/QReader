@@ -28,7 +28,8 @@
     <fragment
         android:id="@+id/browseFragment"
         android:name="com.ubadahj.qidianundergroud.ui.main.BrowseFragment"
-        android:label="BrowseFragment">
+        android:label="BrowseFragment"
+        tools:layout="@layout/book_list_fragment">
         <action
             android:id="@+id/action_browseFragment_to_bookFragment"
             app:destination="@id/bookFragment"
@@ -49,10 +50,30 @@
             app:exitAnim="@anim/slide_down"
             app:popEnterAnim="@anim/slide_up"
             app:popExitAnim="@anim/bottom_sheet_slide_out" />
+        <action
+            android:id="@+id/action_bookFragment_to_bookChaptersFragment"
+            app:destination="@id/bookChaptersFragment"
+            app:enterAnim="@anim/bottom_sheet_slide_in"
+            app:exitAnim="@anim/slide_down"
+            app:popEnterAnim="@anim/slide_up"
+            app:popExitAnim="@anim/bottom_sheet_slide_out" />
     </fragment>
     <fragment
         android:id="@+id/chapterFragment"
         android:name="com.ubadahj.qidianundergroud.ui.main.ChapterFragment"
         android:label="chapter_fragment"
         tools:layout="@layout/chapter_fragment" />
+    <fragment
+        android:id="@+id/bookChaptersFragment"
+        android:name="com.ubadahj.qidianundergroud.ui.dialog.BookChaptersFragment"
+        android:label="BookChaptersFragment"
+        tools:layout="@layout/book_chapters_fragment">
+        <action
+            android:id="@+id/action_bookChaptersFragment_to_chapterFragment"
+            app:destination="@id/chapterFragment"
+            app:enterAnim="@anim/bottom_sheet_slide_in"
+            app:exitAnim="@anim/slide_down"
+            app:popEnterAnim="@anim/slide_up"
+            app:popExitAnim="@anim/bottom_sheet_slide_out" />
+    </fragment>
 </navigation>
