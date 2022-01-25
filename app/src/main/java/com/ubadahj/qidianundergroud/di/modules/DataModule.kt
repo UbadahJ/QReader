@@ -3,6 +3,7 @@ package com.ubadahj.qidianundergroud.di.modules
 import android.content.Context
 import android.content.SharedPreferences
 import androidx.preference.PreferenceManager
+import com.fredporciuncula.flow.preferences.FlowSharedPreferences
 import com.squareup.moshi.Moshi
 import com.squareup.moshi.kotlin.reflect.KotlinJsonAdapterFactory
 import com.ubadahj.qidianundergroud.Database
@@ -35,7 +36,14 @@ object DataModule {
     @Provides
     @Singleton
     fun providesPreferences(@ApplicationContext context: Context): SharedPreferences {
-        return PreferenceManager.getDefaultSharedPreferences(context);
+        return PreferenceManager.getDefaultSharedPreferences(context)
     }
+
+    @Provides
+    @Singleton
+    fun providesFlowPreferences(preferences: SharedPreferences): FlowSharedPreferences {
+        return FlowSharedPreferences(preferences)
+    }
+
 
 }

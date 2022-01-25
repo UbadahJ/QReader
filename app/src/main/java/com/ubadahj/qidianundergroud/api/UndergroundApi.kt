@@ -8,6 +8,7 @@ import com.ubadahj.qidianundergroud.api.retrofit.ProxyApi
 import com.ubadahj.qidianundergroud.api.retrofit.UndergroundApi
 import com.ubadahj.qidianundergroud.models.Content
 import com.ubadahj.qidianundergroud.models.Group
+import com.ubadahj.qidianundergroud.preferences.NetworkPreferences
 import com.ubadahj.qidianundergroud.utils.getHtml
 import com.ubadahj.qidianundergroud.utils.md5
 import com.ubadahj.qidianundergroud.utils.unescapeHtml
@@ -18,14 +19,14 @@ import org.jsoup.Jsoup
 import java.util.concurrent.TimeoutException
 import javax.inject.Inject
 
-private const val maxTimeDelay: Long = 8000
-
 class UndergroundApi @Inject constructor(
     @ApplicationContext private val context: Context,
-    private val provider: RetrofitProvider
+    private val provider: RetrofitProvider,
+    private val pref: NetworkPreferences
 ) {
 
-    private val proxy: Boolean = true
+    private val proxy get() = pref.useProxy.get()
+    private val maxTimeDelay get() = pref.requestTimeout.get().toLongOrNull() ?: 8000
     private val undergroundApi: UndergroundApi by lazy {
         provider.get("https://toc.qidianunderground.org/api/v1/pages/")
             .create(UndergroundApi::class.java)
@@ -66,7 +67,11 @@ class UndergroundApi @Inject constructor(
                 delay(300)
             }
             true
-        } ?: throw TimeoutException("Exceed $maxTimeDelay fetching contents")
+        } ?: throw TimeoutException(
+            "Exceed ${
+                pref.requestTimeout.get().toIntOrNull() ?: 8000
+            } fetching contents"
+        )
 
         doc.select("br").forEach { it.remove() }
         return doc.select(".well")

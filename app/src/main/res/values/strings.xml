@@ -36,6 +36,9 @@
     <string name="pkey_open_reader">showReaderPreferences</string>
     <string name="pkey_open_network">showNetworkPreferences</string>
     <string name="pkey_open_library">showLibraryPreferences</string>
+    <string name="pref_column_count">columnCount</string>
+    <string name="pref_use_proxy">useProxy</string>
+    <string name="pref_request_timeout">webViewTimeout</string>
 
     <string-array name="browse_sort_by">
         <item>Name</item>

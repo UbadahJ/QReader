@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="utf-8"?>
+<PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:title="Settings">
+
+    <SeekBarPreference
+        android:defaultValue="2"
+        android:key="@string/pref_column_count"
+        android:max="10"
+        android:summary="Set the number of columns for library"
+        android:title="Column count"
+        app:min="1" />
+
+</PreferenceScreen>

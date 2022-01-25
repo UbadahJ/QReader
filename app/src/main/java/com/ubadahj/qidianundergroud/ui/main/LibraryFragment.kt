@@ -15,6 +15,7 @@ import com.google.android.material.snackbar.Snackbar
 import com.ubadahj.qidianundergroud.R
 import com.ubadahj.qidianundergroud.databinding.BookListFragmentBinding
 import com.ubadahj.qidianundergroud.models.Resource
+import com.ubadahj.qidianundergroud.preferences.LibraryPreferences
 import com.ubadahj.qidianundergroud.repositories.GroupRepository
 import com.ubadahj.qidianundergroud.repositories.MetadataRepository
 import com.ubadahj.qidianundergroud.ui.adapters.LibraryAdapter
@@ -36,6 +37,9 @@ class LibraryFragment : Fragment() {
 
     @Inject
     lateinit var metadataRepo: MetadataRepository
+
+    @Inject
+    lateinit var pref: LibraryPreferences
 
     private val viewModel: MainViewModel by activityViewModels()
     private val adapter: LibraryAdapter = LibraryAdapter(
@@ -85,14 +89,17 @@ class LibraryFragment : Fragment() {
                     LibraryFragmentDirections.actionLibraryFragmentToBrowseFragment()
                 )
             }
-
-            bookListingView.adapter = adapter
-            bookListingView.layoutManager = GridLayoutManager(requireContext(), 2)
-            bookListingView.addItemDecoration(
-                GridItemOffsetDecoration(
-                    2, 12.toDp(requireContext()).toInt()
-                )
-            )
+            lifecycleScope.launch {
+                bookListingView.adapter = adapter
+                pref.columnCount.asFlow().flowWithLifecycle(lifecycle).collect {
+                    bookListingView.layoutManager = GridLayoutManager(requireContext(), it)
+                    bookListingView.addItemDecoration(
+                        GridItemOffsetDecoration(
+                            it, 12.toDp(requireContext()).toInt()
+                        )
+                    )
+                }
+            }
 
             searchBar.searchEditText.addTextChangedListener { text: Editable? ->
                 adapter.filter.filter((text))

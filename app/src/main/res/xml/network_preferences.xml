@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="utf-8"?>
+<PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:title="Settings">
+
+    <SwitchPreference
+        android:defaultValue="true"
+        android:key="@string/pref_use_proxy"
+        android:summary="Use proxy website to handle toc.underground.com requests"
+        android:title="Use Proxy" />
+
+    <EditTextPreference
+        android:defaultValue="8000"
+        android:dialogMessage="Change the timeout for web view request. Increase in case of slow connection or continuous error in reader"
+        android:dialogTitle="Request timeout"
+        android:key="@string/pref_request_timeout"
+        android:summary="Set the timeout for web view request [Current: %s]"
+        android:title="Request timeout"
+        app:useSimpleSummaryProvider="true" />
+
+</PreferenceScreen>
