@@ -2,6 +2,7 @@ package com.ubadahj.qidianundergroud.utils.ui
 
 import androidx.core.view.doOnLayout
 import androidx.recyclerview.widget.LinearLayoutManager
+import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
 
 fun RecyclerView.linearScroll(pos: Int) {
@@ -44,4 +45,9 @@ fun RecyclerView.preserveState(action: RecyclerView.() -> Unit) {
     val state = layoutManager?.onSaveInstanceState()
     action()
     layoutManager?.onRestoreInstanceState(state)
+}
+
+inline fun <T> ListAdapter<T, *>.getItemSafely(position: Int, crossinline action: (T) -> Unit) {
+    if (!(position == RecyclerView.NO_POSITION || position >= currentList.size))
+        action(currentList[position])
 }

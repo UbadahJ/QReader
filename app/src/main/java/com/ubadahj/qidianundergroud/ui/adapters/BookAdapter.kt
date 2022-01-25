@@ -7,6 +7,7 @@ import com.ubadahj.qidianundergroud.ui.adapters.factories.BookViewHolder
 import com.ubadahj.qidianundergroud.ui.adapters.factories.BookViewHolderFactory
 import com.ubadahj.qidianundergroud.ui.adapters.factories.BookViewHolderType
 import com.ubadahj.qidianundergroud.ui.adapters.generic.SortableListAdapter
+import com.ubadahj.qidianundergroud.utils.ui.getItemSafely
 
 class BookAdapter(
     books: List<Book>,
@@ -33,7 +34,7 @@ class BookAdapter(
         viewType: Int
     ): BookViewHolder {
         return BookViewHolderFactory.get(parent, BookViewHolderType.from(viewType)) {
-            onClick(getItem(it))
+            getItemSafely(it, onClick)
         }
     }
 

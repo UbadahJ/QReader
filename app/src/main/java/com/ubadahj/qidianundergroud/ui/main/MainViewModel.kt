@@ -138,6 +138,7 @@ class MainViewModel @Inject constructor(
 
     fun setSelectedGroup(group: Group?) {
         _selectedGroup.value = group
+        _selectedContent.value = null
     }
 
     fun setSelectedContent(content: Content?) {

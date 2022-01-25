@@ -9,6 +9,7 @@ import com.ubadahj.qidianundergroud.ui.adapters.factories.ContentViewHolder
 import com.ubadahj.qidianundergroud.ui.adapters.factories.ContentViewHolderType
 import com.ubadahj.qidianundergroud.ui.models.ContentHeaderConfig
 import com.ubadahj.qidianundergroud.ui.models.ContentUIItem
+import com.ubadahj.qidianundergroud.utils.ui.getItemSafely
 
 data class ContentAdapterPreferences(
     val scaleFactor: Float = 1f,
@@ -38,7 +39,7 @@ class ContentAdapter(
             parent,
             ContentViewHolderType.from(viewType),
             headerConfig
-        ) { onClick(getItem(it)) }
+        ) { getItemSafely(it, onClick) }
     }
 
     override fun onBindViewHolder(holder: ContentViewHolder, position: Int) {

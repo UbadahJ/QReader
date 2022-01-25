@@ -13,6 +13,7 @@ import com.ubadahj.qidianundergroud.ui.adapters.generic.FilterableListAdapter
 import com.ubadahj.qidianundergroud.utils.models.contains
 import com.ubadahj.qidianundergroud.utils.models.isRead
 import com.ubadahj.qidianundergroud.utils.models.source
+import com.ubadahj.qidianundergroud.utils.ui.getItemSafely
 import com.ubadahj.qidianundergroud.utils.ui.visible
 
 class GroupAdapter(
@@ -44,7 +45,7 @@ class GroupAdapter(
             GroupItemBinding.inflate(
                 LayoutInflater.from(parent.context), parent, false
             )
-        ) { onClick(getItem(it)) }
+        ) { getItemSafely(it, onClick) }
     }
 
     override fun onBindViewHolder(holder: ViewHolder, position: Int) {

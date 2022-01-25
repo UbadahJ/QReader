@@ -10,6 +10,7 @@ import com.ubadahj.qidianundergroud.R
 import com.ubadahj.qidianundergroud.databinding.LibraryBookItemBinding
 import com.ubadahj.qidianundergroud.models.Book
 import com.ubadahj.qidianundergroud.ui.adapters.generic.FilterableListAdapter
+import com.ubadahj.qidianundergroud.utils.ui.getItemSafely
 import com.ubadahj.qidianundergroud.utils.ui.toDp
 import com.ubadahj.qidianundergroud.utils.ui.visible
 
@@ -33,7 +34,7 @@ class LibraryAdapter(
             LibraryBookItemBinding.inflate(
                 LayoutInflater.from(parent.context), parent, false
             )
-        ) { onClick(getItem(it)) }
+        ) { getItemSafely(it, onClick) }
     }
 
     override fun onBindViewHolder(holder: ViewHolder, position: Int) {
