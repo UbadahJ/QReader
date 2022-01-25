@@ -5,13 +5,14 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent">
 
-    <androidx.recyclerview.widget.RecyclerView
+    <com.l4digital.fastscroll.FastScrollRecyclerView
         android:id="@+id/chapter_list_view"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:layout_marginHorizontal="16dp"
         app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
         app:layout_behavior="@string/appbar_scrolling_view_behavior"
+        app:showBubble="false"
         tools:listitem="@layout/group_item" />
 
     <com.google.android.material.appbar.AppBarLayout

@@ -25,6 +25,7 @@ class GroupAdapter(
     private val defaultColors: MutableMap<Group, Int> = mutableMapOf()
     private var readColor: Int = 0
 
+    override val bubbleText: (Group) -> String = { it.text }
     override val filterPredicate: (List<Group>, String) -> List<Group> =
         { list, constraint ->
             list.filter { it.contains(constraint.toIntOrNull() ?: -1) }
