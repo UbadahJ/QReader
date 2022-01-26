@@ -1,0 +1,56 @@
+<?xml version="1.0" encoding="utf-8"?>
+<navigation xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:id="@+id/setting_nav_graph"
+    app:startDestination="@id/generalSettingFragment">
+
+    <fragment
+        android:id="@+id/generalSettingFragment"
+        android:name="com.ubadahj.qidianundergroud.ui.preferences.GeneralSettingFragment"
+        android:label="Settings">
+        <action
+            android:id="@+id/action_to_readerSettingFragment"
+            app:destination="@id/readerSettingFragment"
+            app:enterAnim="@android:anim/fade_in"
+            app:exitAnim="@android:anim/fade_out"
+            app:popEnterAnim="@android:anim/fade_in"
+            app:popExitAnim="@android:anim/fade_out" />
+        <action
+            android:id="@+id/action_to_networkSettingFragment"
+            app:destination="@id/networkSettingFragment"
+            app:enterAnim="@android:anim/fade_in"
+            app:exitAnim="@android:anim/fade_out"
+            app:popEnterAnim="@android:anim/fade_in"
+            app:popExitAnim="@android:anim/fade_out" />
+        <action
+            android:id="@+id/action_to_librarySettingFragment"
+            app:destination="@id/librarySettingFragment"
+            app:enterAnim="@android:anim/fade_in"
+            app:exitAnim="@android:anim/fade_out"
+            app:popEnterAnim="@android:anim/fade_in"
+            app:popExitAnim="@android:anim/fade_out" />
+        <action
+            android:id="@+id/action_to_appearanceSettingFragment"
+            app:destination="@id/appearanceSettingFragment"
+            app:enterAnim="@android:anim/fade_in"
+            app:exitAnim="@android:anim/fade_out"
+            app:popEnterAnim="@android:anim/fade_in"
+            app:popExitAnim="@android:anim/fade_out" />
+    </fragment>
+    <fragment
+        android:id="@+id/readerSettingFragment"
+        android:name="com.ubadahj.qidianundergroud.ui.preferences.ReaderSettingFragment"
+        android:label="Reader" />
+    <fragment
+        android:id="@+id/networkSettingFragment"
+        android:name="com.ubadahj.qidianundergroud.ui.preferences.NetworkSettingFragment"
+        android:label="Network" />
+    <fragment
+        android:id="@+id/librarySettingFragment"
+        android:name="com.ubadahj.qidianundergroud.ui.preferences.LibrarySettingFragment"
+        android:label="Library" />
+    <fragment
+        android:id="@+id/appearanceSettingFragment"
+        android:name="com.ubadahj.qidianundergroud.ui.preferences.AppearanceSettingFragment"
+        android:label="Appearance" />
+</navigation>

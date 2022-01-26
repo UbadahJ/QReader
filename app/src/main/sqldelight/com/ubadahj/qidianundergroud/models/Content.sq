@@ -1,0 +1,41 @@
+-- TABLE
+
+CREATE TABLE Content
+(
+    id         TEXT PRIMARY KEY NOT NULL,
+    groupLink  TEXT             NOT NULL,
+    title      TEXT             NOT NULL,
+    contents   TEXT             NOT NULL,
+    CONSTRAINT group_ibfk
+        FOREIGN KEY (groupLink)
+        REFERENCES BaseGroup(link)
+        ON DELETE CASCADE
+);
+
+CREATE INDEX group_link
+    ON Content(groupLink);
+
+-- Queries
+
+getByGroupLink:
+SELECT *
+FROM Content
+WHERE groupLink = ?;
+
+insert:
+INSERT OR IGNORE INTO Content(id, groupLink, title, contents)
+VALUES ?;
+
+insertByValues:
+INSERT OR IGNORE INTO Content(id, groupLink, title, contents)
+VALUES (?, ?, ?, ?);
+
+deleteByTitle:
+DELETE
+FROM Content
+WHERE title = ?;
+
+deleteByGroupLink:
+DELETE
+FROM Content
+WHERE groupLink = ?;

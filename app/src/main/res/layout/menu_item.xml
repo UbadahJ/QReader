@@ -1,8 +1,10 @@
 <?xml version="1.0" encoding="utf-8"?>
-<com.google.android.material.button.MaterialButton xmlns:android="http://schemas.android.com/apk/res/android"
-    style="@style/Widget.MaterialComponents.Button.TextButton"
+<com.google.android.material.button.MaterialButton
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    style="@style/Widget.Material3.Button.TextButton"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
+    android:textAppearance="@style/TextAppearance.MyTheme.Subtitle1"
     android:id="@+id/menu_item"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
@@ -12,6 +14,6 @@
     android:textColor="?android:attr/textColorPrimary"
     app:iconGravity="start"
     app:iconPadding="16dp"
-    app:iconSize="20dp"
+    app:iconSize="24dp"
     app:iconTint="?android:attr/textColorPrimary"
     tools:text="Settings" />

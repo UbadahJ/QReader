@@ -31,7 +31,7 @@ class DownloadService @AssistedInject constructor(
     private val notificationId = 69420
 
     override suspend fun doWork(): Result {
-        val book = bookRepo.getBookById(inputData.getString("book_id")!!).first()
+        val book = bookRepo.getBookById(inputData.getInt("book_id", 0)).first()
         val groups = bookRepo.getGroups(book).first()
 
         createChannel(

@@ -19,21 +19,21 @@ class GridItemOffsetDecoration(
         when {
             position < spanCount -> {
                 // left grid
-                if (position % 2 == 0)
+                if (position % spanCount == 0)
                     rect.set(0, itemOffset, itemOffset / 2, itemOffset / 2)
                 // right grid
                 else
                     rect.set(itemOffset / 2, itemOffset, 0, itemOffset / 2)
             }
             // left grid
-            position % 2 == 0 ->
+            position % spanCount == 0 ->
                 rect.set(0, itemOffset / 2, itemOffset / 2, itemOffset / 2)
             // right grid
-            position % 2 == 1 ->
+            position % spanCount == 1 ->
                 rect.set(itemOffset / 2, itemOffset / 2, 0, itemOffset / 2)
             else -> {
                 // left grid
-                if (position % 2 == 0) rect.set(0, itemOffset / 2, itemOffset, itemOffset)
+                if (position % spanCount == 0) rect.set(0, itemOffset / 2, itemOffset, itemOffset)
                 // right grid
                 else rect.set(itemOffset / 2, itemOffset / 2, 0, itemOffset)
             }

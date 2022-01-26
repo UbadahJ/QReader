@@ -17,11 +17,11 @@
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
-        app:tint="?android:attr/textColorPrimary" />
+        app:tint="?android:attr/textColorPrimary"/>
 
-    <TextView
+    <com.google.android.material.textview.MaterialTextView
+        android:textAppearance="@style/TextAppearance.MyTheme.Subtitle1"
         android:id="@+id/book_title"
-        style="@style/TextAppearance.MaterialComponents.Subtitle1"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_marginStart="24dp"
@@ -29,18 +29,17 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toEndOf="@+id/book_cover"
         app:layout_constraintTop_toTopOf="@+id/book_cover"
-        tools:text="My House of Horrors" />
+        tools:text="My House of Horrors"/>
 
-    <TextView
+    <com.google.android.material.textview.MaterialTextView
         android:id="@+id/completed_text"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginTop="8dp"
-        android:text="COMPLETED"
-        android:textAllCaps="false"
+        android:text="Completed"
         android:textAppearance="@style/TextAppearance.MyTheme.Body2"
         android:textStyle="italic"
         app:layout_constraintStart_toStartOf="@+id/book_title"
-        app:layout_constraintTop_toBottomOf="@+id/book_title" />
+        app:layout_constraintTop_toBottomOf="@+id/book_title"/>
 
 </androidx.constraintlayout.widget.ConstraintLayout>

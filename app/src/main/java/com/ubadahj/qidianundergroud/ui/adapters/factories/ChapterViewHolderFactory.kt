@@ -7,59 +7,94 @@ import androidx.recyclerview.widget.RecyclerView
 import androidx.viewbinding.ViewBinding
 import com.ubadahj.qidianundergroud.databinding.ChapterBodyItemBinding
 import com.ubadahj.qidianundergroud.databinding.ChapterTitleItemBinding
-import com.ubadahj.qidianundergroud.models.Chapter
+import com.ubadahj.qidianundergroud.models.Content
+import com.ubadahj.qidianundergroud.ui.adapters.ContentAdapterPreferences
+import com.ubadahj.qidianundergroud.ui.adapters.decorations.StickyViewHolder
+import com.ubadahj.qidianundergroud.ui.models.ContentHeaderConfig
+import com.ubadahj.qidianundergroud.ui.models.ContentUIItem
 import com.ubadahj.qidianundergroud.utils.ui.inflater
 import com.ubadahj.qidianundergroud.utils.ui.visible
 
 
-enum class ChapterViewHolderType {
+enum class ContentViewHolderType {
     TITLE, CONTENTS;
 
     companion object {
-        fun from(viewType: Int): ChapterViewHolderType =
+        fun from(viewType: Int): ContentViewHolderType =
             values().associateBy { it.ordinal }[viewType]
                 ?: throw IllegalArgumentException("Invalid view type $viewType")
     }
 }
 
-abstract class ChapterViewHolder(
+abstract class ContentViewHolder(
     binding: ViewBinding
 ) : RecyclerView.ViewHolder(binding.root) {
-    abstract fun bind(item: Chapter, scaleFactor: Float)
+    abstract fun bind(item: Content, preferences: ContentAdapterPreferences)
 }
 
 object ChapterViewHolderFactory {
 
-    fun get(parent: ViewGroup, type: ChapterViewHolderType) = when (type) {
-        ChapterViewHolderType.TITLE -> ChapterTitleViewHolder(
-            ChapterTitleItemBinding.inflate(parent.inflater, parent, false)
+    fun header(
+        binding: ChapterTitleItemBinding,
+        config: ContentHeaderConfig
+    ): StickyViewHolder<ContentUIItem> = ContentTitleViewHolder(binding, config)
+
+    fun get(
+        parent: ViewGroup,
+        type: ContentViewHolderType,
+        config: ContentHeaderConfig,
+        onClick: (Int) -> Unit
+    ) = when (type) {
+        ContentViewHolderType.TITLE -> ContentTitleViewHolder(
+            ChapterTitleItemBinding.inflate(parent.inflater, parent, false), config
         )
-        ChapterViewHolderType.CONTENTS -> ChapterContentsViewHolder(
-            ChapterBodyItemBinding.inflate(parent.inflater, parent, false)
+        ContentViewHolderType.CONTENTS -> ContentContentsViewHolder(
+            ChapterBodyItemBinding.inflate(parent.inflater, parent, false), onClick
         )
     }
 
-    private class ChapterTitleViewHolder(
-        private val binding: ChapterTitleItemBinding
-    ) : ChapterViewHolder(binding) {
-        override fun bind(item: Chapter, scaleFactor: Float) {
+    private class ContentTitleViewHolder(
+        private val binding: ChapterTitleItemBinding,
+        private val config: ContentHeaderConfig
+    ) : ContentViewHolder(binding), StickyViewHolder<ContentUIItem> {
+        companion object {
+            private val PREF = ContentAdapterPreferences()
+        }
+
+        init {
+            binding.headerBack.setOnClickListener { config.onBackPressed() }
+        }
+
+        override val type: Int = ContentViewHolderType.TITLE.ordinal
+        override val root = binding.root
+        override fun bind(item: ContentUIItem) = bind(item.content, PREF)
+        override fun bind(item: Content, preferences: ContentAdapterPreferences) {
             val split = item.title.split(":")
             binding.headerChapterNumber.apply {
                 text = split.first()
                 visible = split.first() != split.last()
             }
             binding.headerChapterInfo.apply {
-                text = split.last()
+                text = split.last().trim()
             }
+            binding.headerMenu.setOnClickListener { config.onMenuPressed(item) }
         }
     }
 
-    private class ChapterContentsViewHolder(
-        private val binding: ChapterBodyItemBinding
-    ) : ChapterViewHolder(binding) {
-        override fun bind(item: Chapter, scaleFactor: Float) {
+    private class ContentContentsViewHolder(
+        private val binding: ChapterBodyItemBinding,
+        onClick: (Int) -> Unit
+    ) : ContentViewHolder(binding) {
+        init {
+            listOf(binding.root, binding.contents).forEach {
+                it.setOnClickListener { onClick(absoluteAdapterPosition) }
+            }
+        }
+
+        override fun bind(item: Content, preferences: ContentAdapterPreferences) {
             binding.contents.apply {
-                textSize = 16f * scaleFactor
+                textSize = 16f * preferences.scaleFactor
+                setLineSpacing(0f, preferences.lineSpacing)
                 setTextFuture(
                     PrecomputedTextCompat.getTextFuture(
                         item.contents,

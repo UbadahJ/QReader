@@ -2,12 +2,11 @@ package com.ubadahj.qidianundergroud.api
 
 import com.ubadahj.qidianundergroud.api.models.webnovel.WNBookRemote
 import com.ubadahj.qidianundergroud.api.models.webnovel.WNChapterRemote
-import com.ubadahj.qidianundergroud.api.models.webnovel.WNRawChapterLinksRemote
 import com.ubadahj.qidianundergroud.api.models.webnovel.WNSearchResultRemote
+import com.ubadahj.qidianundergroud.api.retrofit.IWebNovelApi
 import com.ubadahj.qidianundergroud.models.Book
-import com.ubadahj.qidianundergroud.models.Chapter
-import com.ubadahj.qidianundergroud.models.ChapterGroup
-import com.ubadahj.qidianundergroud.models.Metadata
+import com.ubadahj.qidianundergroud.models.Content
+import com.ubadahj.qidianundergroud.models.Group
 import com.ubadahj.qidianundergroud.utils.md5
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
@@ -16,11 +15,6 @@ import okhttp3.OkHttpClient
 import okhttp3.ResponseBody
 import org.jsoup.Jsoup
 import org.jsoup.nodes.Element
-import retrofit2.Response
-import retrofit2.http.GET
-import retrofit2.http.Path
-import retrofit2.http.Query
-import retrofit2.http.Url
 import java.util.*
 import javax.inject.Inject
 
@@ -43,25 +37,32 @@ class WebNovelApi @Inject constructor(
             ?: return null
 
         val bookPage = webNovelApi.getBook(searchResult.name, searchResult.id)
-        return bookPage.body()?.parseBookPage(searchResult)
+        return bookPage.body()?.parseBookPage(searchResult.link)
     }
 
-    suspend fun getChapter(bookMeta: Metadata): List<WNChapterRemote>? {
-        return webNovelApi.getChaptersLinks(getToken(), bookMeta.id).body()
+    suspend fun getBook(link: String): WNBookRemote? {
+        val (name, id) = link.substringAfterLast("/").split("_")
+        val bookPage = webNovelApi.getBook(name, id)
+
+        return bookPage.body()?.parseBookPage("/book/${name}_${id}")
+    }
+
+    suspend fun getChapter(id: String, link: String): List<WNChapterRemote>? {
+        return webNovelApi.getChaptersLinks(getToken(), id).body()
             ?.data
             ?.volumeItems
             ?.flatMap { it.chapterItems }
             ?.map {
                 WNChapterRemote(
                     it.name,
-                    "${bookMeta.link}/${it.name}_${it.id}".replace("?", ""),
+                    "${link}/${it.name}_${it.id}".replace("?", ""),
                     it.index,
                     it.isVip != 0
                 )
             }
     }
 
-    suspend fun getChapterContents(group: ChapterGroup): Chapter {
+    suspend fun getChapterContents(group: Group): Content {
         val html = withContext(Dispatchers.IO) {
             webNovelApi.getChapterContents(group.link).body()?.string()
                 ?: throw IllegalStateException("Unable to fetch page")
@@ -76,12 +77,7 @@ class WebNovelApi @Inject constructor(
             ?.joinToString("\n\n") { it.text().trim() }
             ?: throw IllegalStateException("Either chapter is premium or parsing failed")
 
-        return Chapter(
-            group.link.md5 + title.md5,
-            group.link,
-            title,
-            contents
-        )
+        return Content(group.link.md5 + title.md5, group.link, title, contents)
     }
 
     private suspend fun getToken(): String {
@@ -147,9 +143,15 @@ class WebNovelApi @Inject constructor(
             ""
         }
 
-    private fun ResponseBody.parseBookPage(searchResult: WNSearchResultRemote): WNBookRemote {
+    private fun ResponseBody.parseBookPage(link: String): WNBookRemote {
         val document = Jsoup.parse(string())
         val infoElement = document.getElementsByClass("det-info").first()
+
+        val title = infoElement?.selectFirst("h2")
+            ?.also { it.selectFirst("small")?.remove() }
+            ?.text()
+
+        val rating = infoElement?.selectFirst("._score strong")?.text()?.toFloatOrNull() ?: 0.0f
 
         val author = infoElement?.selectFirst("address > p")
             ?.children()
@@ -159,7 +161,7 @@ class WebNovelApi @Inject constructor(
             ?: ""
 
         val coverLink = infoElement?.getElementsByTag("img")
-            ?.last { searchResult.name in it.attr("alt") }
+            ?.last { title.toString() in it.attr("alt") }
             ?.attr("src")
             ?.let { "https:$it" }
             ?: ""
@@ -175,10 +177,10 @@ class WebNovelApi @Inject constructor(
             ?: ""
 
         return WNBookRemote(
-            id = searchResult.id,
-            link = searchResult.link,
-            name = searchResult.name,
-            rating = searchResult.rating,
+            id = link.split("_").last(),
+            link = link,
+            name = title.toString(),
+            rating = rating,
             author = author,
             coverLink = coverLink,
             category = category,
@@ -187,29 +189,3 @@ class WebNovelApi @Inject constructor(
     }
 }
 
-private interface IWebNovelApi {
-
-    @GET("/")
-    suspend fun ping(): Response<ResponseBody>
-
-    @GET("search")
-    suspend fun searchBooks(@Query("keywords") query: String): Response<ResponseBody>
-
-    @GET("book/{bookName}_{bookId}")
-    suspend fun getBook(
-        @Path("bookName") bookName: String,
-        @Path("bookId") bookId: String
-    ): Response<ResponseBody>
-
-    @GET("go/pcm/chapter/get-chapter-list")
-    suspend fun getChaptersLinks(
-        @Query("_csrfToken") csrfToken: String,
-        @Query("bookId") bookId: String
-    ): Response<WNRawChapterLinksRemote>
-
-    @GET
-    suspend fun getChapterContents(
-        @Url link: String
-    ): Response<ResponseBody>
-
-}

@@ -1,6 +1,5 @@
 package com.ubadahj.qidianundergroud.ui.adapters
 
-import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.core.content.ContextCompat
 import androidx.recyclerview.widget.DiffUtil
@@ -8,6 +7,8 @@ import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
 import com.ubadahj.qidianundergroud.databinding.MenuItemBinding
 import com.ubadahj.qidianundergroud.ui.models.MenuDialogItem
+import com.ubadahj.qidianundergroud.utils.ui.getItemSafely
+import com.ubadahj.qidianundergroud.utils.ui.inflater
 
 class MenuAdapter(
     items: List<MenuDialogItem>
@@ -20,15 +21,12 @@ class MenuAdapter(
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): MenuViewHolder {
-        return MenuViewHolder(
-            MenuItemBinding.inflate(
-                LayoutInflater.from(parent.context),
-                parent,
-                false
-            )
-        ) {
-            getItem(it).onClick?.invoke()
-            postOnClick?.invoke()
+        return MenuViewHolder(MenuItemBinding.inflate(parent.inflater, parent, false))
+        { pos ->
+            getItemSafely(pos) {
+                it.onClick?.invoke()
+                postOnClick?.invoke()
+            }
         }
     }
 

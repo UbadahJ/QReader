@@ -13,13 +13,23 @@
         android:layout_marginStart="16dp"
         android:layout_marginEnd="16dp"
         android:layout_marginBottom="16dp"
-        app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
         app:bubbleSize="small"
         app:bubbleTextSize="14sp"
+        android:scrollbars="none"
+        app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
+
+    <include
+        android:id="@+id/chapter_sticky_group"
+        layout="@layout/chapter_title_item"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        app:layout_constraintEnd_toEndOf="@+id/chapter_recycler_view"
+        app:layout_constraintStart_toStartOf="@+id/chapter_recycler_view"
+        app:layout_constraintTop_toTopOf="@+id/chapter_recycler_view" />
 
     <ProgressBar
         android:id="@+id/progress_bar"
@@ -36,9 +46,10 @@
         layout="@layout/error_layout"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        app:layout_constraintBottom_toTopOf="@+id/guideline"
+        app:layout_constraintBottom_toBottomOf="@+id/chapter_recycler_view"
         app:layout_constraintEnd_toEndOf="@+id/chapter_recycler_view"
-        app:layout_constraintStart_toStartOf="@+id/chapter_recycler_view" />
+        app:layout_constraintStart_toStartOf="@+id/chapter_recycler_view"
+        app:layout_constraintTop_toTopOf="parent" />
 
     <androidx.constraintlayout.widget.Guideline
         android:id="@+id/guideline"

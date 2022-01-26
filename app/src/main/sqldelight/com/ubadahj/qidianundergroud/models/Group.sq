@@ -1,0 +1,69 @@
+-- TABLE
+
+CREATE TABLE BaseGroup
+(
+    bookId       INTEGER AS Int   NOT NULL,
+    text         TEXT             NOT NULL,
+    link         TEXT PRIMARY KEY NOT NULL,
+    lastRead     INTEGER AS Int   NOT NULL DEFAULT 0,
+    CONSTRAINT book_ibfk
+        FOREIGN KEY (bookId)
+            REFERENCES BaseBook (id)
+            ON DELETE CASCADE
+);
+
+CREATE VIEW `Group` AS
+SELECT bookId,
+       text,
+       CAST(
+           CASE TRIM(SUBSTR(text, 1, INSTR(text, '-') - 1))
+               WHEN '' THEN TRIM(SUBSTR(text, INSTR(text, '-') + 1))
+               ELSE TRIM(SUBSTR(text, 1, INSTR(text, '-') - 1))
+               END AS INTEGER
+       ) firstChapter,
+       CAST(TRIM(SUBSTR(text, INSTR(text, '-') + 1)) AS INTEGER) lastChapter,
+       link,
+       lastRead
+FROM BaseGroup;
+
+-- QUERIES
+get:
+SELECT *
+FROM `Group`
+WHERE link = ?;
+
+getByBookId:
+SELECT *
+FROM `Group`
+WHERE bookId = ?
+ORDER BY firstChapter;
+
+insert:
+INSERT OR IGNORE INTO BaseGroup(bookId, text, link, lastRead)
+VALUES ?;
+
+insertByValues:
+INSERT OR IGNORE INTO BaseGroup(bookId, text, link)
+VALUES (?, ?, ?);
+
+update:
+UPDATE BaseGroup
+SET text = :updatedText,
+    link = :updatedLink
+WHERE
+    link = :link;
+
+deleteByLink:
+DELETE
+FROM BaseGroup
+WHERE link = ?;
+
+updateLastRead:
+UPDATE BaseGroup
+SET lastRead = ?
+WHERE link = ?;
+
+contents:
+SELECT *
+FROM Content
+WHERE groupLink = ?;

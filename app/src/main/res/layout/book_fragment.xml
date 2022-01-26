@@ -6,12 +6,12 @@
     android:layout_height="match_parent"
     tools:context=".ui.main.BookFragment">
 
-    <androidx.core.widget.NestedScrollView
+    <ScrollView
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        tools:context=".ui.main.BookFragment"
-        tools:layout_editor_absoluteX="0dp"
-        tools:layout_editor_absoluteY="16dp">
+        android:layout_height="0dp"
+        app:layout_constraintBottom_toTopOf="@+id/materialCardView"
+        app:layout_constraintTop_toTopOf="parent"
+        tools:layout_editor_absoluteX="0dp">
 
         <androidx.constraintlayout.widget.ConstraintLayout
             android:layout_width="match_parent"
@@ -31,8 +31,7 @@
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="16dp"
-                android:fontFamily="@font/jaldi"
-                android:textSize="16sp"
+                android:textAppearance="@style/TextAppearance.MyTheme.Subtitle1"
                 app:layout_constraintEnd_toStartOf="@+id/v_guideline_90"
                 app:layout_constraintHorizontal_bias="0.0"
                 app:layout_constraintStart_toStartOf="@+id/book_image"
@@ -43,10 +42,9 @@
                 android:id="@+id/book_title"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
-                android:fontFamily="@font/anton"
                 android:textAlignment="viewStart"
+                android:textAppearance="@style/TextAppearance.MyTheme.Headline4"
                 android:textColor="?android:attr/textColorPrimary"
-                android:textSize="28sp"
                 app:layout_constraintEnd_toStartOf="@+id/v_guideline_90"
                 app:layout_constraintStart_toStartOf="@+id/book_author"
                 app:layout_constraintTop_toBottomOf="@+id/book_author"
@@ -63,67 +61,39 @@
                 app:layout_constraintTop_toBottomOf="@+id/book_title"
                 tools:rating="5" />
 
-
             <com.google.android.material.textview.MaterialTextView
                 android:id="@+id/book_rating"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_marginStart="8dp"
-                android:fontFamily="@font/yantramanav"
-                android:textAppearance="@style/TextAppearance.MyTheme.Body2"
+                android:textAppearance="@style/TextAppearance.MyTheme.Subtitle2"
                 app:layout_constraintBottom_toBottomOf="@+id/book_rating_bar"
                 app:layout_constraintEnd_toStartOf="@+id/v_guideline_90"
                 app:layout_constraintStart_toEndOf="@+id/book_rating_bar"
-                app:layout_constraintTop_toTopOf="@+id/book_rating_bar" />
+                app:layout_constraintTop_toTopOf="@+id/book_rating_bar"
+                tools:text="4.2" />
 
             <com.google.android.material.textview.MaterialTextView
                 android:id="@+id/book_desc"
+                style="@style/TextAppearance.MyTheme.Body1"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="16dp"
-                android:fontFamily="@font/yantramanav"
-                app:layout_constraintEnd_toStartOf="@+id/v_guideline_90"
-                app:layout_constraintStart_toStartOf="@+id/book_rating_bar"
-                app:layout_constraintTop_toBottomOf="@+id/book_rating_bar" />
+                android:paddingBottom="16dp"
+                android:lineSpacingMultiplier="1.25"
+                app:layout_constraintEnd_toEndOf="@+id/read_latest_button"
+                app:layout_constraintStart_toStartOf="@+id/read_latest_button"
+                app:layout_constraintTop_toBottomOf="@+id/read_latest_button" />
 
-            <Button
+            <com.google.android.material.button.MaterialButton
                 android:id="@+id/read_latest_button"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="8dp"
-                app:layout_constraintEnd_toEndOf="@+id/book_desc"
-                app:layout_constraintStart_toStartOf="@+id/book_desc"
-                app:layout_constraintTop_toBottomOf="@+id/book_desc"
-                tools:text="Read Chapter 102" />
-
-            <ImageView
-                android:id="@+id/notification_disabled_icon"
-                android:layout_width="20dp"
-                android:layout_height="20dp"
-                android:layout_marginTop="8dp"
-                android:src="@drawable/bell_slash"
-                app:layout_constraintStart_toStartOf="@id/read_latest_button"
-                app:layout_constraintTop_toBottomOf="@id/read_latest_button"
-                app:tint="?android:attr/textColorPrimary" />
-
-            <com.google.android.material.textview.MaterialTextView
-                android:id="@+id/notification_disabled_text"
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_marginStart="8dp"
-                android:fontFamily="@font/yantramanav"
-                android:text="NOTIFICATION DISABLED"
-                android:textAppearance="@style/TextAppearance.MyTheme.Body2"
-                app:layout_constraintBottom_toBottomOf="@+id/notification_disabled_icon"
                 app:layout_constraintEnd_toStartOf="@+id/v_guideline_90"
-                app:layout_constraintStart_toEndOf="@+id/notification_disabled_icon"
-                app:layout_constraintTop_toTopOf="@+id/notification_disabled_icon" />
-
-            <androidx.constraintlayout.widget.Group
-                android:id="@+id/notification_disabled"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                app:constraint_referenced_ids="notification_disabled_icon, notification_disabled_text" />
+                app:layout_constraintStart_toStartOf="@+id/book_rating_bar"
+                app:layout_constraintTop_toBottomOf="@+id/book_rating_bar"
+                tools:text="Read Chapter 102" />
 
             <com.google.android.material.chip.Chip
                 android:id="@+id/book_genre"
@@ -132,11 +102,9 @@
                 android:layout_marginStart="16dp"
                 android:layout_marginTop="8dp"
                 android:layout_marginEnd="16dp"
-                android:fontFamily="@font/yantramanav"
                 android:textAlignment="center"
-                android:textColor="?attr/colorSurface"
+                android:textAppearance="@style/TextAppearance.MyTheme.Subtitle2"
                 android:visibility="gone"
-                app:chipBackgroundColor="?android:attr/textColorPrimary"
                 app:layout_constraintEnd_toStartOf="@+id/v_guideline_90"
                 app:layout_constraintStart_toEndOf="@+id/book_image"
                 app:layout_constraintTop_toBottomOf="@+id/menu_image_view"
@@ -148,7 +116,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 app:barrierDirection="bottom"
-                app:constraint_referenced_ids="book_title,book_genre,book_image,book_desc,notification_disabled_icon"
+                app:constraint_referenced_ids="book_title,book_genre,book_image,book_desc,read_latest_button"
                 tools:layout_editor_absoluteY="425dp" />
 
             <com.google.android.material.textview.MaterialTextView
@@ -156,53 +124,49 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="8dp"
-                android:fontFamily="@font/yantramanav"
                 android:text="Add to Library"
+                android:textAppearance="@style/TextAppearance.MyTheme.Subtitle2"
                 app:layout_constraintEnd_toEndOf="@+id/library_button"
                 app:layout_constraintStart_toStartOf="@+id/library_button"
                 app:layout_constraintTop_toBottomOf="@+id/library_button" />
 
             <ImageView
                 android:id="@+id/download_image_view"
-                android:layout_width="40dp"
-                android:layout_height="40dp"
+                android:layout_width="32dp"
+                android:layout_height="32dp"
                 android:layout_marginTop="16dp"
                 android:contentDescription="Download Chapters"
-                android:fontFamily="@font/yantramanav"
-                android:padding="10dp"
                 android:src="@drawable/download"
                 android:tooltipText="Download Chapters"
                 app:layout_constraintEnd_toStartOf="@+id/v_guideline_90"
                 app:layout_constraintStart_toEndOf="@+id/book_image"
                 app:layout_constraintTop_toBottomOf="@+id/library_label"
-                app:tint="?android:attr/textColorPrimary" />
+                app:tint="?attr/colorPrimary" />
 
             <com.google.android.material.textview.MaterialTextView
                 android:id="@+id/download_label"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="8dp"
-                android:fontFamily="@font/yantramanav"
                 android:text="Download"
+                android:textAppearance="@style/TextAppearance.MyTheme.Subtitle2"
                 app:layout_constraintEnd_toEndOf="@+id/download_image_view"
                 app:layout_constraintStart_toStartOf="@+id/download_image_view"
-                app:layout_constraintTop_toBottomOf="@+id/download_image_view" />
+                app:layout_constraintTop_toBottomOf="@+id/download_image_view"
+                app:tint="?attr/colorPrimary" />
 
             <ImageView
                 android:id="@+id/menu_image_view"
-                android:layout_width="40dp"
-                android:layout_height="40dp"
+                android:layout_width="32dp"
+                android:layout_height="32dp"
                 android:layout_marginTop="16dp"
                 android:contentDescription="Download Chapters"
-                android:fontFamily="@font/yantramanav"
-                android:padding="10dp"
                 android:src="@drawable/menu_dots"
                 android:tooltipText="Download Chapters"
                 app:layout_constraintEnd_toStartOf="@+id/v_guideline_90"
                 app:layout_constraintStart_toEndOf="@+id/book_image"
                 app:layout_constraintTop_toBottomOf="@+id/download_label"
                 app:tint="?android:attr/textColorPrimary" />
-
 
             <androidx.constraintlayout.widget.Guideline
                 android:id="@+id/v_guideline_10"
@@ -227,7 +191,7 @@
                 app:layout_constraintEnd_toStartOf="@+id/v_guideline_90"
                 app:layout_constraintStart_toEndOf="@+id/book_image"
                 app:layout_constraintTop_toTopOf="parent"
-                app:tint="?android:attr/textColorPrimary" />
+                app:tint="?attr/colorPrimary" />
 
             <include
                 android:id="@+id/error_group"
@@ -239,70 +203,66 @@
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toBottomOf="@+id/simple_barrier" />
 
-            <com.google.android.material.card.MaterialCardView
-                android:id="@+id/materialCardView"
-                android:layout_width="0dp"
+        </androidx.constraintlayout.widget.ConstraintLayout>
+    </ScrollView>
+
+    <com.google.android.material.card.MaterialCardView
+        android:id="@+id/materialCardView"
+        style="?attr/materialCardViewFilledStyle"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginHorizontal="16dp"
+        android:layout_marginBottom="8dp"
+        android:clickable="true"
+        android:focusable="true"
+        app:cardUseCompatPadding="true"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent">
+
+        <androidx.appcompat.widget.LinearLayoutCompat
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center_vertical"
+            android:padding="16dp">
+
+            <androidx.appcompat.widget.LinearLayoutCompat
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginStart="8dp"
-                android:layout_marginTop="8dp"
-                android:layout_marginEnd="8dp"
-                android:layout_marginBottom="16dp"
-                app:cardCornerRadius="16dp"
-                app:cardElevation="4dp"
-                app:cardUseCompatPadding="true"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@+id/simple_barrier">
+                android:layout_weight="1"
+                android:orientation="vertical">
 
-                <androidx.appcompat.widget.LinearLayoutCompat
+                <com.google.android.material.textview.MaterialTextView
                     android:layout_width="match_parent"
-                    android:layout_height="match_parent"
-                    android:layout_margin="12dp"
-                    android:orientation="vertical">
+                    android:layout_height="wrap_content"
+                    android:text="Table of Contents"
+                    android:textAppearance="@style/TextAppearance.MyTheme.Headline6" />
 
-                    <com.google.android.material.textview.MaterialTextView
-                        android:id="@+id/chapter_text"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:fontFamily="@font/anton"
-                        android:padding="8dp"
-                        android:text="Chapters"
-                        android:textAppearance="@style/TextAppearance.MaterialComponents.Headline5" />
+                <com.google.android.material.textview.MaterialTextView
+                    android:id="@+id/preview_text"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="Latest: "
+                    android:textAppearance="@style/TextAppearance.MyTheme.Subtitle1" />
+            </androidx.appcompat.widget.LinearLayoutCompat>
 
-                    <androidx.recyclerview.widget.RecyclerView
-                        android:id="@+id/chapter_list_view"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:nestedScrollingEnabled="false"
-                        app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
-                        tools:listitem="@layout/group_item" />
-
-                </androidx.appcompat.widget.LinearLayoutCompat>
-
-            </com.google.android.material.card.MaterialCardView>
-
-            <ProgressBar
-                android:id="@+id/meta_progress"
-                style="?android:attr/progressBarStyle"
+            <ImageView
                 android:layout_width="24dp"
                 android:layout_height="24dp"
-                android:layout_marginTop="16dp"
-                app:layout_constraintEnd_toStartOf="@+id/v_guideline_90"
-                app:layout_constraintTop_toBottomOf="@+id/book_image" />
-
-
-        </androidx.constraintlayout.widget.ConstraintLayout>
-    </androidx.core.widget.NestedScrollView>
+                android:src="@drawable/arrow_up_s"
+                app:tint="?attr/colorPrimary" />
+        </androidx.appcompat.widget.LinearLayoutCompat>
+    </com.google.android.material.card.MaterialCardView>
 
     <ProgressBar
         android:id="@+id/loading_progress"
         style="?android:attr/progressBarStyle"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:layout_marginEnd="32dp"
+        android:layout_marginBottom="32dp"
         android:translationZ="32dp"
         app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
+        app:layout_constraintEnd_toEndOf="parent" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

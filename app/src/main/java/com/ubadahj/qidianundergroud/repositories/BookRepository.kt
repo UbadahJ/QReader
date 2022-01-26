@@ -6,8 +6,8 @@ import com.squareup.sqldelight.runtime.coroutines.asFlow
 import com.squareup.sqldelight.runtime.coroutines.mapToList
 import com.squareup.sqldelight.runtime.coroutines.mapToOne
 import com.ubadahj.qidianundergroud.Database
-import com.ubadahj.qidianundergroud.api.Api
-import com.ubadahj.qidianundergroud.api.models.undeground.BookJson
+import com.ubadahj.qidianundergroud.api.UndergroundApi
+import com.ubadahj.qidianundergroud.api.WebNovelApi
 import com.ubadahj.qidianundergroud.models.Book
 import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.Dispatchers
@@ -22,33 +22,89 @@ import javax.inject.Singleton
 class BookRepository @Inject constructor(
     @ApplicationContext val context: Context,
     private val database: Database,
-    private val api: Api,
-    private val chapterRepo: ChapterRepository
+    private val undergroundApi: UndergroundApi,
+    private val webNovelApi: WebNovelApi,
+    private val contentRepo: ContentRepository
 ) {
 
-    fun getBookById(id: String) = database.bookQueries.getById(id).asFlow().mapToOne()
+    fun getBookById(id: Int) = database.bookQueries.getById(id).asFlow().mapToOne()
 
-    suspend fun getBooks(refresh: Boolean = false): Flow<List<Book>> {
-        val dbBooks = database.bookQueries.getAll().executeAsList()
-        val dbBookIds = dbBooks.map { it.id }
+    suspend fun getUndergroundBooks(refresh: Boolean = false): Flow<List<Book>> {
+        val dbBooks = database.bookQueries.getAllUndergroundBooks().executeAsList()
+        val dbBookIds = dbBooks.map { it.undergroundId }
 
         if (refresh || dbBooks.isEmpty()) {
-            val books = api.getBooks().map { it.toBook() }
+            val books = undergroundApi.getBooks()
             val bookIds = books.map { it.id }
 
-            val (toUpdate, notAvailable) = dbBooks.partition { it.id in bookIds }
+            val (toUpdate, notAvailable) = dbBooks.partition { it.undergroundId in bookIds }
             val toInsert = books.filter { it.id !in dbBookIds }
 
             database.bookQueries.transaction {
                 toUpdate.forEach {
-                    database.bookQueries.update(it.name, it.lastUpdated, it.completed, it.id)
+                    database.bookQueries.updateUndergroundBook(
+                        it.name, it.lastUpdated, it.completed, it.undergroundId
+                    )
                 }
-                notAvailable.forEach { database.bookQueries.setAvailable(false, it.id) }
-                toInsert.forEach { database.bookQueries.insert(it) }
+                notAvailable.forEach {
+                    database.bookQueries.setUndergroundBookAvaliability(
+                        false, it.undergroundId
+                    )
+                }
+                toInsert.forEach {
+                    database.bookQueries.insertUndergroundBook(
+                        it.id,
+                        it.name,
+                        it.lastUpdated,
+                        it.completed
+                    )
+                }
             }
         }
 
         return database.bookQueries.getAll().asFlow().mapToList()
+    }
+
+    suspend fun getWebNovelBook(link: String, refresh: Boolean = false): Flow<Book> {
+        val strippedLink = "/book/${link.trim('/').substringAfterLast("/")}"
+        val dbBook = database.bookQueries.getWebNovelByLink(strippedLink).executeAsOneOrNull()
+        if (dbBook == null || refresh) {
+            val book = webNovelApi.getBook(strippedLink)
+                ?: throw IllegalArgumentException("Invalid link: $strippedLink")
+
+            val uBook = database.bookQueries.getUndergroundByName(book.name).executeAsOneOrNull()
+            if (uBook != null) {
+                if (uBook.novelId == null) {
+                    database.metadataQueries.insertByValues(
+                        book.id,
+                        uBook.undergroundId,
+                        book.link,
+                        book.author,
+                        book.coverLink,
+                        book.category,
+                        book.description,
+                        book.rating,
+                    )
+                }
+                return database.bookQueries.getById(uBook.id).asFlow().mapToOne()
+            }
+
+            database.bookQueries.insertWebNovelBook(
+                book.id,
+                book.name,
+                book.link,
+                book.author,
+                book.coverLink,
+                book.category,
+                book.description,
+                book.rating,
+                false
+            )
+        }
+
+        return database.bookQueries.getById(
+            database.bookQueries.getWebNovelByLink(strippedLink).executeAsOne().bookId
+        ).asFlow().mapToOne()
     }
 
     fun getLibraryBooks() = database.bookQueries.getAllLibraryBooks().asFlow().mapToList()
@@ -81,7 +137,7 @@ class BookRepository @Inject constructor(
             var success = false
             while (!success || retries < 0) {
                 try {
-                    chapterRepo.getChaptersContent(factory, group).first()
+                    contentRepo.getContents(factory, group).first()
                     success = true
                 } catch (e: Exception) {
                     if (--retries < 0) throw e
@@ -90,14 +146,5 @@ class BookRepository @Inject constructor(
             emit(group)
         }
     }
-
-    private fun BookJson.toBook() = Book(
-        id = id,
-        name = name,
-        lastUpdated = lastUpdated,
-        completed = completed,
-        inLibrary = false,
-        isAvailable = true
-    )
 
 }

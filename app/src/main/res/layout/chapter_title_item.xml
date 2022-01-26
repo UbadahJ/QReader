@@ -1,29 +1,67 @@
 <?xml version="1.0" encoding="utf-8"?>
-<com.google.android.material.card.MaterialCardView xmlns:android="http://schemas.android.com/apk/res/android"
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
-    android:layout_height="wrap_content">
+    android:layout_height="wrap_content"
+    android:background="@drawable/dark_gradient"
+    android:paddingVertical="8dp">
 
-    <androidx.appcompat.widget.LinearLayoutCompat
+    <com.google.android.material.card.MaterialCardView
+        style="?attr/materialCardViewFilledStyle"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_margin="8dp"
-        android:background="?android:attr/colorBackground"
-        android:orientation="vertical">
+        android:layout_height="wrap_content">
 
-        <com.google.android.material.textview.MaterialTextView
-            android:id="@+id/header_chapter_number"
-            style="@style/TextAppearance.MyTheme.Subtitle1"
+        <androidx.constraintlayout.widget.ConstraintLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:paddingStart="4dp"
-            tools:text="Chapter 123" />
+            android:layout_margin="16dp">
 
-        <com.google.android.material.textview.MaterialTextView
-            android:id="@+id/header_chapter_info"
-            style="@style/TextAppearance.MyTheme.Headline5"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            tools:text="The execution of Gu Lun" />
-    </androidx.appcompat.widget.LinearLayoutCompat>
-</com.google.android.material.card.MaterialCardView>
+            <com.google.android.material.textview.MaterialTextView
+                android:id="@+id/header_chapter_number"
+                style="@style/TextAppearance.MyTheme.Subtitle2"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginEnd="16dp"
+                app:layout_constraintEnd_toStartOf="@+id/header_menu"
+                app:layout_constraintStart_toStartOf="@+id/header_chapter_info"
+                app:layout_constraintTop_toTopOf="parent"
+                tools:text="Chapter 123" />
+
+            <com.google.android.material.textview.MaterialTextView
+                android:id="@+id/header_chapter_info"
+                style="@style/TextAppearance.MyTheme.Headline5"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="16dp"
+                android:layout_marginEnd="16dp"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintEnd_toStartOf="@+id/header_menu"
+                app:layout_constraintStart_toEndOf="@+id/header_back"
+                app:layout_constraintTop_toBottomOf="@+id/header_chapter_number"
+                app:layout_constraintVertical_bias="0.0"
+                tools:text="The execution of Gu Lun" />
+
+            <ImageView
+                android:id="@+id/header_back"
+                android:layout_width="24dp"
+                android:layout_height="24dp"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent"
+                app:srcCompat="@drawable/arrow_left"
+                app:tint="?android:attr/textColorPrimary" />
+
+            <ImageView
+                android:id="@+id/header_menu"
+                android:layout_width="24dp"
+                android:layout_height="24dp"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintTop_toTopOf="parent"
+                app:srcCompat="@drawable/menu"
+                app:tint="?android:attr/textColorPrimary" />
+        </androidx.constraintlayout.widget.ConstraintLayout>
+    </com.google.android.material.card.MaterialCardView>
+
+</FrameLayout>

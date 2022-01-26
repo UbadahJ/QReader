@@ -8,20 +8,25 @@ import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.RecyclerView
 import com.ubadahj.qidianundergroud.R
 import com.ubadahj.qidianundergroud.databinding.GroupItemBinding
-import com.ubadahj.qidianundergroud.models.ChapterGroup
-import com.ubadahj.qidianundergroud.utils.models.*
+import com.ubadahj.qidianundergroud.models.Group
+import com.ubadahj.qidianundergroud.ui.adapters.generic.FilterableListAdapter
+import com.ubadahj.qidianundergroud.utils.models.contains
+import com.ubadahj.qidianundergroud.utils.models.isRead
+import com.ubadahj.qidianundergroud.utils.models.source
+import com.ubadahj.qidianundergroud.utils.ui.getItemSafely
 import com.ubadahj.qidianundergroud.utils.ui.visible
 
 class GroupAdapter(
-    groups: List<ChapterGroup>,
-    private val onClick: (ChapterGroup) -> Unit,
-    private val menuClick: (ChapterGroup) -> Unit
-) : FilterableListAdapter<ChapterGroup, GroupAdapter.ViewHolder>(DiffCallback()) {
+    groups: List<Group> = listOf(),
+    private val onClick: (Group) -> Unit,
+    private val menuClick: (Group) -> Unit
+) : FilterableListAdapter<Group, GroupAdapter.ViewHolder>(DiffCallback()) {
 
-    private val defaultColors: MutableMap<ChapterGroup, Int> = mutableMapOf()
+    private val defaultColors: MutableMap<Group, Int> = mutableMapOf()
     private var readColor: Int = 0
 
-    override val filterPredicate: (List<ChapterGroup>, String) -> List<ChapterGroup> =
+    override val bubbleText: (Group) -> String = { it.text }
+    override val filterPredicate: (List<Group>, String) -> List<Group> =
         { list, constraint ->
             list.filter { it.contains(constraint.toIntOrNull() ?: -1) }
         }
@@ -41,7 +46,7 @@ class GroupAdapter(
             GroupItemBinding.inflate(
                 LayoutInflater.from(parent.context), parent, false
             )
-        ) { onClick(getItem(it)) }
+        ) { getItemSafely(it, onClick) }
     }
 
     override fun onBindViewHolder(holder: ViewHolder, position: Int) {
@@ -63,7 +68,7 @@ class GroupAdapter(
             if (group.isRead()) readColor else defaultColors[group]!!
         )
         holder.binding.readProgress.visible =
-            group.lastRead != 0 && group.lastRead != group.lastChapter
+            group.lastRead != 0 && !group.isRead()
 
         holder.binding.menu.setOnClickListener { menuClick(group) }
     }
@@ -79,11 +84,11 @@ class GroupAdapter(
         }
     }
 
-    class DiffCallback : DiffUtil.ItemCallback<ChapterGroup>() {
-        override fun areItemsTheSame(oldItem: ChapterGroup, newItem: ChapterGroup): Boolean =
+    class DiffCallback : DiffUtil.ItemCallback<Group>() {
+        override fun areItemsTheSame(oldItem: Group, newItem: Group): Boolean =
             oldItem.link == newItem.link
 
-        override fun areContentsTheSame(oldItem: ChapterGroup, newItem: ChapterGroup): Boolean =
+        override fun areContentsTheSame(oldItem: Group, newItem: Group): Boolean =
             oldItem == newItem
     }
 

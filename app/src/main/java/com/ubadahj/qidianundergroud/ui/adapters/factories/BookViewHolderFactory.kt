@@ -8,7 +8,6 @@ import coil.transform.CircleCropTransformation
 import com.ubadahj.qidianundergroud.databinding.BookMetaItemBinding
 import com.ubadahj.qidianundergroud.databinding.BookNonMetaItemBinding
 import com.ubadahj.qidianundergroud.models.Book
-import com.ubadahj.qidianundergroud.models.Metadata
 import com.ubadahj.qidianundergroud.utils.ui.inflater
 import com.ubadahj.qidianundergroud.utils.ui.visible
 
@@ -31,7 +30,7 @@ abstract class BookViewHolder(
         binding.root.setOnClickListener { onClick(bindingAdapterPosition) }
     }
 
-    abstract fun bind(item: Pair<Book, Metadata?>)
+    abstract fun bind(item: Book)
 }
 
 object BookViewHolderFactory {
@@ -51,9 +50,9 @@ object BookViewHolderFactory {
         private val binding: BookNonMetaItemBinding,
         onClick: (Int) -> Unit
     ) : BookViewHolder(binding, onClick) {
-        override fun bind(item: Pair<Book, Metadata?>) {
-            binding.bookTitle.text = item.first.name
-            binding.completedText.visible = item.first.completed
+        override fun bind(item: Book) {
+            binding.bookTitle.text = item.name
+            binding.completedText.visible = item.completed
         }
     }
 
@@ -61,16 +60,16 @@ object BookViewHolderFactory {
         private val binding: BookMetaItemBinding,
         onClick: (Int) -> Unit
     ) : BookViewHolder(binding, onClick) {
-        override fun bind(item: Pair<Book, Metadata?>) {
-            item.second?.coverPath?.let {
+        override fun bind(item: Book) {
+            item.coverPath?.let {
                 binding.bookCover.load(it) {
                     transformations(CircleCropTransformation())
                 }
             }
-            binding.bookTitle.text = item.first.name
-            binding.authorName.text = item.second?.author
-            binding.ratingText.text = "★ ${item.second?.rating}"
-            binding.completedText.visible = item.first.completed
+            binding.bookTitle.text = item.name
+            binding.authorName.text = item.author
+            binding.ratingText.text = "★ ${item.rating}"
+            binding.completedText.visible = item.completed
         }
     }
 

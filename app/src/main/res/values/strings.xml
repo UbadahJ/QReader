@@ -21,13 +21,24 @@
     <string name="search">Search</string>
     <string name="channel_name">Library updates</string>
     <string name="time_out">Server timed out, try again</string>
-
-    <string name="aboutLibraries_description_showIcon">true</string>
-    <string name="aboutLibraries_description_showVersion">true</string>
-    <string name="aboutLibraries_description_text">Android reader for Qidian Underground API</string>
     <string name="downloader_name">Show download progress</string>
     <string name="update_notification">Application updates</string>
     <string name="index_name">Show current book indexing progress</string>
+    <string name="webnovel_url_hint">https://www.webnovel.com/book/lord-of-mysteries_11022733006234505</string>
+    <string name="pref_lock_font_scale">lockScaleFactor</string>
+    <string name="pref_scale_factor">scaleFactor</string>
+    <string name="pref_immersive_mode">enableImmersiveMode</string>
+    <string name="pref_line_spacing_multiplier">lineSpacingMultiplier</string>
+    <string name="pkey_open_reader">showReaderPreferences</string>
+    <string name="pkey_open_network">showNetworkPreferences</string>
+    <string name="pkey_open_library">showLibraryPreferences</string>
+    <string name="pref_column_count">columnCount</string>
+    <string name="pref_use_proxy">useProxy</string>
+    <string name="pref_request_timeout">webViewTimeout</string>
+    <string name="pkey_open_appearance">showAppearancePreferences</string>
+    <string name="pref_night_mode">nightMode</string>
+    <string name="pref_library_update_freq">libraryUpdateFrequency</string>
+    <string name="worker_library_notification">NotificationService</string>
 
     <string-array name="browse_sort_by">
         <item>Name</item>
@@ -35,5 +46,31 @@
         <item>Rating</item>
         <item>Last Updated</item>
         <item>Completed</item>
+    </string-array>
+    <string-array name="night_mode_options">
+        <item>Disable</item>
+        <item>Enable</item>
+        <item>Follow System</item>
+    </string-array>
+    <string-array name="night_mode_options_value">
+        <item>0</item>
+        <item>1</item>
+        <item>2</item>
+    </string-array>
+    <string-array name="update_freq_options">
+        <item>Manual</item>
+        <item>Every 12 Hours</item>
+        <item>Daily</item>
+        <item>Every 2 Days</item>
+        <item>Every 3 Days</item>
+        <item>Weekly</item>
+    </string-array>
+    <string-array name="update_freq_options_value">
+        <item>0</item>
+        <item>1</item>
+        <item>2</item>
+        <item>3</item>
+        <item>4</item>
+        <item>5</item>
     </string-array>
 </resources>

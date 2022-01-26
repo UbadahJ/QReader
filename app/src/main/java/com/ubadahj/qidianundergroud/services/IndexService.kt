@@ -32,7 +32,7 @@ class IndexService @AssistedInject constructor(
     private val notificationId = 86420
 
     override suspend fun doWork(): Result {
-        val books = bookRepo.getBooks().first()
+        val books = bookRepo.getUndergroundBooks().first()
         createChannel(
             applicationContext, Channel(
                 name = applicationContext.getString(R.string.index_name),

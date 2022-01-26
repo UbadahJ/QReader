@@ -13,12 +13,9 @@ import com.github.ajalt.timberkt.e
 import com.ubadahj.qidianundergroud.MainActivity
 import com.ubadahj.qidianundergroud.R
 import com.ubadahj.qidianundergroud.models.Book
-import com.ubadahj.qidianundergroud.models.ChapterGroup
-import com.ubadahj.qidianundergroud.models.Metadata
+import com.ubadahj.qidianundergroud.models.Group
 import com.ubadahj.qidianundergroud.repositories.BookRepository
-import com.ubadahj.qidianundergroud.repositories.ChapterGroupRepository
-import com.ubadahj.qidianundergroud.repositories.MetadataRepository
-import com.ubadahj.qidianundergroud.utils.models.lastChapter
+import com.ubadahj.qidianundergroud.repositories.GroupRepository
 import dagger.assisted.Assisted
 import dagger.assisted.AssistedInject
 import kotlinx.coroutines.Dispatchers
@@ -34,8 +31,7 @@ class NotificationWorker @AssistedInject constructor(
     @Assisted context: Context,
     @Assisted params: WorkerParameters,
     private val bookRepo: BookRepository,
-    private val groupRepo: ChapterGroupRepository,
-    private val metaRepo: MetadataRepository,
+    private val groupRepo: GroupRepository,
 ) : CoroutineWorker(context, params) {
 
     private val notificationId = 42069
@@ -56,19 +52,17 @@ class NotificationWorker @AssistedInject constructor(
     }
 
     private fun getNotifications() = flow {
-        val books = bookRepo.getBooks(true).first()
-            .filter { it.inLibrary }
-            .associateWith { metaRepo.getBook(it).first() }
+        val books = bookRepo.getLibraryBooks().first()
 
-        progressNotification(books) { book, metadata ->
+        progressNotification(books) { book ->
             try {
                 val lastGroup = groupRepo.getGroups(book).first()
                 val refreshedGroups = groupRepo.getGroups(book, true).first()
                 val updateCount = refreshedGroups.lastChapter() - lastGroup.lastChapter()
-                if (updateCount > 0 && metadata?.enableNotification == true)
+                if (updateCount > 0)
                     emit(
                         BookNotification(
-                            applicationContext, book, metadata, refreshedGroups, updateCount
+                            applicationContext, book, refreshedGroups, updateCount
                         )
                     )
             } catch (e: Exception) {
@@ -77,13 +71,13 @@ class NotificationWorker @AssistedInject constructor(
         }
     }.flowOn(Dispatchers.IO)
 
-    private fun List<ChapterGroup>.lastChapter(): Int {
-        return maxByOrNull { it.lastChapter }?.lastChapter ?: 0
+    private fun List<Group>.lastChapter(): Int {
+        return maxByOrNull { it.lastChapter }?.lastChapter?.toInt() ?: 0
     }
 
     private suspend fun progressNotification(
-        books: Map<Book, Metadata?>,
-        action: suspend (Book, Metadata?) -> Unit
+        books: List<Book>,
+        action: suspend (Book) -> Unit
     ) {
         val builder = NotificationCompat.Builder(applicationContext, CHANNEL_ID).apply {
             setContentTitle("Checking for updates")
@@ -96,14 +90,14 @@ class NotificationWorker @AssistedInject constructor(
             builder.setProgress(books.size, 0, false)
             notify(notificationId, builder.build())
 
-            books.onEachIndexed { counter, (book, metadata) ->
+            books.onEachIndexed { counter, book ->
                 builder.apply {
                     setContentText(book.name)
                     setProgress(books.size, counter, false)
                     notify(notificationId, build())
                 }
 
-                action(book, metadata)
+                action(book)
             }
 
             builder.setProgress(0, 0, false)
@@ -114,8 +108,7 @@ class NotificationWorker @AssistedInject constructor(
     private data class BookNotification(
         val context: Context,
         val book: Book,
-        val metadata: Metadata?,
-        val groups: List<ChapterGroup>,
+        val groups: List<Group>,
         val updateCount: Int
     ) {
 
@@ -124,7 +117,7 @@ class NotificationWorker @AssistedInject constructor(
 
         private val groupKey = "com.ubadahj.qidianunderground.CHAPTER_UPDATES"
 
-        val id: Int = book.id.toCharArray().sumOf { it.toInt() }
+        val id: Int = book.id
 
         suspend fun createNotification(): Notification =
             NotificationCompat.Builder(context, CHANNEL_ID)
@@ -135,11 +128,11 @@ class NotificationWorker @AssistedInject constructor(
                 .setContentIntent(createIntent(lastGroup))
                 .addAction(R.drawable.add, "Open Book", createIntent())
                 .setAutoCancel(true)
-                .setLargeIcon(context, metadata?.coverPath)
+                .setLargeIcon(context, book.coverPath)
                 .setGroup(groupKey)
                 .build()
 
-        private fun createIntent(group: ChapterGroup? = null) =
+        private fun createIntent(group: Group? = null) =
             PendingIntent.getActivity(
                 context,
                 hashCode() + group.hashCode(),
