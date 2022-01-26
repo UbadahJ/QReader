@@ -47,6 +47,12 @@ fun RecyclerView.preserveState(action: RecyclerView.() -> Unit) {
     layoutManager?.onRestoreInstanceState(state)
 }
 
+fun RecyclerView.removeAllDecorations() {
+    (0 until itemDecorationCount)
+        .map(this::getItemDecorationAt)
+        .forEach(this::removeItemDecoration)
+}
+
 inline fun <T> ListAdapter<T, *>.getItemSafely(position: Int, crossinline action: (T) -> Unit) {
     if (!(position == RecyclerView.NO_POSITION || position >= currentList.size))
         action(currentList[position])

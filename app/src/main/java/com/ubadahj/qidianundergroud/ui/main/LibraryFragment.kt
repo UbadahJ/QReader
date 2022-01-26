@@ -21,6 +21,7 @@ import com.ubadahj.qidianundergroud.ui.adapters.MenuAdapter
 import com.ubadahj.qidianundergroud.ui.adapters.decorations.GridItemOffsetDecoration
 import com.ubadahj.qidianundergroud.ui.dialog.MenuDialog
 import com.ubadahj.qidianundergroud.ui.models.MenuDialogItem
+import com.ubadahj.qidianundergroud.utils.ui.removeAllDecorations
 import com.ubadahj.qidianundergroud.utils.ui.toDp
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.flow.collect
@@ -85,6 +86,7 @@ class LibraryFragment : Fragment() {
                 bookListingView.adapter = adapter
                 pref.columnCount.asFlow().flowWithLifecycle(lifecycle).collect {
                     bookListingView.layoutManager = GridLayoutManager(requireContext(), it)
+                    bookListingView.removeAllDecorations()
                     bookListingView.addItemDecoration(
                         GridItemOffsetDecoration(
                             it, 12.toDp(requireContext()).toInt()
