@@ -15,6 +15,7 @@
         android:layout_marginBottom="16dp"
         app:bubbleSize="small"
         app:bubbleTextSize="14sp"
+        android:scrollbars="none"
         app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"

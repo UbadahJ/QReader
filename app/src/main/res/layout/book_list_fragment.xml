@@ -73,7 +73,8 @@
         <com.l4digital.fastscroll.FastScrollRecyclerView
             android:id="@+id/book_listing_view"
             android:layout_width="match_parent"
-            android:layout_height="match_parent" />
+            android:layout_height="match_parent"
+            android:scrollbars="none" />
 
         <com.google.android.material.floatingactionbutton.ExtendedFloatingActionButton
             android:id="@+id/floating_button"
