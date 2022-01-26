@@ -18,5 +18,18 @@
         android:icon="@drawable/menu_dots"
         android:title=""
         app:iconTint="?android:attr/textColorPrimary"
-        app:showAsAction="always" />
+        app:showAsAction="always">
+        <menu>
+            <item
+                android:id="@+id/menu_refresh_books"
+                android:icon="@drawable/refresh"
+                android:title="Refresh"
+                app:iconTint="?android:attr/textColorPrimary" />
+            <item
+                android:id="@+id/menu_generate_index"
+                android:icon="@drawable/download"
+                android:title="Download Books Index"
+                app:iconTint="?android:attr/textColorPrimary" />
+        </menu>
+    </item>
 </menu>

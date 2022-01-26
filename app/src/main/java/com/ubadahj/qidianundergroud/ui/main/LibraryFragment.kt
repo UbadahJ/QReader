@@ -17,11 +17,8 @@ import com.ubadahj.qidianundergroud.databinding.BookListFragmentBinding
 import com.ubadahj.qidianundergroud.models.Resource
 import com.ubadahj.qidianundergroud.preferences.LibraryPreferences
 import com.ubadahj.qidianundergroud.ui.adapters.LibraryAdapter
-import com.ubadahj.qidianundergroud.ui.adapters.MenuAdapter
 import com.ubadahj.qidianundergroud.ui.adapters.decorations.GridItemOffsetDecoration
 import com.ubadahj.qidianundergroud.ui.dialog.AboutDialog
-import com.ubadahj.qidianundergroud.ui.dialog.MenuDialog
-import com.ubadahj.qidianundergroud.ui.models.MenuDialogItem
 import com.ubadahj.qidianundergroud.utils.ui.removeAllDecorations
 import com.ubadahj.qidianundergroud.utils.ui.toDp
 import dagger.hilt.android.AndroidEntryPoint
@@ -44,21 +41,6 @@ class LibraryFragment : Fragment() {
             LibraryFragmentDirections.actionLibraryFragmentToBookFragment()
         )
     }
-    private val menu = MenuDialog(
-        MenuAdapter(
-            listOf(
-                MenuDialogItem("History", R.drawable.archive),
-                MenuDialogItem("Settings", R.drawable.settings) {
-                    findNavController().navigate(
-                        LibraryFragmentDirections.actionLibraryFragmentToSettingFragment()
-                    )
-                },
-                MenuDialogItem("About", R.drawable.info) {
-                    AboutDialog().show(requireActivity().supportFragmentManager, null)
-                }
-            )
-        )
-    )
 
     private var binding: BookListFragmentBinding? = null
 
@@ -139,11 +121,17 @@ class LibraryFragment : Fragment() {
                 }
                 true
             }
-            R.id.menu -> {
-                menu.show(requireActivity().supportFragmentManager, null)
+            R.id.menu_settings -> {
+                findNavController().navigate(
+                    LibraryFragmentDirections.actionLibraryFragmentToSettingFragment()
+                )
                 true
             }
-            else -> false
+            R.id.menu_about -> {
+                AboutDialog().show(requireActivity().supportFragmentManager, null)
+                true
+            }
+            else -> super.onOptionsItemSelected(item)
         }
     }
 

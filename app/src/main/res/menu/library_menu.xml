@@ -12,5 +12,25 @@
         android:icon="@drawable/menu_dots"
         android:title=""
         app:iconTint="?android:attr/textColorPrimary"
-        app:showAsAction="always" />
+        app:showAsAction="always">
+        <menu>
+            <item
+                android:id="@+id/menu_history"
+                android:icon="@drawable/archive"
+                android:title="History"
+                app:iconTint="?android:attr/textColorPrimary" />
+
+            <item
+                android:id="@+id/menu_settings"
+                android:icon="@drawable/settings"
+                android:title="Settings"
+                app:iconTint="?android:attr/textColorPrimary" />
+
+            <item
+                android:id="@+id/menu_about"
+                android:icon="@drawable/info"
+                android:title="About"
+                app:iconTint="?android:attr/textColorPrimary" />
+        </menu>
+    </item>
 </menu>

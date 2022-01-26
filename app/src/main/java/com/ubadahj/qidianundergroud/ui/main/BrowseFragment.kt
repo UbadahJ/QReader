@@ -1,6 +1,5 @@
 package com.ubadahj.qidianundergroud.ui.main
 
-import android.annotation.SuppressLint
 import android.os.Bundle
 import android.text.Editable
 import android.view.*
@@ -22,11 +21,8 @@ import com.ubadahj.qidianundergroud.models.Book
 import com.ubadahj.qidianundergroud.models.Resource
 import com.ubadahj.qidianundergroud.services.IndexService
 import com.ubadahj.qidianundergroud.ui.adapters.BookAdapter
-import com.ubadahj.qidianundergroud.ui.adapters.MenuAdapter
 import com.ubadahj.qidianundergroud.ui.dialog.InputBottomSheet
 import com.ubadahj.qidianundergroud.ui.dialog.InputBottomSheetConfig
-import com.ubadahj.qidianundergroud.ui.dialog.MenuDialog
-import com.ubadahj.qidianundergroud.ui.models.MenuDialogItem
 import com.ubadahj.qidianundergroud.utils.ui.onItemSelectedListener
 import com.ubadahj.qidianundergroud.utils.ui.snackBar
 import com.ubadahj.qidianundergroud.utils.ui.visible
@@ -39,28 +35,6 @@ import kotlinx.coroutines.launch
 class BrowseFragment : Fragment() {
 
     private val viewModel: MainViewModel by activityViewModels()
-
-    @SuppressLint("CheckResult")
-    private val menu = MenuDialog(
-        MenuAdapter(
-            listOf(
-                MenuDialogItem("Refresh", R.drawable.refresh) {
-                    lifecycleScope.launch {
-                        viewModel
-                            .getBooks(refresh = true)
-                            .flowWithLifecycle(lifecycle)
-                            .collect { getBooks(it, true) }
-                    }
-                },
-                MenuDialogItem("Generate Index", R.drawable.download) {
-                    val work = OneTimeWorkRequestBuilder<IndexService>().build()
-                    WorkManager.getInstance(requireContext()).enqueueUniqueWork(
-                        "index-service", ExistingWorkPolicy.KEEP, work
-                    )
-                }
-            )
-        )
-    )
 
     private var binding: BookListFragmentBinding? = null
     private val adapter: BookAdapter = BookAdapter(listOf()) {
@@ -162,8 +136,20 @@ class BrowseFragment : Fragment() {
                 }
                 true
             }
-            R.id.menu -> {
-                menu.show(requireActivity().supportFragmentManager, null)
+            R.id.menu_refresh_books -> {
+                lifecycleScope.launch {
+                    viewModel
+                        .getBooks(refresh = true)
+                        .flowWithLifecycle(lifecycle)
+                        .collect { getBooks(it, true) }
+                }
+                true
+            }
+            R.id.menu_generate_index -> {
+                val work = OneTimeWorkRequestBuilder<IndexService>().build()
+                WorkManager.getInstance(requireContext()).enqueueUniqueWork(
+                    "index-service", ExistingWorkPolicy.KEEP, work
+                )
                 true
             }
             R.id.add -> {
@@ -178,7 +164,7 @@ class BrowseFragment : Fragment() {
                 ).show(requireActivity().supportFragmentManager, null)
                 true
             }
-            else -> false
+            else -> super.onOptionsItemSelected(item)
         }
     }
 
