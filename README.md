@@ -1,8 +1,7 @@
-<p align="center">
-  <img width="400" src="https://user-images.githubusercontent.com/47380312/150648680-ee0cb8e7-0e1d-4d6e-94fb-49f0cbe7ce08.svg" alt="QReader logo">
-</p>
+# QReader
 
-A simple application intended provide extension to the capabilities of the website <https://toc.qidianunderground.org/>
+A reader application that aggregates <https://toc.qidianunderground.org/> and WebNovel into single
+unified platform
 
 ## Features :sparkles:
 
@@ -13,7 +12,7 @@ A simple application intended provide extension to the capabilities of the websi
 - Support for downloading books for offline reading
 - Notifications service for book updates with multiple actions
 - Bookmark progress on chapters
-- Day/Night theme support (Requires Android P or above)
+- Day/Night theme support
 - Caching to allow offline content access
 
 ## Screenshots :camera:
@@ -24,6 +23,7 @@ A simple application intended provide extension to the capabilities of the websi
 | Book     | ![book_view_dark](images/book_view_dark.png)               | ![book_view_light](images/book_view_light.png)               |
 | Chapters | ![chapters_view_dark](images/chapters_view_dark.png)       | ![chapters_view_light](images/chapters_view_light.png)       |
 | Article  | ![text_view_dark](images/text_view_dark.png)               | ![text_view_light](images/text_view_light.png)               |
+| Settings | ![text_view_dark](images/settings_view_dark.png)           | ![text_view_light](images/settings_view_light.png)           |
 
 ## Contributing
 
@@ -42,10 +42,10 @@ Don't forget to give the project a star! Thanks again!
 
 Learn more about upcoming features and fixes
 
-https://github.com/users/UbadahJ/projects/1
+<https://github.com/users/UbadahJ/projects/1>
 
 ## Discussion
 
-Jump into discussions on 
+Jump into discussions on
 
-https://github.com/UbadahJ/QReader/discussions/
+<https://github.com/UbadahJ/QReader/discussions/>
