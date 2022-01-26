@@ -15,6 +15,7 @@ import androidx.work.WorkManager
 import com.github.ajalt.timberkt.Timber
 import com.ubadahj.qidianundergroud.databinding.MainActivityBinding
 import com.ubadahj.qidianundergroud.preferences.AppearancePreferences
+import com.ubadahj.qidianundergroud.preferences.LibraryPreferences
 import com.ubadahj.qidianundergroud.repositories.BookRepository
 import com.ubadahj.qidianundergroud.repositories.GroupRepository
 import com.ubadahj.qidianundergroud.services.NotificationWorker
@@ -23,8 +24,8 @@ import com.ubadahj.qidianundergroud.ui.main.MainViewModel
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
-import java.util.concurrent.TimeUnit
 import javax.inject.Inject
 
 @AndroidEntryPoint
@@ -32,14 +33,14 @@ class MainActivity : AppCompatActivity() {
 
     private val viewModel: MainViewModel by viewModels()
     private val updateRequest = OneTimeWorkRequestBuilder<UpdateService>().build()
-    private val notificationRequest = PeriodicWorkRequestBuilder<NotificationWorker>(
-        1, TimeUnit.HOURS
-    ).build()
 
     private lateinit var binding: MainActivityBinding
 
     @Inject
-    lateinit var pref: AppearancePreferences
+    lateinit var appearancePref: AppearancePreferences
+
+    @Inject
+    lateinit var libraryPref: LibraryPreferences
 
     @Inject
     lateinit var bookRepo: BookRepository
@@ -74,22 +75,30 @@ class MainActivity : AppCompatActivity() {
             }
         }
 
+        val manager = WorkManager.getInstance(applicationContext)
         lifecycleScope.launch {
-            pref.nightMode.asFlow().flowWithLifecycle(lifecycle).collect {
-                AppCompatDelegate.setDefaultNightMode(
-                    when (it) {
-                        "0" -> AppCompatDelegate.MODE_NIGHT_NO
-                        "1" -> AppCompatDelegate.MODE_NIGHT_YES
-                        else -> AppCompatDelegate.MODE_NIGHT_FOLLOW_SYSTEM
-                    }
-                )
+            launch {
+                appearancePref.nightMode.asFlow().map(appearancePref::nightModeMapper)
+                    .flowWithLifecycle(lifecycle)
+                    .collect { AppCompatDelegate.setDefaultNightMode(it) }
+            }
+            launch {
+                libraryPref.updateFrequency.asFlow().map(libraryPref::mapUpdateFrequency).collect {
+                    val uniqueTag = getString(R.string.worker_library_notification)
+                    it?.let { freq ->
+                        manager.enqueueUniquePeriodicWork(
+                            uniqueTag,
+                            ExistingPeriodicWorkPolicy.REPLACE,
+                            PeriodicWorkRequestBuilder<NotificationWorker>(
+                                freq.first, freq.second
+                            ).build()
+                        )
+                    } ?: manager.cancelUniqueWork(uniqueTag)
+                }
             }
         }
 
-        WorkManager.getInstance(applicationContext).enqueueUniquePeriodicWork(
-            "NotificationService", ExistingPeriodicWorkPolicy.REPLACE, notificationRequest
-        )
-        WorkManager.getInstance(applicationContext).enqueue(updateRequest)
+        manager.enqueue(updateRequest)
     }
 
     override fun onSupportNavigateUp() = findNavController(R.id.nav_host_fragment).navigateUp()

@@ -41,6 +41,8 @@
     <string name="pref_request_timeout">webViewTimeout</string>
     <string name="pkey_open_appearance">showAppearancePreferences</string>
     <string name="pref_night_mode">nightMode</string>
+    <string name="pref_library_update_freq">libraryUpdateFrequency</string>
+    <string name="worker_library_notification">NotificationService</string>
 
     <string-array name="browse_sort_by">
         <item>Name</item>
@@ -58,5 +60,21 @@
         <item>0</item>
         <item>1</item>
         <item>2</item>
+    </string-array>
+    <string-array name="update_freq_options">
+        <item>Manual</item>
+        <item>Every 12 Hours</item>
+        <item>Daily</item>
+        <item>Every 2 Days</item>
+        <item>Every 3 Days</item>
+        <item>Weekly</item>
+    </string-array>
+    <string-array name="update_freq_options_value">
+        <item>0</item>
+        <item>1</item>
+        <item>2</item>
+        <item>3</item>
+        <item>4</item>
+        <item>5</item>
     </string-array>
 </resources>
