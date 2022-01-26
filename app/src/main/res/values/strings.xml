@@ -21,10 +21,6 @@
     <string name="search">Search</string>
     <string name="channel_name">Library updates</string>
     <string name="time_out">Server timed out, try again</string>
-
-    <string name="aboutLibraries_description_showIcon">true</string>
-    <string name="aboutLibraries_description_showVersion">true</string>
-    <string name="aboutLibraries_description_text">Android reader for Qidian Underground API</string>
     <string name="downloader_name">Show download progress</string>
     <string name="update_notification">Application updates</string>
     <string name="index_name">Show current book indexing progress</string>

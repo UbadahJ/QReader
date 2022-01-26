@@ -19,6 +19,7 @@ import com.ubadahj.qidianundergroud.preferences.LibraryPreferences
 import com.ubadahj.qidianundergroud.ui.adapters.LibraryAdapter
 import com.ubadahj.qidianundergroud.ui.adapters.MenuAdapter
 import com.ubadahj.qidianundergroud.ui.adapters.decorations.GridItemOffsetDecoration
+import com.ubadahj.qidianundergroud.ui.dialog.AboutDialog
 import com.ubadahj.qidianundergroud.ui.dialog.MenuDialog
 import com.ubadahj.qidianundergroud.ui.models.MenuDialogItem
 import com.ubadahj.qidianundergroud.utils.ui.removeAllDecorations
@@ -53,7 +54,7 @@ class LibraryFragment : Fragment() {
                     )
                 },
                 MenuDialogItem("About", R.drawable.info) {
-                    com.mikepenz.aboutlibraries.LibsBuilder().start(requireContext())
+                    AboutDialog().show(requireActivity().supportFragmentManager, null)
                 }
             )
         )

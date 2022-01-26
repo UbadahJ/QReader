@@ -8,7 +8,6 @@ plugins {
     id "com.google.gms.google-services"
     id "com.google.firebase.crashlytics"
     id "androidx.navigation.safeargs.kotlin"
-    id "com.mikepenz.aboutlibraries.plugin"
 
     id "com.diffplug.spotless" version "5.17.0"
 }
@@ -134,10 +133,6 @@ dependencies {
 
     // For for working with JSoup
     implementation('org.jsoup:jsoup:1.14.3')
-
-    // About page
-    implementation('com.mikepenz:aboutlibraries-core:8.9.3')
-    implementation('com.mikepenz:aboutlibraries:8.9.3')
 
     // Database support
     implementation('com.squareup.sqldelight:android-driver:1.5.2')
