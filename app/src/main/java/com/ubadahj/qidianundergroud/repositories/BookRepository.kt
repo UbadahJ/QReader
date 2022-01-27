@@ -5,6 +5,7 @@ import android.webkit.WebView
 import com.squareup.sqldelight.runtime.coroutines.asFlow
 import com.squareup.sqldelight.runtime.coroutines.mapToList
 import com.squareup.sqldelight.runtime.coroutines.mapToOne
+import com.squareup.sqldelight.runtime.coroutines.mapToOneOrNull
 import com.ubadahj.qidianundergroud.Database
 import com.ubadahj.qidianundergroud.api.UndergroundApi
 import com.ubadahj.qidianundergroud.api.WebNovelApi
@@ -27,7 +28,7 @@ class BookRepository @Inject constructor(
     private val contentRepo: ContentRepository
 ) {
 
-    fun getBookById(id: Int) = database.bookQueries.getById(id).asFlow().mapToOne()
+    fun getBookById(id: Int) = database.bookQueries.getById(id).asFlow().mapToOneOrNull()
 
     suspend fun getUndergroundBooks(refresh: Boolean = false): Flow<List<Book>> {
         val dbBooks = database.bookQueries.getAllUndergroundBooks().executeAsList()
