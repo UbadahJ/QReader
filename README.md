@@ -49,3 +49,5 @@ Learn more about upcoming features and fixes
 Jump into discussions on
 
 <https://github.com/UbadahJ/QReader/discussions/>
+
+or join our [Discord Server](https://discord.gg/xVURsQnfY4)
