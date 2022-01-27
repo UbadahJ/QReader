@@ -60,6 +60,7 @@
         <item name="android:navigationBarDividerColor" tools:ignore="NewApi">
             ?attr/colorControlHighlight
         </item>
+        <item name="android:forceDarkAllowed" tools:targetApi="q">false</item>
     </style>
 
     <style name="PreferenceTheme" parent="@style/PreferenceThemeOverlay">

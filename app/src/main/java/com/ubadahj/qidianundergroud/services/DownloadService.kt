@@ -31,7 +31,10 @@ class DownloadService @AssistedInject constructor(
     private val notificationId = 69420
 
     override suspend fun doWork(): Result {
-        val book = bookRepo.getBookById(inputData.getInt("book_id", 0)).first()
+        val id = inputData.getInt("book_id", 0)
+        val book = bookRepo.getBookById(id).first() ?: throw IllegalArgumentException(
+            "Invalid bookId as argument: $id"
+        )
         val groups = bookRepo.getGroups(book).first()
 
         createChannel(

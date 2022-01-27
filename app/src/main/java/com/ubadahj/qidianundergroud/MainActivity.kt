@@ -56,21 +56,23 @@ class MainActivity : AppCompatActivity() {
         if (BuildConfig.DEBUG)
             Timber.plant(Timber.DebugTree())
 
+
         lifecycleScope.launch {
-            val book = intent.extras?.getInt("book")?.let {
+            intent.extras?.getInt("book")?.let {
                 viewModel.setSelectedBook(it)
             }
 
-            val groups = intent.extras?.getString("group")
+            intent.extras?.getString("group")
                 ?.let { groupRepo.getGroupByLink(it).first() }
                 .also { viewModel.setSelectedGroup(it) }
 
-            if (book != null) {
-                val navHost = binding.navHostFragment.findNavController()
+            if (viewModel.selectedBook.value != null) {
+                val navHost = findNavController(R.id.nav_host_fragment)
                 val graphInflater = navHost.navInflater
                 navHost.graph = graphInflater.inflate(R.navigation.nav_graph).apply {
                     startDestination =
-                        if (groups != null) R.id.chapterFragment else R.id.bookFragment
+                        if (viewModel.selectedGroup.value != null) R.id.chapterFragment
+                        else R.id.bookFragment
                 }
             }
         }
