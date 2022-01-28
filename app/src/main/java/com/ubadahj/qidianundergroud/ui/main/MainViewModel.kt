@@ -113,6 +113,13 @@ class MainViewModel @Inject constructor(
         }
     }
 
+    fun clearState() {
+        selectedBookJob?.cancel()
+        _selectedBook.value = null
+        _selectedGroup.value = null
+        _selectedContent.value = null
+    }
+
     fun setSelectedBook(book: Book) {
         setSelectedBook(book.id)
     }

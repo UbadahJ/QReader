@@ -49,8 +49,10 @@ class LibraryFragment : Fragment() {
         container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View {
-        binding = BookListFragmentBinding.inflate(inflater, container, false)
-        return binding!!.root
+        return BookListFragmentBinding.inflate(inflater, container, false).apply {
+            binding = this
+            viewModel.clearState()
+        }.root
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {

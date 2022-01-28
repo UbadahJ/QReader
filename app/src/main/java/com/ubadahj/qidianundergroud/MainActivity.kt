@@ -57,7 +57,7 @@ class MainActivity : AppCompatActivity() {
 
 
         lifecycleScope.launch {
-            intent.extras?.getInt("book")?.let {
+            val bookId = intent.extras?.getInt("book")?.also {
                 viewModel.setSelectedBook(it)
             }
 
@@ -65,7 +65,7 @@ class MainActivity : AppCompatActivity() {
                 ?.let { groupRepo.getGroupByLink(it).first() }
                 .also { viewModel.setSelectedGroup(it) }
 
-            if (viewModel.selectedBook.value != null) {
+            if (bookId != null && viewModel.selectedBook.value != null) {
                 val navHost = findNavController(R.id.nav_host_fragment)
                 val graphInflater = navHost.navInflater
                 navHost.graph = graphInflater.inflate(R.navigation.nav_graph).apply {
