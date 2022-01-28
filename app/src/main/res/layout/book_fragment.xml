@@ -18,16 +18,20 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content">
 
+            <include
+                android:id="@+id/toolbar"
+                layout="@layout/material_toolbar" />
+
             <ImageView
                 android:id="@+id/book_image"
                 android:layout_width="0dp"
                 android:layout_height="0dp"
-                android:layout_marginTop="24dp"
+                android:layout_marginTop="8dp"
                 android:layout_marginEnd="16dp"
                 app:layout_constraintDimensionRatio="3:4"
                 app:layout_constraintEnd_toStartOf="@+id/v_guideline_60"
                 app:layout_constraintStart_toStartOf="@+id/v_guideline_10"
-                app:layout_constraintTop_toTopOf="parent" />
+                app:layout_constraintTop_toBottomOf="@+id/toolbar" />
 
             <com.google.android.material.textview.MaterialTextView
                 android:id="@+id/book_author"
@@ -189,11 +193,10 @@
                 android:id="@+id/library_button"
                 android:layout_width="32dp"
                 android:layout_height="32dp"
-                android:layout_marginTop="24dp"
                 android:src="@drawable/heart"
                 app:layout_constraintEnd_toStartOf="@+id/v_guideline_90"
                 app:layout_constraintStart_toStartOf="@+id/v_guideline_60"
-                app:layout_constraintTop_toTopOf="parent"
+                app:layout_constraintTop_toTopOf="@+id/book_image"
                 app:tint="?attr/colorPrimary" />
 
             <include
