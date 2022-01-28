@@ -54,7 +54,8 @@ class IndexService @AssistedInject constructor(
 
             try {
                 coroutineScope {
-                    books.asFlow()
+                    books.filter { it.author == null }
+                        .asFlow()
                         .flowOn(Dispatchers.IO)
                         .flatMapMerge(12) { flow { emit(it.apply { metaRepo.getBook(this) }) } }
                         .collectIndexed { i, it ->

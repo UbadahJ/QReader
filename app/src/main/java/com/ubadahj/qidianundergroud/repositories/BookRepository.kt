@@ -30,6 +30,15 @@ class BookRepository @Inject constructor(
 
     fun getBookById(id: Int) = database.bookQueries.getById(id).asFlow().mapToOneOrNull()
 
+    suspend fun getBooks(refresh: Boolean = false): Flow<List<Book>> {
+        if (refresh) {
+            getUndergroundBooks(refresh)
+            getWebNovelBooks(refresh)
+        }
+
+        return database.bookQueries.getAll().asFlow().mapToList()
+    }
+
     suspend fun getUndergroundBooks(refresh: Boolean = false): Flow<List<Book>> {
         val dbBooks = database.bookQueries.getAllUndergroundBooks().executeAsList()
         val dbBookIds = dbBooks.map { it.undergroundId }
@@ -63,7 +72,16 @@ class BookRepository @Inject constructor(
             }
         }
 
-        return database.bookQueries.getAll().asFlow().mapToList()
+        return database.bookQueries.getAllUndergroundBooksAsBook().asFlow().mapToList()
+    }
+
+    suspend fun getWebNovelBooks(refresh: Boolean = false): Flow<List<Book>> {
+        if (refresh) {
+            val dbBooks = database.bookQueries.getAllWebNovelBooks().executeAsList()
+            dbBooks.forEach { getWebNovelBook(it.link, refresh) }
+        }
+
+        return database.bookQueries.getAllWebNovelBooksAsBook().asFlow().mapToList()
     }
 
     suspend fun getWebNovelBook(link: String, refresh: Boolean = false): Flow<Book> {
@@ -90,7 +108,7 @@ class BookRepository @Inject constructor(
                 return database.bookQueries.getById(uBook.id).asFlow().mapToOne()
             }
 
-            database.bookQueries.insertWebNovelBook(
+            if (dbBook == null) database.bookQueries.insertWebNovelBook(
                 book.id,
                 book.name,
                 book.link,
@@ -100,6 +118,16 @@ class BookRepository @Inject constructor(
                 book.description,
                 book.rating,
                 false
+            ) else database.bookQueries.updateWebNovelBook(
+                book.name,
+                book.link,
+                book.author,
+                book.coverLink,
+                book.category,
+                book.description,
+                book.rating,
+                false,
+                book.id
             )
         }
 

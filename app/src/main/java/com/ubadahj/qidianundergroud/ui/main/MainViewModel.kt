@@ -53,7 +53,7 @@ class MainViewModel @Inject constructor(
         emit(Resource.Loading)
         try {
             emitAll(
-                bookRepo.getUndergroundBooks(refresh)
+                bookRepo.getBooks(refresh)
                     .catch { Resource.Error(it) }
                     .map { books -> Resource.Success(books) }
             )
