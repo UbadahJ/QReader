@@ -26,7 +26,7 @@ class UndergroundApi @Inject constructor(
 ) {
 
     private val proxy get() = pref.useProxy.get()
-    private val maxTimeDelay get() = pref.requestTimeout.get().toLongOrNull() ?: 8000
+    private val maxTimeDelay get() = pref.requestTimeout.get()
     private val undergroundApi: UndergroundApi by lazy {
         provider.get("https://toc.qidianunderground.org/api/v1/pages/")
             .create(UndergroundApi::class.java)
@@ -67,11 +67,7 @@ class UndergroundApi @Inject constructor(
                 delay(300)
             }
             true
-        } ?: throw TimeoutException(
-            "Exceed ${
-                pref.requestTimeout.get().toIntOrNull() ?: 8000
-            } fetching contents"
-        )
+        } ?: throw TimeoutException("Exceed $maxTimeDelay fetching contents")
 
         doc.select("br").forEach { it.remove() }
         return doc.select(".well")
@@ -81,6 +77,8 @@ class UndergroundApi @Inject constructor(
                 val title = it.select("h2.text-center").first()?.html()?.unescapeHtml() ?: ""
                 val contents = it.select("p").outerHtml().unescapeHtml()
                 Content(group.link.md5 + title.md5, group.link, title, contents)
-            }.also { webView.clearCache(true) }
+            }.also {
+                if (pref.disableWebViewCache.get()) webView.clearCache(true)
+            }
     }
 }

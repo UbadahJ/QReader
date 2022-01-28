@@ -34,11 +34,18 @@
     <string name="pkey_open_library">showLibraryPreferences</string>
     <string name="pref_column_count">columnCount</string>
     <string name="pref_use_proxy">useProxy</string>
-    <string name="pref_request_timeout">webViewTimeout</string>
+    <string name="pref_webview_request_timeout">webViewTimeout</string>
     <string name="pkey_open_appearance">showAppearancePreferences</string>
     <string name="pref_night_mode">nightMode</string>
     <string name="pref_library_update_freq">libraryUpdateFrequency</string>
     <string name="worker_library_notification">NotificationService</string>
+    <string name="pref_concurrent_requests">concurrentRequests</string>
+    <string name="pref_req_connection_timeout">requestConnectionTimeout</string>
+    <string name="pref_req_read_timeout">requestReadTimeout</string>
+    <string name="pref_req_write_timeout">requestWriteTimeout</string>
+    <string name="pref_req_max_host_requests">requestMaxHostRequests</string>
+    <string name="pref_req_max_requests">requestMaxRequests</string>
+    <string name="pref_disable_webview_cache">disableWebViewCache</string>
 
     <string-array name="browse_sort_by">
         <item>Name</item>

@@ -24,7 +24,6 @@ import com.ubadahj.qidianundergroud.ui.main.MainViewModel
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.flow.first
-import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
@@ -80,12 +79,12 @@ class MainActivity : AppCompatActivity() {
         val manager = WorkManager.getInstance(applicationContext)
         lifecycleScope.launch {
             launch {
-                appearancePref.nightMode.asFlow().map(appearancePref::nightModeMapper)
+                appearancePref.nightMode.asFlow()
                     .flowWithLifecycle(lifecycle)
                     .collect { AppCompatDelegate.setDefaultNightMode(it) }
             }
             launch {
-                libraryPref.updateFrequency.asFlow().map(libraryPref::mapUpdateFrequency).collect {
+                libraryPref.updateFrequency.asFlow().collect {
                     val uniqueTag = getString(R.string.worker_library_notification)
                     it?.let { freq ->
                         manager.enqueueUniquePeriodicWork(

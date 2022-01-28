@@ -26,8 +26,6 @@ class LibraryPreferences @Inject constructor(
     )
     val updateFrequency = preferences.getString(
         context.getString(R.string.pref_library_update_freq), "1"
-    )
-
-    fun mapUpdateFrequency(freq: String) = updateFreqOptions[freq]
+    ).mapToEntries(updateFreqOptions)
 
 }
