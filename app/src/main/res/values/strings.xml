@@ -46,6 +46,7 @@
     <string name="pref_req_max_host_requests">requestMaxHostRequests</string>
     <string name="pref_req_max_requests">requestMaxRequests</string>
     <string name="pref_disable_webview_cache">disableWebViewCache</string>
+    <string name="pref_check_web_novel_update">checkWebNovelOnUpdate</string>
 
     <string-array name="browse_sort_by">
         <item>Name</item>
