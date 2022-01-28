@@ -10,12 +10,60 @@
         android:title="Use Proxy" />
 
     <EditTextPreference
-        android:defaultValue="8000"
-        android:dialogMessage="Change the timeout for web view request. Increase in case of slow connection or continuous error in reader"
-        android:dialogTitle="Request timeout"
-        android:key="@string/pref_request_timeout"
-        android:summary="Set the timeout for web view request [Current: %s]"
-        android:title="Request timeout"
+        android:defaultValue="12"
+        android:dialogMessage="Configure the max number of requests in concurrent supported tasks"
+        android:dialogTitle="Concurrent Requests"
+        android:key="@string/pref_concurrent_requests"
+        android:title="Concurrent Requests"
         app:useSimpleSummaryProvider="true" />
+
+    <PreferenceCategory android:title="Requests">
+        <EditTextPreference
+            android:defaultValue="2"
+            android:dialogMessage="Sets the default read timeout for new connections. A value of 0 means no timeout"
+            android:dialogTitle="Connection timeout"
+            android:key="@string/pref_req_connection_timeout"
+            android:title="Connection timeout" />
+        <EditTextPreference
+            android:defaultValue="2"
+            android:dialogMessage="Sets the default connect timeout for new connections. A value of 0 means no timeout"
+            android:dialogTitle="Read timeout"
+            android:key="@string/pref_req_read_timeout"
+            android:title="Read timeout" />
+        <EditTextPreference
+            android:defaultValue="2"
+            android:dialogMessage="Sets the default write timeout for new connections. A value of 0 means no timeout"
+            android:dialogTitle="Write timeout"
+            android:key="@string/pref_req_write_timeout"
+            android:title="Write timeout" />
+        <EditTextPreference
+            android:defaultValue="10"
+            android:dialogMessage="The maximum number of requests for each host to execute concurrently. This limits requests by the URL's host name. Note that concurrent requests to a single IP address may still exceed this limit: multiple hostnames may share an IP address or be routed through the same HTTP proxy."
+            android:dialogTitle="Max Host Requests"
+            android:key="@string/pref_req_max_host_requests"
+            android:title="Max Host Requests"
+            app:useSimpleSummaryProvider="true" />
+        <EditTextPreference
+            android:defaultValue="64"
+            android:dialogMessage="The maximum number of requests to execute concurrently."
+            android:dialogTitle="Host Requests"
+            android:key="@string/pref_req_max_requests"
+            android:title="Host Requests"
+            app:useSimpleSummaryProvider="true" />
+    </PreferenceCategory>
+
+    <PreferenceCategory android:title="WebView">
+        <SwitchPreference
+            android:defaultValue="false"
+            android:key="@string/pref_disable_webview_cache"
+            android:summary="Disable caching for WebView (Might slow performance but decrease disk space used)"
+            android:title="Disable Cache" />
+        <EditTextPreference
+            android:defaultValue="8000"
+            android:dialogMessage="Change the timeout for web view request. Increase in case of slow connection or continuous error in reader"
+            android:dialogTitle="Request timeout"
+            android:key="@string/pref_webview_request_timeout"
+            android:title="Request timeout" />
+    </PreferenceCategory>
 
 </PreferenceScreen>

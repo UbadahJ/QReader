@@ -16,6 +16,10 @@ class LibraryPreferences @Inject constructor(
         context.getString(R.string.pref_column_count), 2
     )
 
+    val checkForWebNovel = preferences.getBoolean(
+        context.getString(R.string.pref_check_web_novel_update), false
+    )
+
     private val updateFreqOptions = mapOf(
         "0" to null,
         "1" to (12L to TimeUnit.HOURS),
@@ -26,8 +30,6 @@ class LibraryPreferences @Inject constructor(
     )
     val updateFrequency = preferences.getString(
         context.getString(R.string.pref_library_update_freq), "1"
-    )
-
-    fun mapUpdateFrequency(freq: String) = updateFreqOptions[freq]
+    ).mapToEntries(updateFreqOptions)
 
 }

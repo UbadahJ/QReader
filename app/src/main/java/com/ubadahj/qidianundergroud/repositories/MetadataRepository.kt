@@ -28,7 +28,8 @@ class MetadataRepository @Inject constructor(
         database.metadataQueries.selectAll().asFlow().mapToList()
 
     suspend fun getBook(book: Book, refresh: Boolean = false): Flow<Metadata?> {
-        val dbBook = database.bookQueries.getUndergroundById(book.id).executeAsOne()
+        val dbBook = database.bookQueries.getUndergroundById(book.id).executeAsOneOrNull()
+            ?: throw IllegalArgumentException("${book.name} is not UndergroundBook")
         val dbMeta = database.metadataQueries.select(dbBook.undergroundId).executeAsOneOrNull()
         if (refresh || dbMeta == null) {
             webNovelApi.getBook(book)?.toMetadata(dbBook)?.also { meta ->

@@ -18,9 +18,7 @@ class AppearancePreferences @Inject constructor(
         "2" to AppCompatDelegate.MODE_NIGHT_FOLLOW_SYSTEM
     )
     val nightMode = preferences.getString(
-        context.getString(R.string.pref_night_mode), ""
-    )
-
-    fun nightModeMapper(option: String) = nightModeOptions[option] ?: nightModeOptions["2"]!!
+        context.getString(R.string.pref_night_mode), "2"
+    ).mapToEntries(nightModeOptions)
 
 }

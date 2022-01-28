@@ -41,7 +41,7 @@ FROM UndergroundBook b
 CREATE TABLE WebNovelBook
 (
     id                 TEXT               NOT NULL,
-    bookId             INTEGER AS Int            NOT NULL,
+    bookId             INTEGER AS Int     NOT NULL,
     name               TEXT               NOT NULL,
     link               TEXT               NOT NULL,
     author             TEXT               NOT NULL,
@@ -108,9 +108,29 @@ getAll:
 SELECT *
 FROM Book;
 
+getAllUndergroundBooksAsBook:
+SELECT *
+FROM Book
+WHERE id IN (
+    SELECT id
+    FROM UndergroundBookWithMeta
+);
+
+getAllWebNovelBooksAsBook:
+SELECT *
+FROM Book
+WHERE id IN (
+    SELECT bookId
+    FROM WebNovelBook
+);
+
 getAllUndergroundBooks:
 SELECT *
 FROM UndergroundBookWithMeta;
+
+getAllWebNovelBooks:
+SELECT *
+FROM WebNovelBook;
 
 getAllLibraryBooks:
 SELECT *
@@ -176,6 +196,11 @@ WHERE id = ?;
 updateUndergroundBook:
 UPDATE UndergroundBook
 SET name = ?, lastUpdated = ?, completed = ?
+WHERE id = ?;
+
+updateWebNovelBook:
+UPDATE WebNovelBook
+SET name = ?, link = ?, author = ?, coverPath = ?, category = ?, description = ?, rating = ?, completed = ?
 WHERE id = ?;
 
 deleteById:

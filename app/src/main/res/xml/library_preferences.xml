@@ -13,6 +13,11 @@
             app:min="1" />
     </PreferenceCategory>
     <PreferenceCategory android:title="Updates">
+        <SwitchPreference
+            android:defaultValue="false"
+            android:key="@string/pref_check_web_novel_update"
+            android:summary="Enable checking for new chapters from web novel for Underground books"
+            android:title="Check for WebNovel updates" />
         <ListPreference
             android:defaultValue="1"
             android:entries="@array/update_freq_options"

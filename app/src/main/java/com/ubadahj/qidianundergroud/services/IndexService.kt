@@ -9,6 +9,7 @@ import androidx.work.CoroutineWorker
 import androidx.work.WorkerParameters
 import com.github.ajalt.timberkt.e
 import com.ubadahj.qidianundergroud.R
+import com.ubadahj.qidianundergroud.preferences.NetworkPreferences
 import com.ubadahj.qidianundergroud.repositories.BookRepository
 import com.ubadahj.qidianundergroud.repositories.MetadataRepository
 import dagger.assisted.Assisted
@@ -27,6 +28,7 @@ class IndexService @AssistedInject constructor(
     @Assisted params: WorkerParameters,
     private val bookRepo: BookRepository,
     private val metaRepo: MetadataRepository,
+    private val pref: NetworkPreferences
 ) : CoroutineWorker(context, params) {
 
     private val notificationId = 86420
@@ -54,9 +56,12 @@ class IndexService @AssistedInject constructor(
 
             try {
                 coroutineScope {
-                    books.asFlow()
+                    books.filter { it.author == null }
+                        .asFlow()
                         .flowOn(Dispatchers.IO)
-                        .flatMapMerge(12) { flow { emit(it.apply { metaRepo.getBook(this) }) } }
+                        .flatMapMerge(pref.concurrentRequests.get()) {
+                            flow { emit(it.apply { metaRepo.getBook(this) }) }
+                        }
                         .collectIndexed { i, it ->
                             builder.setContentText("[${i}/${books.size}] ${it.name}")
                             builder.setProgress(books.size, i, false)

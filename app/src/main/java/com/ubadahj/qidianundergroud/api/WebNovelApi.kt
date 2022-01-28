@@ -15,7 +15,6 @@ import okhttp3.OkHttpClient
 import okhttp3.ResponseBody
 import org.jsoup.Jsoup
 import org.jsoup.nodes.Element
-import java.util.*
 import javax.inject.Inject
 
 private const val WEB_NOVEL_URL = "https://www.webnovel.com/"
@@ -155,13 +154,13 @@ class WebNovelApi @Inject constructor(
 
         val author = infoElement?.selectFirst("address > p")
             ?.children()
-            ?.first { it.text().contains("author", true) }
+            ?.firstOrNull { it.text().contains("author", true) }
             ?.nextElementSibling()
             ?.text()
             ?: ""
 
         val coverLink = infoElement?.getElementsByTag("img")
-            ?.last { title.toString() in it.attr("alt") }
+            ?.lastOrNull { title.toString() in it.attr("alt") }
             ?.attr("src")
             ?.let { "https:$it" }
             ?: ""
