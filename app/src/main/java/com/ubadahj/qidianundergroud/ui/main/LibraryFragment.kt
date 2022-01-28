@@ -19,10 +19,12 @@ import com.ubadahj.qidianundergroud.preferences.LibraryPreferences
 import com.ubadahj.qidianundergroud.ui.adapters.LibraryAdapter
 import com.ubadahj.qidianundergroud.ui.adapters.decorations.GridItemOffsetDecoration
 import com.ubadahj.qidianundergroud.ui.dialog.AboutDialog
+import com.ubadahj.qidianundergroud.utils.ui.isPortraitMode
 import com.ubadahj.qidianundergroud.utils.ui.removeAllDecorations
 import com.ubadahj.qidianundergroud.utils.ui.toDp
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.flow.collect
+import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
@@ -69,15 +71,20 @@ class LibraryFragment : Fragment() {
             }
             lifecycleScope.launch {
                 bookListingView.adapter = adapter
-                pref.columnCount.asFlow().flowWithLifecycle(lifecycle).collect {
-                    bookListingView.layoutManager = GridLayoutManager(requireContext(), it)
-                    bookListingView.removeAllDecorations()
-                    bookListingView.addItemDecoration(
-                        GridItemOffsetDecoration(
-                            it, 12.toDp(requireContext()).toInt()
+                pref.columnCountPortrait.asFlow()
+                    .combine(pref.columnCountLandscape.asFlow()) { port, land ->
+                        if (isPortraitMode()) port else land
+                    }
+                    .flowWithLifecycle(lifecycle)
+                    .collect {
+                        bookListingView.layoutManager = GridLayoutManager(requireContext(), it)
+                        bookListingView.removeAllDecorations()
+                        bookListingView.addItemDecoration(
+                            GridItemOffsetDecoration(
+                                it, 12.toDp(requireContext()).toInt()
+                            )
                         )
-                    )
-                }
+                    }
             }
 
             searchBar.searchEditText.addTextChangedListener { text: Editable? ->

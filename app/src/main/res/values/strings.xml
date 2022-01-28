@@ -32,7 +32,7 @@
     <string name="pkey_open_reader">showReaderPreferences</string>
     <string name="pkey_open_network">showNetworkPreferences</string>
     <string name="pkey_open_library">showLibraryPreferences</string>
-    <string name="pref_column_count">columnCount</string>
+    <string name="pref_portrait_grid_columns">columnCount</string>
     <string name="pref_use_proxy">useProxy</string>
     <string name="pref_webview_request_timeout">webViewTimeout</string>
     <string name="pkey_open_appearance">showAppearancePreferences</string>
@@ -47,6 +47,7 @@
     <string name="pref_req_max_requests">requestMaxRequests</string>
     <string name="pref_disable_webview_cache">disableWebViewCache</string>
     <string name="pref_check_web_novel_update">checkWebNovelOnUpdate</string>
+    <string name="pref_landscape_grid_columns">columnCountLandscape</string>
 
     <string-array name="browse_sort_by">
         <item>Name</item>

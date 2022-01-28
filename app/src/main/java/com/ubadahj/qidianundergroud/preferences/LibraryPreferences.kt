@@ -12,8 +12,12 @@ class LibraryPreferences @Inject constructor(
     preferences: FlowSharedPreferences
 ) {
 
-    val columnCount = preferences.getInt(
-        context.getString(R.string.pref_column_count), 2
+    val columnCountPortrait = preferences.getInt(
+        context.getString(R.string.pref_portrait_grid_columns), 2
+    )
+
+    val columnCountLandscape = preferences.getInt(
+        context.getString(R.string.pref_landscape_grid_columns), 2
     )
 
     val checkForWebNovel = preferences.getBoolean(
