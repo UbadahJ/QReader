@@ -58,7 +58,11 @@ class BrowseFragment : Fragment() {
         setHasOptionsMenu(true)
 
         binding?.apply {
-            (requireActivity() as AppCompatActivity).setSupportActionBar(toolbar.appbar)
+            (requireActivity() as AppCompatActivity).apply {
+                setSupportActionBar(toolbar.appbar)
+                supportActionBar?.setDisplayShowHomeEnabled(true)
+                supportActionBar?.setDisplayHomeAsUpEnabled(true)
+            }
             toolbar.appbar.title = resources.getText(R.string.browse)
 
             bookListingView.layoutManager = LinearLayoutManager(requireContext())

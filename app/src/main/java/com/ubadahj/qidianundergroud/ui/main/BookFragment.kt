@@ -141,11 +141,11 @@ class BookFragment : Fragment() {
                 transformations(RoundedCornersTransformation(4.toDp(requireContext()).toFloat()))
             }
         }
-        bookAuthor.text = book.author ?: "Unknown"
-        bookDesc.text = book.description ?: "No description"
+        bookAuthor.text = book.author?.trim() ?: "Unknown"
+        bookDesc.text = book.description?.trim() ?: "No description"
         bookRatingBar.rating = book.rating ?: 0.0f
         bookRating.text = book.rating?.toString() ?: "0.0"
-        bookGenre.text = book.category ?: "Unknown"
+        bookGenre.text = book.category?.trim() ?: "Unknown"
         bookGenre.visible = true
         configureMenu(book)
     }
