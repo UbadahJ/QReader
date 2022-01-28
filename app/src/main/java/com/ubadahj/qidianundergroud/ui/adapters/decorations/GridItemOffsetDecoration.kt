@@ -16,26 +16,49 @@ class GridItemOffsetDecoration(
         state: RecyclerView.State
     ) {
         val position = parent.getChildAdapterPosition(view)
+        val halfOffset = itemOffset / 2
         when {
+            // Top Row
             position < spanCount -> {
-                // left grid
-                if (position % spanCount == 0)
-                    rect.set(0, itemOffset, itemOffset / 2, itemOffset / 2)
-                // right grid
-                else
-                    rect.set(itemOffset / 2, itemOffset, 0, itemOffset / 2)
+                when {
+                    // left grid
+                    position % spanCount == 0 -> rect.set(0, itemOffset, halfOffset, halfOffset)
+                    // right grid
+                    position % spanCount == spanCount - 1 -> rect.set(
+                        halfOffset,
+                        itemOffset,
+                        0,
+                        halfOffset
+                    )
+                    // middle
+                    else -> rect.set(halfOffset, itemOffset, halfOffset, halfOffset)
+                }
             }
             // left grid
-            position % spanCount == 0 ->
-                rect.set(0, itemOffset / 2, itemOffset / 2, itemOffset / 2)
+            position % spanCount == 0 -> rect.set(0, halfOffset, halfOffset, halfOffset)
+            // middle
+            position % spanCount in (1 until spanCount) -> rect.set(
+                halfOffset,
+                halfOffset,
+                halfOffset,
+                halfOffset
+            )
             // right grid
-            position % spanCount == 1 ->
-                rect.set(itemOffset / 2, itemOffset / 2, 0, itemOffset / 2)
+            position % spanCount == spanCount - 1 -> rect.set(halfOffset, halfOffset, 0, halfOffset)
+            // Bottom Row
             else -> {
-                // left grid
-                if (position % spanCount == 0) rect.set(0, itemOffset / 2, itemOffset, itemOffset)
-                // right grid
-                else rect.set(itemOffset / 2, itemOffset / 2, 0, itemOffset)
+                when {
+                    // left grid
+                    position % spanCount == 0 -> rect.set(0, halfOffset, itemOffset, itemOffset)
+                    // right grid
+                    position % spanCount == spanCount - 1 -> rect.set(
+                        halfOffset,
+                        halfOffset,
+                        0,
+                        itemOffset
+                    )
+                    else -> rect.set(halfOffset, halfOffset, itemOffset, itemOffset)
+                }
             }
         }
     }
