@@ -43,7 +43,7 @@ class ContentAdapter(
     }
 
     override fun onBindViewHolder(holder: ContentViewHolder, position: Int) {
-        holder.bind(getItem(position).content, preferences)
+        holder.bind(getItem(position), preferences)
     }
 
     class DiffCallback : DiffUtil.ItemCallback<ContentUIItem>() {

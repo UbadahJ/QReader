@@ -6,5 +6,5 @@ sealed class ContentUIItem(
     val content: Content
 ) {
     class ContentUITitleItem(content: Content) : ContentUIItem(content)
-    class ContentUIContentItem(content: Content) : ContentUIItem(content)
+    class ContentUIContentItem(content: Content, val text: String) : ContentUIItem(content)
 }

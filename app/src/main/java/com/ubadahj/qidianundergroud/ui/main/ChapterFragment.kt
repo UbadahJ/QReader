@@ -3,7 +3,9 @@ package com.ubadahj.qidianundergroud.ui.main
 import android.annotation.SuppressLint
 import android.content.Context
 import android.os.Bundle
-import android.view.*
+import android.view.LayoutInflater
+import android.view.View
+import android.view.ViewGroup
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import androidx.lifecycle.Lifecycle
@@ -193,13 +195,19 @@ class ChapterFragment : Fragment() {
                 chapter.groupLink != group?.link
 
         if (hasDataChanged && resource is Resource.Success) {
-            baseAdapter.submitList(resource.data.toUIModel())
+            val models = resource.data.toUIModel()
+            baseAdapter.submitList(models)
             group?.let {
                 val index = (if (group.lastRead != 0) group.lastRead - group.firstChapter else 0)
                     .toInt()
 
                 viewModel.setSelectedContent(resource.data.run { getOrNull(index) ?: first() })
-                binding?.chapterRecyclerView?.linearScroll(index * 2)
+                binding?.chapterRecyclerView?.linearScroll(
+                    models.mapIndexed { i, it -> i to it }
+                        .filter { it.second is ContentUIItem.ContentUIContentItem }
+                        .firstOrNull { it.second.content == viewModel.selectedContent.value }
+                        ?.first ?: 0
+                )
             }
         }
     }
@@ -223,10 +231,14 @@ class ChapterFragment : Fragment() {
         }
     }
 
-    private fun List<Content>.toUIModel(): List<ContentUIItem> = flatMap {
-        listOf(
-            ContentUIItem.ContentUITitleItem(it), ContentUIItem.ContentUIContentItem(it)
-        )
+    private fun List<Content>.toUIModel(): List<ContentUIItem> = flatMap { content ->
+        mutableListOf<ContentUIItem>(
+            ContentUIItem.ContentUITitleItem(content)
+        ).apply {
+            addAll(content.contents.lines().map {
+                ContentUIItem.ContentUIContentItem(content, it)
+            })
+        }
     }
 
     private inner class ReaderGestures(context: Context) : OnGestureListener(context) {
