@@ -215,7 +215,7 @@ class ChapterFragment : Fragment() {
     private fun Content.getIndex(): Int {
         return try {
             title.split(':').first().trim().split(" ").last().toInt()
-        } catch (e: NoSuchElementException) {
+        } catch (e: RuntimeException) {
             viewModel.selectedGroup.value?.lastChapter?.toInt() ?: throw IllegalStateException(
                 "Failed to get lastChapter from ViewModel selectChapterGroup"
             )
