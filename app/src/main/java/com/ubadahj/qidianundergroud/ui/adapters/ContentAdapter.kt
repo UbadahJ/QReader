@@ -1,9 +1,9 @@
 package com.ubadahj.qidianundergroud.ui.adapters
 
 import android.view.ViewGroup
-import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
 import com.l4digital.fastscroll.FastScroller
+import com.ubadahj.qidianundergroud.ui.adapters.diff.ContentDiffCallback
 import com.ubadahj.qidianundergroud.ui.adapters.factories.ChapterViewHolderFactory
 import com.ubadahj.qidianundergroud.ui.adapters.factories.ContentViewHolder
 import com.ubadahj.qidianundergroud.ui.adapters.factories.ContentViewHolderType
@@ -21,7 +21,7 @@ class ContentAdapter(
     var preferences: ContentAdapterPreferences = ContentAdapterPreferences(),
     val headerConfig: ContentHeaderConfig,
     val onClick: (ContentUIItem) -> Unit
-) : ListAdapter<ContentUIItem, ContentViewHolder>(DiffCallback()),
+) : ListAdapter<ContentUIItem, ContentViewHolder>(ContentDiffCallback),
     FastScroller.SectionIndexer {
 
     init {
@@ -44,14 +44,6 @@ class ContentAdapter(
 
     override fun onBindViewHolder(holder: ContentViewHolder, position: Int) {
         holder.bind(getItem(position), preferences)
-    }
-
-    class DiffCallback : DiffUtil.ItemCallback<ContentUIItem>() {
-        override fun areItemsTheSame(oldItem: ContentUIItem, newItem: ContentUIItem): Boolean =
-            oldItem.content.id == newItem.content.id
-
-        override fun areContentsTheSame(oldItem: ContentUIItem, newItem: ContentUIItem): Boolean =
-            oldItem.content == newItem.content
     }
 
     override fun getSectionText(position: Int): CharSequence {

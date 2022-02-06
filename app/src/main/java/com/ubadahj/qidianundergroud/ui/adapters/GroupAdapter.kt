@@ -4,11 +4,11 @@ import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.core.content.ContextCompat
 import androidx.core.view.children
-import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.RecyclerView
 import com.ubadahj.qidianundergroud.R
 import com.ubadahj.qidianundergroud.databinding.GroupItemBinding
 import com.ubadahj.qidianundergroud.models.Group
+import com.ubadahj.qidianundergroud.ui.adapters.diff.GroupDiffCallback
 import com.ubadahj.qidianundergroud.ui.adapters.generic.FilterableListAdapter
 import com.ubadahj.qidianundergroud.utils.models.contains
 import com.ubadahj.qidianundergroud.utils.models.isRead
@@ -20,7 +20,7 @@ class GroupAdapter(
     groups: List<Group> = listOf(),
     private val onClick: (Group) -> Unit,
     private val menuClick: (Group) -> Unit
-) : FilterableListAdapter<Group, GroupAdapter.ViewHolder>(DiffCallback()) {
+) : FilterableListAdapter<Group, GroupAdapter.ViewHolder>(GroupDiffCallback) {
 
     private val defaultColors: MutableMap<Group, Int> = mutableMapOf()
     private var readColor: Int = 0
@@ -82,14 +82,6 @@ class GroupAdapter(
                     it.setOnClickListener { onClick(bindingAdapterPosition) }
                 }
         }
-    }
-
-    class DiffCallback : DiffUtil.ItemCallback<Group>() {
-        override fun areItemsTheSame(oldItem: Group, newItem: Group): Boolean =
-            oldItem.link == newItem.link
-
-        override fun areContentsTheSame(oldItem: Group, newItem: Group): Boolean =
-            oldItem == newItem
     }
 
 }

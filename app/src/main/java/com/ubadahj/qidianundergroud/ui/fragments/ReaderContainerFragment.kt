@@ -7,13 +7,16 @@ import android.view.ViewGroup
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import androidx.lifecycle.lifecycleScope
-import androidx.viewpager2.adapter.FragmentStateAdapter
+import androidx.navigation.fragment.findNavController
 import com.ubadahj.qidianundergroud.databinding.ReaderContainerLayoutBinding
 import com.ubadahj.qidianundergroud.models.Group
+import com.ubadahj.qidianundergroud.models.Resource
 import com.ubadahj.qidianundergroud.repositories.GroupRepository
+import com.ubadahj.qidianundergroud.ui.adapters.diff.GroupDiffCallback
+import com.ubadahj.qidianundergroud.ui.adapters.generic.DiffFragmentStateAdapter
 import com.ubadahj.qidianundergroud.ui.viewmodels.MainViewModel
 import dagger.hilt.android.AndroidEntryPoint
-import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
@@ -22,6 +25,7 @@ class ReaderContainerFragment : Fragment() {
 
     private val viewModel: MainViewModel by activityViewModels()
     private var binding: ReaderContainerLayoutBinding? = null
+    private val adapter by lazy { ChapterReaderAdapter(this) }
 
     @Inject
     lateinit var groupRepo: GroupRepository
@@ -38,12 +42,26 @@ class ReaderContainerFragment : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+        binding?.pager?.adapter = adapter
+
         lifecycleScope.launch {
-            val list = groupRepo.getGroups(viewModel.selectedBook.value!!).first()
-            binding?.pager?.apply {
-                adapter = ChapterReaderAdapter(this@ReaderContainerFragment, list)
-                viewModel.selectedGroup.value?.let { group ->
-                    currentItem = list.indexOf(group)
+            var first = true
+            viewModel.getChapters(viewModel.selectedBook.value!!).collect {
+                when (it) {
+                    Resource.Loading -> {}
+                    is Resource.Error -> findNavController().popBackStack()
+                    is Resource.Success -> {
+                        adapter.submitList(it.data.sortedBy(Group::firstChapter))
+                        if (first) {
+                            first = false
+                            viewModel.selectedGroup.value?.let { group ->
+                                binding?.pager?.setCurrentItem(
+                                    adapter.currentList.indexOf(group),
+                                    false
+                                )
+                            }
+                        }
+                    }
                 }
             }
         }
@@ -55,13 +73,10 @@ class ReaderContainerFragment : Fragment() {
     }
 
     private class ChapterReaderAdapter(
-        fragment: Fragment,
-        val groups: List<Group>
-    ) : FragmentStateAdapter(fragment) {
-        override fun getItemCount(): Int = groups.size
-
+        fragment: Fragment
+    ) : DiffFragmentStateAdapter<Group>(fragment, GroupDiffCallback) {
         override fun createFragment(position: Int): Fragment {
-            return ChapterFragment.newInstance(groups[position].link)
+            return ChapterFragment.newInstance(currentList[position].link)
         }
     }
 
