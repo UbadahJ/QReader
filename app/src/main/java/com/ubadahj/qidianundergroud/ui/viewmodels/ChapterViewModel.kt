@@ -12,9 +12,9 @@ import com.ubadahj.qidianundergroud.repositories.ContentRepository
 import com.ubadahj.qidianundergroud.repositories.GroupRepository
 import com.ubadahj.qidianundergroud.utils.coroutines.asSourceFlow
 import dagger.hilt.android.lifecycle.HiltViewModel
-import kotlinx.coroutines.TimeoutCancellationException
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
+import java.util.concurrent.TimeoutException
 import javax.inject.Inject
 
 @HiltViewModel
@@ -62,7 +62,7 @@ class ChapterViewModel @Inject constructor(
                     WebView(it).apply { settings.javaScriptEnabled = true }
                 }.catch { Resource.Error(it) }.map { Resource.Success(it) }
             )
-        } catch (e: TimeoutCancellationException) {
+        } catch (e: TimeoutException) {
             Timber.e(e) { "Failed loading content" }
             emit(Resource.Error(e))
         }

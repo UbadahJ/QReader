@@ -70,7 +70,7 @@ class MainActivity : AppCompatActivity() {
                 val graphInflater = navHost.navInflater
                 navHost.graph = graphInflater.inflate(R.navigation.nav_graph).apply {
                     startDestination =
-                        if (viewModel.selectedGroup.value != null) R.id.chapterFragment
+                        if (viewModel.selectedGroup.value != null) R.id.readerContainerFragment
                         else R.id.bookFragment
                 }
             }
