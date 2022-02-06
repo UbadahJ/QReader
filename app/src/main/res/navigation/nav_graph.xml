@@ -72,7 +72,7 @@
         tools:layout="@layout/reader_container_layout" />
     <fragment
         android:id="@+id/bookChaptersFragment"
-        android:name="com.ubadahj.qidianundergroud.ui.dialog.BookChaptersFragment"
+        android:name="com.ubadahj.qidianundergroud.ui.fragments.BookChaptersFragment"
         android:label="BookChaptersFragment"
         tools:layout="@layout/book_chapters_fragment">
         <action
