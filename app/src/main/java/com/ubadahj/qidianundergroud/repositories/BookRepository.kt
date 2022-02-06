@@ -31,7 +31,7 @@ class BookRepository @Inject constructor(
     fun getBookById(id: Int) = database.bookQueries.getById(id).asFlow().mapToOneOrNull()
 
     suspend fun getBooks(refresh: Boolean = false): Flow<List<Book>> {
-        if (refresh) {
+        if (refresh || database.bookQueries.getAll().executeAsList().isEmpty()) {
             getUndergroundBooks(refresh)
             getWebNovelBooks(refresh)
         }
