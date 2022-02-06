@@ -100,12 +100,9 @@ class ChapterFragment : Fragment() {
                 }
             }
             launch {
-                viewModel.selectedContent.flowWithLifecycle(lifecycle)
-                    .collectNotNull { content ->
-                        viewModel.group.value?.run {
-                            groupRepo.updateLastRead(this, content.getIndex())
-                        }
-                    }
+                viewModel.selectedContent.flowWithLifecycle(lifecycle).collectNotNull {
+                    viewModel.updateLastRead(it)
+                }
             }
             launch {
                 viewModel.contents.collect {
@@ -197,16 +194,6 @@ class ChapterFragment : Fragment() {
                         ?.first ?: 0
                 )
             }
-        }
-    }
-
-    private fun Content.getIndex(): Int {
-        return try {
-            title.split(':').first().trim().split(" ").last().toInt()
-        } catch (e: RuntimeException) {
-            viewModel.group.value?.lastChapter?.toInt() ?: throw IllegalStateException(
-                "Failed to get lastChapter from ViewModel selectChapterGroup"
-            )
         }
     }
 

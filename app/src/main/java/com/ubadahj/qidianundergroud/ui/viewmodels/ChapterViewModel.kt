@@ -10,8 +10,8 @@ import com.ubadahj.qidianundergroud.models.Group
 import com.ubadahj.qidianundergroud.models.Resource
 import com.ubadahj.qidianundergroud.repositories.ContentRepository
 import com.ubadahj.qidianundergroud.repositories.GroupRepository
+import com.ubadahj.qidianundergroud.utils.coroutines.asSourceFlow
 import dagger.hilt.android.lifecycle.HiltViewModel
-import kotlinx.coroutines.Job
 import kotlinx.coroutines.TimeoutCancellationException
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
@@ -23,15 +23,13 @@ class ChapterViewModel @Inject constructor(
     private val contentRepo: ContentRepository
 ) : ViewModel() {
 
-    private val _group: MutableStateFlow<Group?> = MutableStateFlow(null)
+    private val _group = MutableStateFlow<Group?>(null).asSourceFlow()
     val group = _group.asStateFlow()
 
-    private var currentContentsJob: Job? = null
-    private val _contents: MutableStateFlow<Resource<List<Content>>> =
-        MutableStateFlow(Resource.Loading)
+    private val _contents = MutableStateFlow<Resource<List<Content>>>(Resource.Loading)
     val contents = _contents.asStateFlow()
 
-    private val _selectedContent: MutableStateFlow<Content?> = MutableStateFlow(null)
+    private val _selectedContent = MutableStateFlow<Content?>(null)
     val selectedContent = _selectedContent.asStateFlow()
 
     fun init(link: String) {
@@ -43,14 +41,15 @@ class ChapterViewModel @Inject constructor(
         }
     }
 
-    fun updateLastRead(content: Content) {
-
+    fun getContents() {
+        viewModelScope.launch {
+            _contents.emitAll(getContentsAsFlow())
+        }
     }
 
-    fun getContents() {
-        currentContentsJob?.cancel()
-        currentContentsJob = viewModelScope.launch {
-            _contents.emitAll(getContentsAsFlow())
+    fun updateLastRead(content: Content) {
+        group.value?.let {
+            groupRepo.updateLastRead(it, content.getIndex())
         }
     }
 
@@ -71,6 +70,16 @@ class ChapterViewModel @Inject constructor(
 
     fun setSelectedContent(content: Content) {
         _selectedContent.value = content
+    }
+
+    private fun Content.getIndex(): Int {
+        return try {
+            title.split(':').first().trim().split(" ").last().toInt()
+        } catch (e: RuntimeException) {
+            group.value?.lastChapter?.toInt() ?: throw IllegalStateException(
+                "Failed to get lastChapter from ViewModel selectChapterGroup"
+            )
+        }
     }
 
 }
