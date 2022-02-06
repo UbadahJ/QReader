@@ -5,6 +5,7 @@ import com.ubadahj.qidianundergroud.api.models.webnovel.WNChapterRemote
 import com.ubadahj.qidianundergroud.api.models.webnovel.WNSearchResultRemote
 import com.ubadahj.qidianundergroud.api.retrofit.IWebNovelApi
 import com.ubadahj.qidianundergroud.models.Book
+import com.ubadahj.qidianundergroud.models.BookReview
 import com.ubadahj.qidianundergroud.models.Content
 import com.ubadahj.qidianundergroud.models.Group
 import com.ubadahj.qidianundergroud.utils.md5
@@ -77,6 +78,25 @@ class WebNovelApi @Inject constructor(
             ?: throw IllegalStateException("Either chapter is premium or parsing failed")
 
         return Content(group.link.md5 + title.md5, group.link, title, contents)
+    }
+
+    suspend fun getBookReviews(bookId: String): List<BookReview> {
+        val review = webNovelApi.getBookReviews(getToken(), bookId)
+        return review.body()?.let {
+            it.data.bookReviewInfos.map {
+                BookReview(
+                    userId = it.userId,
+                    bookId = it.bookId,
+                    reviewId = it.reviewId,
+                    userName = it.userName,
+                    rating = it.totalScore,
+                    contents = it.content,
+                    timestamp = it.createTime,
+                    likes = it.likeAmount,
+                    replies = it.replyAmount
+                )
+            }
+        } ?: listOf()
     }
 
     private suspend fun getToken(): String {

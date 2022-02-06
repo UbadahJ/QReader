@@ -1,0 +1,66 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/book_item"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:background="@drawable/accent_ripple"
+    android:paddingHorizontal="8dp"
+    android:paddingVertical="24dp">
+
+    <ImageView
+        android:id="@+id/user_avatar"
+        android:layout_width="48dp"
+        android:layout_height="48dp"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="@+id/user_name" />
+
+    <com.google.android.material.textview.MaterialTextView
+        android:id="@+id/user_name"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="24dp"
+        android:text=""
+        android:textAppearance="@style/TextAppearance.MyTheme.Subtitle1"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toEndOf="@+id/user_avatar"
+        app:layout_constraintTop_toTopOf="parent"
+        tools:text="LordChadiwala" />
+
+    <androidx.appcompat.widget.AppCompatRatingBar
+        android:id="@+id/review_rating"
+        style="@style/Widget.AppCompat.RatingBar.Small"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="4dp"
+        android:isIndicator="true"
+        android:stepSize="0.1"
+        app:layout_constraintStart_toStartOf="@+id/user_name"
+        app:layout_constraintTop_toBottomOf="@+id/user_name"
+        tools:rating="4" />
+
+
+    <com.google.android.material.textview.MaterialTextView
+        android:id="@+id/user_review"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="8dp"
+        android:textAppearance="@style/TextAppearance.MyTheme.Body1"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="@+id/review_rating"
+        app:layout_constraintTop_toBottomOf="@+id/review_rating"
+        tools:text="I've read up to chapter 23. Is one of the Cuttlefish Who Loves Diving Deep's newest series. He is the creator of Throne of Magical Arcana, Martial Arts Master, and The Sage Who Transcended Samsara, all of which are currently on this website. Out of the other series he has written, this one is most like Throne of Magical Arcana. The genres for this series are horror, suspense, mystery, steampunk in a Victorian setting, and supernatural/fantasy." />
+
+    <com.google.android.material.textview.MaterialTextView
+        android:id="@+id/created_date"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="8dp"
+        android:textAppearance="@style/TextAppearance.MyTheme.Body2"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="@+id/review_rating"
+        app:layout_constraintTop_toBottomOf="@+id/user_review"
+        tools:text="3 months" />
+
+</androidx.constraintlayout.widget.ConstraintLayout>

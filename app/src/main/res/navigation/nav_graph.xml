@@ -64,6 +64,9 @@
             app:exitAnim="@anim/slide_down"
             app:popEnterAnim="@anim/slide_up"
             app:popExitAnim="@anim/bottom_sheet_slide_out" />
+        <action
+            android:id="@+id/action_bookFragment_to_bookReviewFragment"
+            app:destination="@id/bookReviewFragment" />
     </fragment>
     <fragment
         android:id="@+id/readerContainerFragment"
@@ -88,4 +91,9 @@
         android:name="com.ubadahj.qidianundergroud.ui.fragments.SettingFragment"
         android:label="SettingFragment"
         tools:layout="@layout/setting_base_fragment" />
+    <fragment
+        android:id="@+id/bookReviewFragment"
+        android:name="com.ubadahj.qidianundergroud.ui.fragments.BookReviewFragment"
+        android:label="BookReviewFragment"
+        tools:layout="@layout/book_review_fragment" />
 </navigation>

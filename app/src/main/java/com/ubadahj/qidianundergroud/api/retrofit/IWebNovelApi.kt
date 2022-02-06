@@ -1,6 +1,8 @@
 package com.ubadahj.qidianundergroud.api.retrofit
 
 import com.ubadahj.qidianundergroud.api.models.webnovel.WNRawChapterLinksRemote
+import com.ubadahj.qidianundergroud.api.models.webnovel.reviews.WNReviewRemote
+import com.ubadahj.qidianundergroud.api.models.webnovel.reviews.replies.WNReviewReplyRemote
 import okhttp3.ResponseBody
 import retrofit2.Response
 import retrofit2.http.GET
@@ -27,6 +29,26 @@ interface IWebNovelApi {
         @Query("_csrfToken") csrfToken: String,
         @Query("bookId") bookId: String
     ): Response<WNRawChapterLinksRemote>
+
+    @GET("go/pcm/bookReview/get-reviews")
+    suspend fun getBookReviews(
+        @Query("_csrfToken") csrfToken: String,
+        @Query("bookId") bookId: String,
+        @Query("pageIndex") pageIndex: Int = 1,
+        @Query("pageSize") pageSize: Int = 9999,
+        @Query("orderBy") orderBy: Int = 1,
+        @Query("novelType") novelType: Int = 1,
+        @Query("needSummary") needSummary: Int = 1
+    ): Response<WNReviewRemote>
+
+    @GET("go/pcm/bookReview/detail")
+    suspend fun getBookReviewReplies(
+        @Query("_csrfToken") csrfToken: String,
+        @Query("bookId") bookId: String,
+        @Query("reviewId") reviewId: Int,
+        @Query("pageIndex") pageIndex: Int = 1,
+        @Query("pageSize") pageSize: Int = 9999,
+    ): Response<WNReviewReplyRemote>
 
     @GET
     suspend fun getChapterContents(

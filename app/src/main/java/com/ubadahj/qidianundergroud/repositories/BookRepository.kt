@@ -10,11 +10,15 @@ import com.ubadahj.qidianundergroud.Database
 import com.ubadahj.qidianundergroud.api.UndergroundApi
 import com.ubadahj.qidianundergroud.api.WebNovelApi
 import com.ubadahj.qidianundergroud.models.Book
+import com.ubadahj.qidianundergroud.models.BookReview
+import com.ubadahj.qidianundergroud.repositories.models.RepoBook
+import com.ubadahj.qidianundergroud.repositories.models.asRepoBook
 import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.flow
+import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.withContext
 import javax.inject.Inject
 import javax.inject.Singleton
@@ -134,6 +138,15 @@ class BookRepository @Inject constructor(
         return database.bookQueries.getById(
             database.bookQueries.getWebNovelByLink(strippedLink).executeAsOne().bookId
         ).asFlow().mapToOne()
+    }
+
+    suspend fun getReviews(book: Book): Flow<List<BookReview>> {
+        val novelId = when (val it = book.asRepoBook(database)) {
+            is RepoBook.Underground -> it.book.novelId!!
+            is RepoBook.WebNovel -> it.book.id
+        }
+
+        return flowOf(webNovelApi.getBookReviews(novelId))
     }
 
     fun getLibraryBooks() = database.bookQueries.getAllLibraryBooks().asFlow().mapToList()

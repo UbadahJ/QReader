@@ -170,6 +170,11 @@ class BookFragment : Fragment() {
                 lifecycleScope.launch {
                     bookRepo.markAllRead(book)
                 }
+            },
+            MenuDialogItem("Show Reviews") {
+                findNavController().navigate(
+                    BookFragmentDirections.actionBookFragmentToBookReviewFragment()
+                )
             }
         )
 

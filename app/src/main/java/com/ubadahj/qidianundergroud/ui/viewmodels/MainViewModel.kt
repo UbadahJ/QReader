@@ -81,6 +81,19 @@ class MainViewModel @Inject constructor(
         }
     }
 
+    fun getReviews(book: Book) = flow {
+        emit(Resource.Loading)
+        try {
+            emitAll(
+                bookRepo.getReviews(book)
+                    .catch { Resource.Error(it) }
+                    .map { Resource.Success(it) }
+            )
+        } catch (e: Exception) {
+            emit(Resource.Error(e))
+        }
+    }
+
     fun clearState() {
         _selectedBook.value = null
         _selectedGroup.value = null
