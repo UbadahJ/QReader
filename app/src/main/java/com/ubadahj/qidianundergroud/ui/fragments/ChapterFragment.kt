@@ -116,7 +116,6 @@ class ChapterFragment : Fragment() {
     override fun onDestroyView() {
         super.onDestroyView()
         binding = null
-        requireActivity().showSystemBar(true)
     }
 
     @SuppressLint("SetJavaScriptEnabled")
@@ -141,13 +140,6 @@ class ChapterFragment : Fragment() {
                 .map { it.toFloat() / 10 }
                 .collect {
                     updateAdapterPreferences { copy(lineSpacing = it) }
-                }
-        }
-        launch {
-            preferences.immersiveMode.asFlow()
-                .flowWithLifecycle(lifecycle, Lifecycle.State.RESUMED)
-                .collect {
-                    requireActivity().showSystemBar(!it)
                 }
         }
     }
