@@ -166,7 +166,7 @@ class BookRepository @Inject constructor(
             var success = false
             while (!success || retries < 0) {
                 try {
-                    contentRepo.getContents(factory, group).first()
+                    contentRepo.getContents(group = group, webViewFactory = factory).first()
                     success = true
                 } catch (e: Exception) {
                     if (--retries < 0) throw e

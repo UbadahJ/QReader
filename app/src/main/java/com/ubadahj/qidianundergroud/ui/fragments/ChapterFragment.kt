@@ -1,13 +1,12 @@
 package com.ubadahj.qidianundergroud.ui.fragments
 
 import android.annotation.SuppressLint
-import android.content.Context
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
-import androidx.fragment.app.activityViewModels
+import androidx.fragment.app.viewModels
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.flowWithLifecycle
 import androidx.lifecycle.lifecycleScope
@@ -24,27 +23,26 @@ import com.ubadahj.qidianundergroud.ui.adapters.ContentAdapterPreferences
 import com.ubadahj.qidianundergroud.ui.adapters.decorations.StickyHeaderManager
 import com.ubadahj.qidianundergroud.ui.adapters.factories.ChapterViewHolderFactory
 import com.ubadahj.qidianundergroud.ui.dialog.ContentPreferencesDialog
-import com.ubadahj.qidianundergroud.ui.listeners.OnGestureListener
 import com.ubadahj.qidianundergroud.ui.models.ContentHeaderConfig
 import com.ubadahj.qidianundergroud.ui.models.ContentUIItem
-import com.ubadahj.qidianundergroud.ui.viewmodels.MainViewModel
+import com.ubadahj.qidianundergroud.ui.viewmodels.ChapterViewModel
 import com.ubadahj.qidianundergroud.utils.collectNotNull
 import com.ubadahj.qidianundergroud.utils.ui.*
 import dagger.hilt.android.AndroidEntryPoint
-import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.collect
-import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
 import javax.inject.Inject
-import kotlin.math.roundToInt
+
+const val CHAPTER_FRAGMENT_ARG_GROUP_LINK = "groupLink"
+
 
 @AndroidEntryPoint
 class ChapterFragment : Fragment() {
 
-    private val viewModel: MainViewModel by activityViewModels()
-    private var contentJob: Job? = null
+    private val viewModel: ChapterViewModel by viewModels()
     private var binding: ChapterFragmentBinding? = null
+
     private var menu = ContentPreferencesDialog()
     private val headerConfig = ContentHeaderConfig(
         onBackPressed = { requireActivity().onBackPressed() },
@@ -68,21 +66,7 @@ class ChapterFragment : Fragment() {
     ): View {
         return ChapterFragmentBinding.inflate(inflater, container, false).apply {
             binding = this
-            lifecycleScope.launch {
-                launch {
-                    viewModel.selectedGroup.flowWithLifecycle(lifecycle).collectNotNull { group ->
-                        init(group)
-                    }
-                }
-                launch {
-                    viewModel.selectedContent.flowWithLifecycle(lifecycle)
-                        .collectNotNull { content ->
-                            viewModel.selectedGroup.value?.run {
-                                groupRepo.updateLastRead(this, content.getIndex())
-                            }
-                        }
-                }
-            }
+            viewModel.init(requireArguments().getString(CHAPTER_FRAGMENT_ARG_GROUP_LINK)!!)
         }.root
     }
 
@@ -105,8 +89,29 @@ class ChapterFragment : Fragment() {
                 baseAdapter,
                 ChapterViewHolderFactory.header(chapterStickyGroup, headerConfig)
             )
-            configureSwipeGestures()
             configurePreferencesFlow()
+        }
+
+        lifecycleScope.launch {
+            launch {
+                viewModel.group.flowWithLifecycle(lifecycle).collectNotNull {
+                    init(it)
+                }
+            }
+            launch {
+                viewModel.selectedContent.flowWithLifecycle(lifecycle)
+                    .collectNotNull { content ->
+                        viewModel.group.value?.run {
+                            groupRepo.updateLastRead(this, content.getIndex())
+                        }
+                    }
+            }
+            launch {
+                viewModel.contents.collect {
+                    updateRecyclerAdapter(it)
+                    binding?.updateUIIndicators(it)
+                }
+            }
         }
     }
 
@@ -119,9 +124,8 @@ class ChapterFragment : Fragment() {
     @SuppressLint("SetJavaScriptEnabled")
     private fun init(chapters: Group) {
         binding?.apply {
-            errorGroup.errorButton.setOnClickListener { getChapterContents(chapters, true) }
+            errorGroup.errorButton.setOnClickListener { viewModel.getContents() }
         }
-        getChapterContents(chapters)
     }
 
     private fun ChapterFragmentBinding.configurePreferencesFlow() = lifecycleScope.launch {
@@ -150,18 +154,6 @@ class ChapterFragment : Fragment() {
         }
     }
 
-    private fun getChapterContents(group: Group, refresh: Boolean = false) {
-        contentJob?.cancel()
-        contentJob = lifecycleScope.launch {
-            viewModel
-                .getChapterContents(group, refresh)
-                .collect {
-                    updateRecyclerAdapter(it)
-                    binding?.updateUIIndicators(it)
-                }
-        }
-    }
-
     private fun ChapterFragmentBinding.updateUIIndicators(resource: Resource<List<Content>>) {
         when (resource) {
             is Resource.Error -> {
@@ -182,14 +174,8 @@ class ChapterFragment : Fragment() {
         }
     }
 
-
-    @SuppressLint("ClickableViewAccessibility")
-    private fun ChapterFragmentBinding.configureSwipeGestures() {
-        chapterRecyclerView.addOnItemTouchListener(ReaderGestures(requireContext()))
-    }
-
     private fun updateRecyclerAdapter(resource: Resource<List<Content>>) {
-        val group = viewModel.selectedGroup.value
+        val group = viewModel.group.value
         val chapter = viewModel.selectedContent.value
         val hasDataChanged = chapter == null ||
                 baseAdapter.currentList.isEmpty() ||
@@ -217,7 +203,7 @@ class ChapterFragment : Fragment() {
         return try {
             title.split(':').first().trim().split(" ").last().toInt()
         } catch (e: RuntimeException) {
-            viewModel.selectedGroup.value?.lastChapter?.toInt() ?: throw IllegalStateException(
+            viewModel.group.value?.lastChapter?.toInt() ?: throw IllegalStateException(
                 "Failed to get lastChapter from ViewModel selectChapterGroup"
             )
         }
@@ -239,38 +225,6 @@ class ChapterFragment : Fragment() {
             addAll(content.contents.lines().map {
                 ContentUIItem.ContentUIContentItem(content, it)
             })
-        }
-    }
-
-    private inner class ReaderGestures(context: Context) : OnGestureListener(context) {
-        override fun onSwipeLeft() {
-            selectChapterGroup { current, other ->
-                current.lastChapter == other.firstChapter - 1
-            }
-        }
-
-        override fun onSwipeRight() {
-            selectChapterGroup { current, other ->
-                current.firstChapter == other.lastChapter + 1
-            }
-        }
-
-        override fun onScaleView(scale: Float) {
-            if (!preferences.lockFontScale.get())
-                preferences.fontScale.set((scale * 10).roundToInt())
-        }
-
-        private fun selectChapterGroup(
-            predicate: (current: Group, other: Group) -> Boolean
-        ) {
-            val group = viewModel.selectedGroup.value
-            viewModel.selectedBook.value?.let { book ->
-                lifecycleScope.launch {
-                    groupRepo.getGroups(book).first()
-                        .firstOrNull { other -> group?.let { predicate(it, other) } == true }
-                        ?.let { viewModel.setSelectedGroup(it) }
-                }
-            }
         }
     }
 }

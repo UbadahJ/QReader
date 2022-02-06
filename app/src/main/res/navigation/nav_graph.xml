@@ -56,7 +56,12 @@
             app:enterAnim="@anim/bottom_sheet_slide_in"
             app:exitAnim="@anim/slide_down"
             app:popEnterAnim="@anim/slide_up"
-            app:popExitAnim="@anim/bottom_sheet_slide_out" />
+            app:popExitAnim="@anim/bottom_sheet_slide_out">
+            <argument
+                android:name="groupLink"
+                app:argType="string"
+                app:nullable="false" />
+        </action>
         <action
             android:id="@+id/action_bookFragment_to_bookChaptersFragment"
             app:destination="@id/bookChaptersFragment"
@@ -81,7 +86,12 @@
             app:enterAnim="@anim/bottom_sheet_slide_in"
             app:exitAnim="@anim/slide_down"
             app:popEnterAnim="@anim/slide_up"
-            app:popExitAnim="@anim/bottom_sheet_slide_out" />
+            app:popExitAnim="@anim/bottom_sheet_slide_out">
+            <argument
+                android:name="groupLink"
+                app:argType="string"
+                app:nullable="false" />
+        </action>
     </fragment>
     <fragment
         android:id="@+id/settingFragment"

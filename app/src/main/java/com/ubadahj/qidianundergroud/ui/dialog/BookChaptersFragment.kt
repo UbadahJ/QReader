@@ -27,9 +27,8 @@ class BookChaptersFragment : Fragment() {
     private var groupJob: Job? = null
 
     private val adapter: GroupAdapter = GroupAdapter(onClick = {
-        viewModel.setSelectedGroup(it)
         findNavController().navigate(
-            BookChaptersFragmentDirections.actionBookChaptersFragmentToChapterFragment()
+            BookChaptersFragmentDirections.actionBookChaptersFragmentToChapterFragment(it.link)
         )
     }) { GroupDetailsDialog(it).show(requireActivity().supportFragmentManager, null) }
 

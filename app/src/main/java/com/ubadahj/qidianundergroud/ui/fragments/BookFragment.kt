@@ -212,9 +212,10 @@ class BookFragment : Fragment() {
                                 else -> "Read chapter ${group.firstChapter}"
                             }
                             setOnClickListener {
-                                viewModel.setSelectedGroup(group)
                                 findNavController().navigate(
-                                    BookFragmentDirections.actionBookFragmentToChapterFragment()
+                                    BookFragmentDirections.actionBookFragmentToChapterFragment(
+                                        group.link
+                                    )
                                 )
                             }
                         }
