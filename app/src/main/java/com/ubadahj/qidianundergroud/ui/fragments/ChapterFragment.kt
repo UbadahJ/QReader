@@ -1,4 +1,4 @@
-package com.ubadahj.qidianundergroud.ui.main
+package com.ubadahj.qidianundergroud.ui.fragments
 
 import android.annotation.SuppressLint
 import android.content.Context
@@ -27,6 +27,7 @@ import com.ubadahj.qidianundergroud.ui.dialog.ContentPreferencesDialog
 import com.ubadahj.qidianundergroud.ui.listeners.OnGestureListener
 import com.ubadahj.qidianundergroud.ui.models.ContentHeaderConfig
 import com.ubadahj.qidianundergroud.ui.models.ContentUIItem
+import com.ubadahj.qidianundergroud.ui.viewmodels.MainViewModel
 import com.ubadahj.qidianundergroud.utils.collectNotNull
 import com.ubadahj.qidianundergroud.utils.ui.*
 import dagger.hilt.android.AndroidEntryPoint

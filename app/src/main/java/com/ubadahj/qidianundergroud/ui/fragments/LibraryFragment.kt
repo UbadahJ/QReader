@@ -1,4 +1,4 @@
-package com.ubadahj.qidianundergroud.ui.main
+package com.ubadahj.qidianundergroud.ui.fragments
 
 import android.os.Bundle
 import android.text.Editable
@@ -19,6 +19,7 @@ import com.ubadahj.qidianundergroud.preferences.LibraryPreferences
 import com.ubadahj.qidianundergroud.ui.adapters.LibraryAdapter
 import com.ubadahj.qidianundergroud.ui.adapters.decorations.GridItemOffsetDecoration
 import com.ubadahj.qidianundergroud.ui.dialog.AboutDialog
+import com.ubadahj.qidianundergroud.ui.viewmodels.MainViewModel
 import com.ubadahj.qidianundergroud.utils.ui.isPortraitMode
 import com.ubadahj.qidianundergroud.utils.ui.removeAllDecorations
 import com.ubadahj.qidianundergroud.utils.ui.toDp

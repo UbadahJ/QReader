@@ -7,7 +7,7 @@
 
     <fragment
         android:id="@+id/libraryFragment"
-        android:name="com.ubadahj.qidianundergroud.ui.main.LibraryFragment"
+        android:name="com.ubadahj.qidianundergroud.ui.fragments.LibraryFragment"
         android:label="book_list_fragment"
         tools:layout="@layout/book_list_fragment">
         <action
@@ -34,7 +34,7 @@
     </fragment>
     <fragment
         android:id="@+id/browseFragment"
-        android:name="com.ubadahj.qidianundergroud.ui.main.BrowseFragment"
+        android:name="com.ubadahj.qidianundergroud.ui.fragments.BrowseFragment"
         android:label="BrowseFragment"
         tools:layout="@layout/book_list_fragment">
         <action
@@ -47,7 +47,7 @@
     </fragment>
     <fragment
         android:id="@+id/bookFragment"
-        android:name="com.ubadahj.qidianundergroud.ui.main.BookFragment"
+        android:name="com.ubadahj.qidianundergroud.ui.fragments.BookFragment"
         android:label="book_fragment"
         tools:layout="@layout/book_fragment">
         <action
@@ -67,7 +67,7 @@
     </fragment>
     <fragment
         android:id="@+id/chapterFragment"
-        android:name="com.ubadahj.qidianundergroud.ui.main.ChapterFragment"
+        android:name="com.ubadahj.qidianundergroud.ui.fragments.ChapterFragment"
         android:label="chapter_fragment"
         tools:layout="@layout/chapter_fragment" />
     <fragment
@@ -85,7 +85,7 @@
     </fragment>
     <fragment
         android:id="@+id/settingFragment"
-        android:name="com.ubadahj.qidianundergroud.ui.main.SettingFragment"
+        android:name="com.ubadahj.qidianundergroud.ui.fragments.SettingFragment"
         android:label="SettingFragment"
         tools:layout="@layout/setting_base_fragment" />
 </navigation>

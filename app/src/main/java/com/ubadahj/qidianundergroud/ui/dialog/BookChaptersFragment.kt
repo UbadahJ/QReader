@@ -13,7 +13,7 @@ import com.ubadahj.qidianundergroud.databinding.BookChaptersFragmentBinding
 import com.ubadahj.qidianundergroud.models.Group
 import com.ubadahj.qidianundergroud.models.Resource
 import com.ubadahj.qidianundergroud.ui.adapters.GroupAdapter
-import com.ubadahj.qidianundergroud.ui.main.MainViewModel
+import com.ubadahj.qidianundergroud.ui.viewmodels.MainViewModel
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.collect

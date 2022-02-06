@@ -1,4 +1,4 @@
-package com.ubadahj.qidianundergroud.ui.main
+package com.ubadahj.qidianundergroud.ui.fragments
 
 import android.os.Bundle
 import android.view.LayoutInflater
@@ -26,6 +26,7 @@ import com.ubadahj.qidianundergroud.services.DownloadService
 import com.ubadahj.qidianundergroud.ui.adapters.MenuAdapter
 import com.ubadahj.qidianundergroud.ui.dialog.MenuDialog
 import com.ubadahj.qidianundergroud.ui.models.MenuDialogItem
+import com.ubadahj.qidianundergroud.ui.viewmodels.MainViewModel
 import com.ubadahj.qidianundergroud.utils.collectNotNull
 import com.ubadahj.qidianundergroud.utils.models.isRead
 import com.ubadahj.qidianundergroud.utils.ui.openLink

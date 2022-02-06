@@ -1,4 +1,4 @@
-package com.ubadahj.qidianundergroud.ui.main
+package com.ubadahj.qidianundergroud.ui.viewmodels
 
 import android.annotation.SuppressLint
 import android.webkit.WebView

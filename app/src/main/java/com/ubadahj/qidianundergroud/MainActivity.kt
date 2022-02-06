@@ -20,7 +20,7 @@ import com.ubadahj.qidianundergroud.repositories.BookRepository
 import com.ubadahj.qidianundergroud.repositories.GroupRepository
 import com.ubadahj.qidianundergroud.services.NotificationWorker
 import com.ubadahj.qidianundergroud.services.updater.service.UpdateService
-import com.ubadahj.qidianundergroud.ui.main.MainViewModel
+import com.ubadahj.qidianundergroud.ui.viewmodels.MainViewModel
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.flow.first
