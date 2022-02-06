@@ -9,17 +9,17 @@ import androidx.fragment.app.activityViewModels
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.flowWithLifecycle
 import androidx.lifecycle.lifecycleScope
-import androidx.navigation.fragment.findNavController
 import com.ubadahj.qidianundergroud.databinding.ReaderContainerLayoutBinding
 import com.ubadahj.qidianundergroud.models.Group
-import com.ubadahj.qidianundergroud.models.Resource
 import com.ubadahj.qidianundergroud.preferences.ReaderPreferences
+import com.ubadahj.qidianundergroud.repositories.GroupRepository
 import com.ubadahj.qidianundergroud.ui.adapters.diff.GroupDiffCallback
 import com.ubadahj.qidianundergroud.ui.adapters.generic.DiffFragmentStateAdapter
 import com.ubadahj.qidianundergroud.ui.viewmodels.MainViewModel
 import com.ubadahj.qidianundergroud.utils.ui.showSystemBar
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.flow.collect
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
@@ -29,6 +29,9 @@ class ReaderContainerFragment : Fragment() {
     private val viewModel: MainViewModel by activityViewModels()
     private var binding: ReaderContainerLayoutBinding? = null
     private val adapter by lazy { ChapterReaderAdapter(this) }
+
+    @Inject
+    lateinit var groupRepo: GroupRepository
 
     @Inject
     lateinit var preferences: ReaderPreferences
@@ -48,23 +51,13 @@ class ReaderContainerFragment : Fragment() {
         binding?.pager?.adapter = adapter
 
         lifecycleScope.launch {
-            var first = true
-            viewModel.getChapters(viewModel.selectedBook.value!!).collect {
-                when (it) {
-                    Resource.Loading -> {}
-                    is Resource.Error -> findNavController().popBackStack()
-                    is Resource.Success -> {
-                        adapter.submitList(it.data.sortedBy(Group::firstChapter))
-                        if (first) {
-                            first = false
-                            viewModel.selectedGroup.value?.let { group ->
-                                binding?.pager?.setCurrentItem(
-                                    adapter.currentList.indexOf(group),
-                                    false
-                                )
-                            }
-                        }
-                    }
+            groupRepo.getGroups(viewModel.selectedBook.value!!).first().let {
+                adapter.submitList(it)
+                viewModel.selectedGroup.value?.let { group ->
+                    binding?.pager?.setCurrentItem(
+                        adapter.currentList.indexOf(group),
+                        false
+                    )
                 }
             }
         }
