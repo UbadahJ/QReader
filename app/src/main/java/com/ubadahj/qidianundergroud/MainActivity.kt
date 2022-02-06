@@ -63,8 +63,17 @@ class MainActivity : AppCompatActivity() {
 
             intent.extras?.getString("group")
                 ?.let { groupRepo.getGroupByLink(it).first() }
+                .also { viewModel.setSelectedGroup(it) }
 
-            // TODO: Add flow to the content
+            if (bookId != null && viewModel.selectedBook.value != null) {
+                val navHost = findNavController(R.id.nav_host_fragment)
+                val graphInflater = navHost.navInflater
+                navHost.graph = graphInflater.inflate(R.navigation.nav_graph).apply {
+                    startDestination =
+                        if (viewModel.selectedGroup.value != null) R.id.chapterFragment
+                        else R.id.bookFragment
+                }
+            }
         }
 
         val manager = WorkManager.getInstance(applicationContext)

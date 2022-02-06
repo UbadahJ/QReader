@@ -7,8 +7,8 @@ import com.ubadahj.qidianundergroud.models.Group
 import com.ubadahj.qidianundergroud.models.Resource
 import com.ubadahj.qidianundergroud.repositories.BookRepository
 import com.ubadahj.qidianundergroud.repositories.GroupRepository
+import com.ubadahj.qidianundergroud.utils.coroutines.asSourceFlow
 import dagger.hilt.android.lifecycle.HiltViewModel
-import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
 import javax.inject.Inject
@@ -19,10 +19,11 @@ class MainViewModel @Inject constructor(
     private val groupRepo: GroupRepository
 ) : ViewModel() {
 
-    private var selectedBookJob: Job? = null
-    private val _selectedBook: MutableStateFlow<Book?> = MutableStateFlow(null)
+    private val _selectedBook = MutableStateFlow<Book?>(null).asSourceFlow()
+    private val _selectedGroup = MutableStateFlow<Group?>(null).asSourceFlow()
 
-    val selectedBook: StateFlow<Book?> = _selectedBook
+    val selectedBook = _selectedBook.asStateFlow()
+    val selectedGroup = _selectedGroup.asStateFlow()
 
     val libraryBooks = flow {
         emit(Resource.Loading)
@@ -81,8 +82,8 @@ class MainViewModel @Inject constructor(
     }
 
     fun clearState() {
-        selectedBookJob?.cancel()
         _selectedBook.value = null
+        _selectedGroup.value = null
     }
 
     fun setSelectedBook(book: Book) {
@@ -90,8 +91,16 @@ class MainViewModel @Inject constructor(
     }
 
     fun setSelectedBook(id: Int) {
-        selectedBookJob?.cancel()
-        selectedBookJob = viewModelScope.launch { _selectedBook.emitAll(bookRepo.getBookById(id)) }
+        viewModelScope.launch { _selectedBook.emitAll(bookRepo.getBookById(id)) }
+    }
+
+    fun setSelectedGroup(group: Group?) {
+        if (group == null) {
+            _selectedGroup.value = null
+            return
+        }
+
+        viewModelScope.launch { _selectedGroup.emitAll(groupRepo.getGroupByLink(group.link)) }
     }
 
 }
