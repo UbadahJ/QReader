@@ -28,7 +28,10 @@ import com.ubadahj.qidianundergroud.ui.models.ContentHeaderConfig
 import com.ubadahj.qidianundergroud.ui.models.ContentUIItem
 import com.ubadahj.qidianundergroud.ui.viewmodels.ChapterViewModel
 import com.ubadahj.qidianundergroud.utils.collectNotNull
-import com.ubadahj.qidianundergroud.utils.ui.*
+import com.ubadahj.qidianundergroud.utils.ui.addOnScrollStateListener
+import com.ubadahj.qidianundergroud.utils.ui.linearScroll
+import com.ubadahj.qidianundergroud.utils.ui.preserveState
+import com.ubadahj.qidianundergroud.utils.ui.visible
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.flow.map
@@ -60,6 +63,10 @@ class ChapterFragment : Fragment() {
     @Inject
     lateinit var preferences: ReaderPreferences
 
+    private val groupLink by lazy {
+        requireArguments().getString(CHAPTER_FRAGMENT_ARG_GROUP_LINK)!!
+    }
+
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
@@ -67,7 +74,7 @@ class ChapterFragment : Fragment() {
     ): View {
         return ChapterFragmentBinding.inflate(inflater, container, false).apply {
             binding = this
-            viewModel.init(requireArguments().getString(CHAPTER_FRAGMENT_ARG_GROUP_LINK)!!)
+            viewModel.init(groupLink)
         }.root
     }
 

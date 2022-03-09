@@ -10,7 +10,6 @@ import com.ubadahj.qidianundergroud.models.Group
 import com.ubadahj.qidianundergroud.models.Resource
 import com.ubadahj.qidianundergroud.repositories.ContentRepository
 import com.ubadahj.qidianundergroud.repositories.GroupRepository
-import com.ubadahj.qidianundergroud.utils.coroutines.asSourceFlow
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
@@ -23,7 +22,7 @@ class ChapterViewModel @Inject constructor(
     private val contentRepo: ContentRepository
 ) : ViewModel() {
 
-    private val _group = MutableStateFlow<Group?>(null).asSourceFlow()
+    private val _group = MutableStateFlow<Group?>(null)
     val group = _group.asStateFlow()
 
     private val _contents = MutableStateFlow<Resource<List<Content>>>(Resource.Loading)
@@ -34,10 +33,8 @@ class ChapterViewModel @Inject constructor(
 
     fun init(link: String) {
         viewModelScope.launch {
-            launch { _group.emitAll(groupRepo.getGroupByLink(link)) }
-            group.collect {
-                it?.let { getContents() }
-            }
+            launch { _group.emit(groupRepo.getGroupByLink(link).first()) }
+            launch { group.collect { it?.let { getContents() } } }
         }
     }
 
