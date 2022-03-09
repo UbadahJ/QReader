@@ -8,9 +8,7 @@ import androidx.lifecycle.flowWithLifecycle
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.ActivityNavigator
 import androidx.navigation.findNavController
-import androidx.work.ExistingPeriodicWorkPolicy
 import androidx.work.OneTimeWorkRequestBuilder
-import androidx.work.PeriodicWorkRequestBuilder
 import androidx.work.WorkManager
 import com.github.ajalt.timberkt.Timber
 import com.ubadahj.qidianundergroud.databinding.MainActivityBinding
@@ -18,7 +16,7 @@ import com.ubadahj.qidianundergroud.preferences.AppearancePreferences
 import com.ubadahj.qidianundergroud.preferences.LibraryPreferences
 import com.ubadahj.qidianundergroud.repositories.BookRepository
 import com.ubadahj.qidianundergroud.repositories.GroupRepository
-import com.ubadahj.qidianundergroud.services.NotificationWorker
+import com.ubadahj.qidianundergroud.services.launchBookUpdateService
 import com.ubadahj.qidianundergroud.services.updater.service.UpdateService
 import com.ubadahj.qidianundergroud.ui.viewmodels.MainViewModel
 import dagger.hilt.android.AndroidEntryPoint
@@ -85,16 +83,7 @@ class MainActivity : AppCompatActivity() {
             }
             launch {
                 libraryPref.updateFrequency.asFlow().collect {
-                    val uniqueTag = getString(R.string.worker_library_notification)
-                    it?.let { freq ->
-                        manager.enqueueUniquePeriodicWork(
-                            uniqueTag,
-                            ExistingPeriodicWorkPolicy.REPLACE,
-                            PeriodicWorkRequestBuilder<NotificationWorker>(
-                                freq.first, freq.second
-                            ).build()
-                        )
-                    } ?: manager.cancelUniqueWork(uniqueTag)
+                    it?.let { manager.launchBookUpdateService(baseContext, it) }
                 }
             }
         }

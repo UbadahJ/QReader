@@ -66,8 +66,20 @@ class BrowseFragment : Fragment() {
             }
             toolbar.appbar.title = resources.getText(R.string.browse)
 
-            bookListingView.layoutManager = LinearLayoutManager(requireContext())
-            bookListingView.adapter = adapter
+            bookListingView.setLayoutManager(LinearLayoutManager(requireContext()))
+            bookListingView.setAdapter(adapter)
+
+            swipeReload.setOnRefreshListener {
+                lifecycleScope.launch {
+                    viewModel
+                        .getBooks(refresh = true)
+                        .flowWithLifecycle(lifecycle)
+                        .collect {
+                            getBooks(it, true)
+                            swipeReload.isRefreshing = false
+                        }
+                }
+            }
 
             searchBar.searchEditText.addTextChangedListener { text: Editable? ->
                 adapter.filter.filter(text)

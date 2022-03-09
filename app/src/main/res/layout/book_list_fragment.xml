@@ -70,11 +70,18 @@
         app:layout_constraintTop_toBottomOf="@+id/toolbar"
         tools:visibility="gone">
 
-        <com.l4digital.fastscroll.FastScrollRecyclerView
-            android:id="@+id/book_listing_view"
+        <androidx.swiperefreshlayout.widget.SwipeRefreshLayout
+            android:id="@+id/swipe_reload"
             android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:scrollbars="none" />
+            android:layout_height="match_parent">
+
+            <com.l4digital.fastscroll.FastScrollView
+                android:id="@+id/book_listing_view"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:scrollbars="none" />
+
+        </androidx.swiperefreshlayout.widget.SwipeRefreshLayout>
 
         <com.google.android.material.floatingactionbutton.ExtendedFloatingActionButton
             android:id="@+id/floating_button"
@@ -82,18 +89,18 @@
             android:layout_height="wrap_content"
             android:layout_gravity="bottom|end"
             android:layout_marginBottom="16dp"
+            android:backgroundTint="?attr/colorPrimary"
             android:clickable="true"
             android:focusable="true"
             android:text="@string/browse"
             android:textAppearance="@style/TextAppearance.MyTheme.Body1"
-            android:backgroundTint="?attr/colorPrimary"
             android:textColor="?attr/colorOnPrimary"
             android:visibility="gone"
             app:icon="@drawable/browse"
             app:iconTint="?attr/colorOnPrimary"
             app:layout_behavior="com.google.android.material.behavior.HideBottomViewOnScrollBehavior"
             app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintEnd_toEndOf="parent"/>
+            app:layout_constraintEnd_toEndOf="parent" />
 
     </androidx.coordinatorlayout.widget.CoordinatorLayout>
 

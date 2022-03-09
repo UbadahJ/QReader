@@ -11,11 +11,13 @@ import androidx.lifecycle.flowWithLifecycle
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.GridLayoutManager
+import androidx.work.WorkManager
 import com.google.android.material.snackbar.Snackbar
 import com.ubadahj.qidianundergroud.R
 import com.ubadahj.qidianundergroud.databinding.BookListFragmentBinding
 import com.ubadahj.qidianundergroud.models.Resource
 import com.ubadahj.qidianundergroud.preferences.LibraryPreferences
+import com.ubadahj.qidianundergroud.services.launchBookUpdateService
 import com.ubadahj.qidianundergroud.ui.adapters.LibraryAdapter
 import com.ubadahj.qidianundergroud.ui.adapters.decorations.GridItemOffsetDecoration
 import com.ubadahj.qidianundergroud.ui.dialog.AboutDialog
@@ -71,21 +73,30 @@ class LibraryFragment : Fragment() {
                 )
             }
             lifecycleScope.launch {
-                bookListingView.adapter = adapter
+                bookListingView.setAdapter(adapter)
                 pref.columnCountPortrait.asFlow()
                     .combine(pref.columnCountLandscape.asFlow()) { port, land ->
                         if (isPortraitMode()) port else land
                     }
                     .flowWithLifecycle(lifecycle)
                     .collect {
-                        bookListingView.layoutManager = GridLayoutManager(requireContext(), it)
-                        bookListingView.removeAllDecorations()
-                        bookListingView.addItemDecoration(
-                            GridItemOffsetDecoration(
-                                it, 12.toDp(requireContext()).toInt()
+                        bookListingView.setLayoutManager(GridLayoutManager(requireContext(), it))
+                        bookListingView.recyclerView.apply {
+                            removeAllDecorations()
+                            addItemDecoration(
+                                GridItemOffsetDecoration(
+                                    it, 12.toDp(requireContext()).toInt()
+                                )
                             )
-                        )
+                        }
                     }
+            }
+
+            swipeReload.setOnRefreshListener {
+                val freq = pref.updateFrequency.get() ?: return@setOnRefreshListener
+                WorkManager.getInstance(requireContext())
+                    .launchBookUpdateService(requireContext(), freq)
+                swipeReload.isRefreshing = false
             }
 
             searchBar.searchEditText.addTextChangedListener { text: Editable? ->

@@ -7,8 +7,7 @@ import android.content.Intent
 import androidx.core.app.NotificationCompat
 import androidx.core.app.NotificationManagerCompat
 import androidx.hilt.work.HiltWorker
-import androidx.work.CoroutineWorker
-import androidx.work.WorkerParameters
+import androidx.work.*
 import com.ubadahj.qidianundergroud.MainActivity
 import com.ubadahj.qidianundergroud.R
 import com.ubadahj.qidianundergroud.models.Book
@@ -20,6 +19,7 @@ import dagger.assisted.Assisted
 import dagger.assisted.AssistedInject
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.*
+import java.util.concurrent.TimeUnit
 import kotlin.Result.Companion as ResultKt
 
 private const val CHANNEL_ID: String = "42000"
@@ -182,4 +182,15 @@ class NotificationWorker @AssistedInject constructor(
 
     }
 
+}
+
+fun WorkManager.launchBookUpdateService(context: Context, timeUnits: Pair<Long, TimeUnit>) {
+    val uniqueTag = context.getString(R.string.worker_library_notification)
+    enqueueUniquePeriodicWork(
+        uniqueTag,
+        ExistingPeriodicWorkPolicy.REPLACE,
+        PeriodicWorkRequestBuilder<NotificationWorker>(
+            timeUnits.first, timeUnits.second
+        ).build()
+    )
 }
