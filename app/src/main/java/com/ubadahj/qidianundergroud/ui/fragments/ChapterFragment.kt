@@ -190,7 +190,8 @@ class ChapterFragment : Fragment() {
                     models.mapIndexed { i, it -> i to it }
                         .filter { it.second is ContentUIItem.ContentUIContentItem }
                         .firstOrNull { it.second.content == viewModel.selectedContent.value }
-                        ?.first ?: 0
+                        ?.first
+                        ?.minus(1) ?: 0
                 )
             }
         }
