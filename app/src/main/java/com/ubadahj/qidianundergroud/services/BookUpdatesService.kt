@@ -27,7 +27,7 @@ import kotlin.Result.Companion as ResultKt
 private const val CHANNEL_ID: String = "42000"
 
 @HiltWorker
-class NotificationWorker @AssistedInject constructor(
+class BookUpdatesService @AssistedInject constructor(
     @Assisted context: Context,
     @Assisted params: WorkerParameters,
     private val bookRepo: BookRepository,
@@ -194,7 +194,7 @@ fun WorkManager.launchBookUpdateService(context: Context, timeUnits: Pair<Long, 
     enqueueUniquePeriodicWork(
         uniqueTag,
         ExistingPeriodicWorkPolicy.REPLACE,
-        PeriodicWorkRequestBuilder<NotificationWorker>(
+        PeriodicWorkRequestBuilder<BookUpdatesService>(
             timeUnits.first, timeUnits.second
         ).build()
     )

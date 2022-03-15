@@ -26,7 +26,6 @@ import com.ubadahj.qidianundergroud.utils.ui.isPortraitMode
 import com.ubadahj.qidianundergroud.utils.ui.removeAllDecorations
 import com.ubadahj.qidianundergroud.utils.ui.toDp
 import dagger.hilt.android.AndroidEntryPoint
-import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.launch
 import javax.inject.Inject
