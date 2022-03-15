@@ -20,8 +20,6 @@ import com.ubadahj.qidianundergroud.services.launchBookUpdateService
 import com.ubadahj.qidianundergroud.services.updater.service.UpdateService
 import com.ubadahj.qidianundergroud.ui.viewmodels.MainViewModel
 import dagger.hilt.android.AndroidEntryPoint
-import kotlinx.coroutines.flow.collect
-import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
@@ -52,27 +50,6 @@ class MainActivity : AppCompatActivity() {
 
         if (BuildConfig.DEBUG)
             Timber.plant(Timber.DebugTree())
-
-
-        lifecycleScope.launch {
-            val bookId = intent.extras?.getInt("book")?.also {
-                viewModel.setSelectedBook(it)
-            }
-
-            intent.extras?.getString("group")
-                ?.let { groupRepo.getGroupByLink(it).first() }
-                .also { viewModel.setSelectedGroup(it) }
-
-            if (bookId != null && viewModel.selectedBook.value != null) {
-                val navHost = findNavController(R.id.nav_host_fragment)
-                val graphInflater = navHost.navInflater
-                navHost.graph = graphInflater.inflate(R.navigation.nav_graph).apply {
-                    startDestination =
-                        if (viewModel.selectedGroup.value != null) R.id.readerContainerFragment
-                        else R.id.bookFragment
-                }
-            }
-        }
 
         val manager = WorkManager.getInstance(applicationContext)
         lifecycleScope.launch {
