@@ -29,7 +29,6 @@ import com.ubadahj.qidianundergroud.utils.ui.snackBar
 import com.ubadahj.qidianundergroud.utils.ui.visible
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.cancel
-import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.launch
 
 @AndroidEntryPoint
@@ -157,8 +156,10 @@ class BrowseFragment : Fragment() {
                 lifecycleScope.launch {
                     viewModel
                         .getBooks(refresh = true)
-                        .flowWithLifecycle(lifecycle)
-                        .collect { getBooks(it, true) }
+                        .collect {
+                            getBooks(it, true)
+                            if (it !is Resource.Loading) cancel()
+                        }
                 }
                 true
             }
