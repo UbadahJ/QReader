@@ -84,10 +84,11 @@ class MainViewModel @Inject constructor(
     fun getReviews(book: Book) = flow {
         emit(Resource.Loading)
         try {
-            emitAll(
+            emit(
                 bookRepo.getReviews(book)
                     .catch { Resource.Error(it) }
                     .map { Resource.Success(it) }
+                    .first()
             )
         } catch (e: Exception) {
             emit(Resource.Error(e))

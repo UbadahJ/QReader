@@ -9,15 +9,15 @@ import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
-import com.github.ajalt.timberkt.d
-import com.github.ajalt.timberkt.e
 import com.ubadahj.qidianundergroud.databinding.BookReviewFragmentBinding
+import com.ubadahj.qidianundergroud.models.Book
 import com.ubadahj.qidianundergroud.models.Resource
 import com.ubadahj.qidianundergroud.ui.adapters.BookReviewAdapter
 import com.ubadahj.qidianundergroud.ui.viewmodels.MainViewModel
 import com.ubadahj.qidianundergroud.utils.coroutines.SingleJobScope
+import com.ubadahj.qidianundergroud.utils.ui.visible
 import dagger.hilt.android.AndroidEntryPoint
-import kotlinx.coroutines.flow.collect
+import kotlinx.coroutines.launch
 
 @AndroidEntryPoint
 class BookReviewFragment : Fragment() {
@@ -50,13 +50,30 @@ class BookReviewFragment : Fragment() {
             (requireActivity() as AppCompatActivity).setSupportActionBar(toolbar)
             collapsingLayout.title = "Reviews"
             reviewListView.adapter = adapter
+
+            errorLayout.errorButton.setOnClickListener {
+                getReviews(book)
+            }
         }
-        scope.launch {
+
+        getReviews(book)
+    }
+
+    private fun getReviews(book: Book) {
+        lifecycleScope.launch {
             viewModel.getReviews(book).collect {
                 when (it) {
-                    is Resource.Error -> e(it.message)
-                    Resource.Loading -> d { "Loading..." }
+                    is Resource.Error -> {
+                        binding?.progressBar?.visible = false
+                        binding?.errorLayout?.root?.visible = true
+                    }
+                    Resource.Loading -> {
+                        binding?.progressBar?.visible = true
+                        binding?.errorLayout?.root?.visible = false
+                    }
                     is Resource.Success -> {
+                        binding?.progressBar?.visible = false
+                        binding?.errorLayout?.root?.visible = false
                         adapter.submitList(it.data)
                     }
                 }
