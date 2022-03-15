@@ -62,6 +62,7 @@
                 style="@style/Widget.AppCompat.RatingBar.Small"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
+                android:layout_marginTop="8dp"
                 android:isIndicator="true"
                 android:stepSize="0.1"
                 app:layout_constraintStart_toStartOf="@+id/book_title"
@@ -75,7 +76,6 @@
                 android:layout_marginStart="8dp"
                 android:textAppearance="@style/TextAppearance.MyTheme.Subtitle2"
                 app:layout_constraintBottom_toBottomOf="@+id/book_rating_bar"
-                app:layout_constraintEnd_toStartOf="@+id/v_guideline_90"
                 app:layout_constraintStart_toEndOf="@+id/book_rating_bar"
                 app:layout_constraintTop_toTopOf="@+id/book_rating_bar"
                 tools:text="4.2" />
@@ -102,20 +102,19 @@
                 app:layout_constraintTop_toBottomOf="@+id/book_rating_bar"
                 tools:text="Read Chapter 102" />
 
-            <com.google.android.material.chip.Chip
+            <TextView
                 android:id="@+id/book_genre"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
-                android:layout_marginStart="16dp"
-                android:layout_marginTop="16dp"
+                android:layout_marginStart="8dp"
                 android:layout_marginEnd="16dp"
-                android:textAlignment="center"
                 android:textAppearance="@style/TextAppearance.MyTheme.Subtitle2"
                 android:visibility="gone"
+                app:layout_constraintBottom_toBottomOf="@+id/book_rating"
                 app:layout_constraintEnd_toStartOf="@+id/v_guideline_90"
-                app:layout_constraintStart_toStartOf="@+id/v_guideline_60"
-                app:layout_constraintTop_toBottomOf="@+id/menu_image_view"
-                tools:text="Fantasy"
+                app:layout_constraintStart_toEndOf="@+id/book_rating"
+                app:layout_constraintTop_toTopOf="@+id/book_rating"
+                tools:text="•  Fantasy"
                 tools:visibility="visible" />
 
             <androidx.constraintlayout.widget.Barrier

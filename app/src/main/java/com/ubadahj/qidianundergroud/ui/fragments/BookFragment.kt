@@ -156,7 +156,7 @@ class BookFragment : Fragment() {
         bookDesc.text = book.description?.trim() ?: "No description"
         bookRatingBar.rating = book.rating ?: 0.0f
         bookRating.text = book.rating?.toString() ?: "0.0"
-        bookGenre.text = book.category?.trim() ?: "Unknown"
+        bookGenre.text = "•  ${book.category?.trim() ?: "Unknown"}"
         bookGenre.visible = true
         configureMenu(book)
     }
@@ -173,7 +173,7 @@ class BookFragment : Fragment() {
                     bookRepo.markAllRead(book)
                 }
             },
-            MenuDialogItem("Show Reviews") {
+            MenuDialogItem("Show Reviews", R.drawable.comment) {
                 findNavController().navigate(
                     BookFragmentDirections.actionBookFragmentToBookReviewFragment()
                 )
