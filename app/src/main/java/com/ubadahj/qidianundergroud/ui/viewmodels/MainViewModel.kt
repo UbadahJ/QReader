@@ -108,12 +108,11 @@ class MainViewModel @Inject constructor(
     }
 
     fun setSelectedGroup(group: Group?) {
-        if (group == null) {
-            _selectedGroup.value = null
-            return
-        }
+        setSelectedGroup(group?.link ?: return)
+    }
 
-        viewModelScope.launch { _selectedGroup.emitAll(groupRepo.getGroupByLink(group.link)) }
+    fun setSelectedGroup(link: String) {
+        viewModelScope.launch { _selectedGroup.emitAll(groupRepo.getGroupByLink(link)) }
     }
 
 }

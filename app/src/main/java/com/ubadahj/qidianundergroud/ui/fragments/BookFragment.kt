@@ -35,7 +35,6 @@ import com.ubadahj.qidianundergroud.utils.ui.toDp
 import com.ubadahj.qidianundergroud.utils.ui.visible
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.Job
-import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
@@ -55,8 +54,11 @@ class BookFragment : Fragment() {
         container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View {
-        binding = BookFragmentBinding.inflate(inflater, container, false)
-        return binding!!.root
+        return BookFragmentBinding.inflate(inflater, container, false).also {
+            binding = it
+
+            handleNotificationIntent()
+        }.root
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
@@ -242,4 +244,9 @@ class BookFragment : Fragment() {
         binding = null
     }
 
+    private fun handleNotificationIntent() {
+        val bookId = requireArguments().getInt("bookId", -1)
+        if (bookId == -1) return
+        viewModel.setSelectedBook(bookId)
+    }
 }

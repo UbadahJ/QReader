@@ -1,14 +1,13 @@
 package com.ubadahj.qidianundergroud.services
 
 import android.app.Notification
-import android.app.PendingIntent
 import android.content.Context
-import android.content.Intent
 import androidx.core.app.NotificationCompat
 import androidx.core.app.NotificationManagerCompat
+import androidx.core.os.bundleOf
 import androidx.hilt.work.HiltWorker
+import androidx.navigation.NavDeepLinkBuilder
 import androidx.work.*
-import com.ubadahj.qidianundergroud.MainActivity
 import com.ubadahj.qidianundergroud.R
 import com.ubadahj.qidianundergroud.models.Book
 import com.ubadahj.qidianundergroud.models.Group
@@ -18,7 +17,10 @@ import com.ubadahj.qidianundergroud.utils.isNetworkAvailable
 import dagger.assisted.Assisted
 import dagger.assisted.AssistedInject
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.flow.*
+import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.flow.flow
+import kotlinx.coroutines.flow.flowOn
+import kotlinx.coroutines.flow.onCompletion
 import java.util.concurrent.TimeUnit
 import kotlin.Result.Companion as ResultKt
 
@@ -169,16 +171,19 @@ class NotificationWorker @AssistedInject constructor(
                 .setGroup(groupKey)
                 .build()
 
-        private fun createIntent(group: Group? = null) =
-            PendingIntent.getActivity(
-                context,
-                hashCode() + group.hashCode(),
-                Intent(context, MainActivity::class.java).apply {
-                    putExtra("book", book.id)
-                    putExtra("group", group?.link)
-                },
-                flags
-            )!!
+        private fun createIntent(group: Group? = null) = NavDeepLinkBuilder(context)
+            .setGraph(R.navigation.nav_graph)
+            .run {
+                if (group != null) setDestination(R.id.readerContainerFragment)
+                    .setArguments(
+                        bundleOf(
+                            "bookId" to book.id,
+                            "groupLink" to group.link
+                        )
+                    )
+                else setDestination(R.id.bookFragment)
+                    .setArguments(bundleOf("bookId" to book.id))
+            }.createPendingIntent()
 
     }
 
