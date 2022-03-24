@@ -7,7 +7,7 @@
 
     <fragment
         android:id="@+id/libraryFragment"
-        android:name="com.ubadahj.qidianundergroud.ui.main.LibraryFragment"
+        android:name="com.ubadahj.qidianundergroud.ui.fragments.LibraryFragment"
         android:label="book_list_fragment"
         tools:layout="@layout/book_list_fragment">
         <action
@@ -34,7 +34,7 @@
     </fragment>
     <fragment
         android:id="@+id/browseFragment"
-        android:name="com.ubadahj.qidianundergroud.ui.main.BrowseFragment"
+        android:name="com.ubadahj.qidianundergroud.ui.fragments.BrowseFragment"
         android:label="BrowseFragment"
         tools:layout="@layout/book_list_fragment">
         <action
@@ -47,16 +47,16 @@
     </fragment>
     <fragment
         android:id="@+id/bookFragment"
-        android:name="com.ubadahj.qidianundergroud.ui.main.BookFragment"
+        android:name="com.ubadahj.qidianundergroud.ui.fragments.BookFragment"
         android:label="book_fragment"
         tools:layout="@layout/book_fragment">
         <action
-            android:id="@+id/action_bookFragment_to_chapterFragment"
-            app:destination="@id/chapterFragment"
+            android:id="@+id/action_bookFragment_to_readerContainerFragment"
+            app:destination="@id/readerContainerFragment"
             app:enterAnim="@anim/bottom_sheet_slide_in"
             app:exitAnim="@anim/slide_down"
             app:popEnterAnim="@anim/slide_up"
-            app:popExitAnim="@anim/bottom_sheet_slide_out" />
+            app:popExitAnim="@anim/bottom_sheet_slide_out"></action>
         <action
             android:id="@+id/action_bookFragment_to_bookChaptersFragment"
             app:destination="@id/bookChaptersFragment"
@@ -64,28 +64,36 @@
             app:exitAnim="@anim/slide_down"
             app:popEnterAnim="@anim/slide_up"
             app:popExitAnim="@anim/bottom_sheet_slide_out" />
+        <action
+            android:id="@+id/action_bookFragment_to_bookReviewFragment"
+            app:destination="@id/bookReviewFragment" />
     </fragment>
     <fragment
-        android:id="@+id/chapterFragment"
-        android:name="com.ubadahj.qidianundergroud.ui.main.ChapterFragment"
-        android:label="chapter_fragment"
-        tools:layout="@layout/chapter_fragment" />
+        android:id="@+id/readerContainerFragment"
+        android:name="com.ubadahj.qidianundergroud.ui.fragments.ReaderContainerFragment"
+        android:label="reader_container_fragment"
+        tools:layout="@layout/reader_container_layout" />
     <fragment
         android:id="@+id/bookChaptersFragment"
-        android:name="com.ubadahj.qidianundergroud.ui.dialog.BookChaptersFragment"
+        android:name="com.ubadahj.qidianundergroud.ui.fragments.BookChaptersFragment"
         android:label="BookChaptersFragment"
         tools:layout="@layout/book_chapters_fragment">
         <action
-            android:id="@+id/action_bookChaptersFragment_to_chapterFragment"
-            app:destination="@id/chapterFragment"
+            android:id="@+id/action_bookChaptersFragment_to_readerContainerFragment"
+            app:destination="@id/readerContainerFragment"
             app:enterAnim="@anim/bottom_sheet_slide_in"
             app:exitAnim="@anim/slide_down"
             app:popEnterAnim="@anim/slide_up"
-            app:popExitAnim="@anim/bottom_sheet_slide_out" />
+            app:popExitAnim="@anim/bottom_sheet_slide_out"></action>
     </fragment>
     <fragment
         android:id="@+id/settingFragment"
-        android:name="com.ubadahj.qidianundergroud.ui.main.SettingFragment"
+        android:name="com.ubadahj.qidianundergroud.ui.fragments.SettingFragment"
         android:label="SettingFragment"
         tools:layout="@layout/setting_base_fragment" />
+    <fragment
+        android:id="@+id/bookReviewFragment"
+        android:name="com.ubadahj.qidianundergroud.ui.fragments.BookReviewFragment"
+        android:label="BookReviewFragment"
+        tools:layout="@layout/book_review_fragment" />
 </navigation>

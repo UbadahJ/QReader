@@ -23,9 +23,9 @@ class ContentRepository @Inject constructor(
 ) {
 
     suspend fun getContents(
-        webViewFactory: (Context) -> WebView,
+        refresh: Boolean = false,
         group: Group,
-        refresh: Boolean = false
+        webViewFactory: (Context) -> WebView
     ): Flow<List<Content>> {
         val dbChapters = database.groupQueries.contents(group.link).executeAsList()
         if (refresh || dbChapters.isEmpty()) {

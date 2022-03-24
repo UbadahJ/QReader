@@ -2,13 +2,13 @@ package com.ubadahj.qidianundergroud.ui.adapters
 
 import android.view.LayoutInflater
 import android.view.ViewGroup
-import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.RecyclerView
 import coil.load
 import coil.transform.RoundedCornersTransformation
 import com.ubadahj.qidianundergroud.R
 import com.ubadahj.qidianundergroud.databinding.LibraryBookItemBinding
 import com.ubadahj.qidianundergroud.models.Book
+import com.ubadahj.qidianundergroud.ui.adapters.diff.BookDiffCallback
 import com.ubadahj.qidianundergroud.ui.adapters.generic.FilterableListAdapter
 import com.ubadahj.qidianundergroud.utils.ui.getItemSafely
 import com.ubadahj.qidianundergroud.utils.ui.toDp
@@ -17,7 +17,7 @@ import com.ubadahj.qidianundergroud.utils.ui.visible
 class LibraryAdapter(
     books: List<Book>,
     private val onClick: (Book) -> Unit
-) : FilterableListAdapter<Book, LibraryAdapter.ViewHolder>(DiffCallback()) {
+) : FilterableListAdapter<Book, LibraryAdapter.ViewHolder>(BookDiffCallback) {
 
     override val filterPredicate: (List<Book>, String) -> List<Book> = { list, constraint ->
         list.filter { it.name.contains(constraint, true) }
@@ -65,14 +65,6 @@ class LibraryAdapter(
         init {
             binding.root.setOnClickListener { onClick(bindingAdapterPosition) }
         }
-    }
-
-    class DiffCallback : DiffUtil.ItemCallback<Book>() {
-        override fun areItemsTheSame(oldItem: Book, newItem: Book): Boolean =
-            oldItem.id == newItem.id
-
-        override fun areContentsTheSame(oldItem: Book, newItem: Book): Boolean =
-            oldItem == newItem
     }
 
 }

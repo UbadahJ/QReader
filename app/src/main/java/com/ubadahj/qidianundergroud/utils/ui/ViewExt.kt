@@ -3,6 +3,7 @@ package com.ubadahj.qidianundergroud.utils.ui
 import android.app.Activity
 import android.content.Context
 import android.content.Intent
+import android.content.res.Configuration
 import android.util.TypedValue
 import android.view.LayoutInflater
 import android.view.View
@@ -16,6 +17,7 @@ import androidx.core.view.ViewCompat
 import androidx.core.view.WindowCompat
 import androidx.core.view.WindowInsetsCompat
 import androidx.core.view.WindowInsetsControllerCompat
+import androidx.fragment.app.Fragment
 import androidx.recyclerview.widget.RecyclerView
 import com.google.android.material.snackbar.Snackbar
 
@@ -103,3 +105,6 @@ fun View.snackBar(@StringRes text: Int, length: Int = Snackbar.LENGTH_SHORT) = t
     Snackbar.make(this, text, length).show()
 } catch (e: Exception) {
 }
+
+fun Fragment.isPortraitMode() =
+    resources.configuration.orientation == Configuration.ORIENTATION_PORTRAIT

@@ -1,4 +1,4 @@
-package com.ubadahj.qidianundergroud.ui.main
+package com.ubadahj.qidianundergroud.ui.fragments
 
 import android.os.Bundle
 import android.text.Editable
@@ -11,18 +11,22 @@ import androidx.lifecycle.flowWithLifecycle
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.GridLayoutManager
+import androidx.work.WorkManager
 import com.google.android.material.snackbar.Snackbar
 import com.ubadahj.qidianundergroud.R
 import com.ubadahj.qidianundergroud.databinding.BookListFragmentBinding
 import com.ubadahj.qidianundergroud.models.Resource
 import com.ubadahj.qidianundergroud.preferences.LibraryPreferences
+import com.ubadahj.qidianundergroud.services.launchBookUpdateService
 import com.ubadahj.qidianundergroud.ui.adapters.LibraryAdapter
 import com.ubadahj.qidianundergroud.ui.adapters.decorations.GridItemOffsetDecoration
 import com.ubadahj.qidianundergroud.ui.dialog.AboutDialog
+import com.ubadahj.qidianundergroud.ui.viewmodels.MainViewModel
+import com.ubadahj.qidianundergroud.utils.ui.isPortraitMode
 import com.ubadahj.qidianundergroud.utils.ui.removeAllDecorations
 import com.ubadahj.qidianundergroud.utils.ui.toDp
 import dagger.hilt.android.AndroidEntryPoint
-import kotlinx.coroutines.flow.collect
+import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
@@ -49,8 +53,10 @@ class LibraryFragment : Fragment() {
         container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View {
-        binding = BookListFragmentBinding.inflate(inflater, container, false)
-        return binding!!.root
+        return BookListFragmentBinding.inflate(inflater, container, false).apply {
+            binding = this
+            viewModel.clearState()
+        }.root
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
@@ -66,16 +72,30 @@ class LibraryFragment : Fragment() {
                 )
             }
             lifecycleScope.launch {
-                bookListingView.adapter = adapter
-                pref.columnCount.asFlow().flowWithLifecycle(lifecycle).collect {
-                    bookListingView.layoutManager = GridLayoutManager(requireContext(), it)
-                    bookListingView.removeAllDecorations()
-                    bookListingView.addItemDecoration(
-                        GridItemOffsetDecoration(
-                            it, 12.toDp(requireContext()).toInt()
-                        )
-                    )
-                }
+                bookListingView.setAdapter(adapter)
+                pref.columnCountPortrait.asFlow()
+                    .combine(pref.columnCountLandscape.asFlow()) { port, land ->
+                        if (isPortraitMode()) port else land
+                    }
+                    .flowWithLifecycle(lifecycle)
+                    .collect {
+                        bookListingView.setLayoutManager(GridLayoutManager(requireContext(), it))
+                        bookListingView.recyclerView.apply {
+                            removeAllDecorations()
+                            addItemDecoration(
+                                GridItemOffsetDecoration(
+                                    it, 12.toDp(requireContext()).toInt()
+                                )
+                            )
+                        }
+                    }
+            }
+
+            swipeReload.setOnRefreshListener {
+                val freq = pref.updateFrequency.get() ?: return@setOnRefreshListener
+                WorkManager.getInstance(requireContext())
+                    .launchBookUpdateService(requireContext(), freq)
+                swipeReload.isRefreshing = false
             }
 
             searchBar.searchEditText.addTextChangedListener { text: Editable? ->

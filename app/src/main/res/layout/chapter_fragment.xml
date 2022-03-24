@@ -4,7 +4,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".ui.main.ChapterFragment">
+    tools:context=".ui.fragments.ChapterFragment">
 
     <com.l4digital.fastscroll.FastScrollRecyclerView
         android:id="@+id/chapter_recycler_view"

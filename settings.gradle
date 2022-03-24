@@ -1,2 +1,31 @@
+pluginManagement {
+    resolutionStrategy {
+        def redirectIndex = [
+                'dagger.hilt.android.plugin': 'com.google.dagger:hilt-android-gradle-plugin',
+                'androidx.navigation.safeargs.kotlin': 'androidx.navigation:navigation-safe-args-gradle-plugin',
+                'com.google.gms.google-services': 'com.google.gms:google-services',
+                'com.google.firebase.crashlytics': 'com.google.firebase:firebase-crashlytics-gradle',
+        ]
+
+        eachPlugin {
+            if (redirectIndex.containsKey(requested.id.id)) {
+                useModule("${redirectIndex.get(requested.id.id)}:${requested.version}")
+            }
+        }
+    }
+    repositories {
+        gradlePluginPortal()
+        google()
+        mavenCentral()
+    }
+}
+dependencyResolutionManagement {
+    repositoriesMode.set(RepositoriesMode.FAIL_ON_PROJECT_REPOS)
+    repositories {
+        google()
+        mavenCentral()
+    }
+}
+
 include(":app")
 rootProject.name = "QReader"

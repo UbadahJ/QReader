@@ -1,33 +1,33 @@
 package com.ubadahj.qidianundergroud.services
 
 import android.app.Notification
-import android.app.PendingIntent
 import android.content.Context
-import android.content.Intent
 import androidx.core.app.NotificationCompat
 import androidx.core.app.NotificationManagerCompat
+import androidx.core.os.bundleOf
 import androidx.hilt.work.HiltWorker
-import androidx.work.CoroutineWorker
-import androidx.work.WorkerParameters
-import com.github.ajalt.timberkt.e
-import com.ubadahj.qidianundergroud.MainActivity
+import androidx.navigation.NavDeepLinkBuilder
+import androidx.work.*
 import com.ubadahj.qidianundergroud.R
 import com.ubadahj.qidianundergroud.models.Book
 import com.ubadahj.qidianundergroud.models.Group
 import com.ubadahj.qidianundergroud.repositories.BookRepository
 import com.ubadahj.qidianundergroud.repositories.GroupRepository
+import com.ubadahj.qidianundergroud.utils.isNetworkAvailable
 import dagger.assisted.Assisted
 import dagger.assisted.AssistedInject
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.flowOn
+import kotlinx.coroutines.flow.onCompletion
+import java.util.concurrent.TimeUnit
+import kotlin.Result.Companion as ResultKt
 
 private const val CHANNEL_ID: String = "42000"
 
 @HiltWorker
-class NotificationWorker @AssistedInject constructor(
+class BookUpdatesService @AssistedInject constructor(
     @Assisted context: Context,
     @Assisted params: WorkerParameters,
     private val bookRepo: BookRepository,
@@ -43,11 +43,41 @@ class NotificationWorker @AssistedInject constructor(
                 id = CHANNEL_ID
             )
         )
-        getNotifications().collect {
+
+        if (!applicationContext.isNetworkAvailable()) {
             with(NotificationManagerCompat.from(applicationContext)) {
-                notify(it.id, it.createNotification())
+                notify(
+                    0,
+                    "No internet connection available".toErrorNotification(applicationContext)
+                )
             }
+
+            return Result.failure()
         }
+
+        val failures = mutableListOf<Throwable>()
+        getNotifications()
+            .onCompletion {
+                if (failures.isEmpty()) return@onCompletion
+                with(NotificationManagerCompat.from(applicationContext)) {
+                    notify(
+                        failures.hashCode(),
+                        failures
+                            .joinToString("\n") { it.message.toString() }
+                            .toErrorNotification(applicationContext)
+                    )
+                }
+            }
+            .collect {
+                with(NotificationManagerCompat.from(applicationContext)) {
+                    if (it.isSuccess) {
+                        val notification = it.getOrThrow()
+                        notify(notification.id, notification.createNotification())
+                    } else {
+                        failures.add(it.exceptionOrNull()!!)
+                    }
+                }
+            }
         return Result.success()
     }
 
@@ -61,12 +91,12 @@ class NotificationWorker @AssistedInject constructor(
                 val updateCount = refreshedGroups.lastChapter() - lastGroup.lastChapter()
                 if (updateCount > 0)
                     emit(
-                        BookNotification(
-                            applicationContext, book, refreshedGroups, updateCount
+                        ResultKt.success(
+                            BookNotification(applicationContext, book, refreshedGroups, updateCount)
                         )
                     )
             } catch (e: Exception) {
-                e(e) { "getNotifications: Failed to query $book" }
+                ResultKt.failure<BookNotification>(e)
             }
         }
     }.flowOn(Dispatchers.IO)
@@ -105,6 +135,15 @@ class NotificationWorker @AssistedInject constructor(
         }
     }
 
+    private fun String.toErrorNotification(context: Context) =
+        NotificationCompat.Builder(context, CHANNEL_ID)
+            .setSmallIcon(R.drawable.app_image_outline)
+            .setContentTitle("Error fetching updates")
+            .setContentText(this)
+            .setPriority(NotificationCompat.PRIORITY_DEFAULT)
+            .build()
+
+
     private data class BookNotification(
         val context: Context,
         val book: Book,
@@ -132,17 +171,31 @@ class NotificationWorker @AssistedInject constructor(
                 .setGroup(groupKey)
                 .build()
 
-        private fun createIntent(group: Group? = null) =
-            PendingIntent.getActivity(
-                context,
-                hashCode() + group.hashCode(),
-                Intent(context, MainActivity::class.java).apply {
-                    putExtra("book", book.id)
-                    putExtra("group", group?.link)
-                },
-                flags
-            )!!
+        private fun createIntent(group: Group? = null) = NavDeepLinkBuilder(context)
+            .setGraph(R.navigation.nav_graph)
+            .run {
+                if (group != null) setDestination(R.id.readerContainerFragment)
+                    .setArguments(
+                        bundleOf(
+                            "bookId" to book.id,
+                            "groupLink" to group.link
+                        )
+                    )
+                else setDestination(R.id.bookFragment)
+                    .setArguments(bundleOf("bookId" to book.id))
+            }.createPendingIntent()
 
     }
 
+}
+
+fun WorkManager.launchBookUpdateService(context: Context, timeUnits: Pair<Long, TimeUnit>) {
+    val uniqueTag = context.getString(R.string.worker_library_notification)
+    enqueueUniquePeriodicWork(
+        uniqueTag,
+        ExistingPeriodicWorkPolicy.REPLACE,
+        PeriodicWorkRequestBuilder<BookUpdatesService>(
+            timeUnits.first, timeUnits.second
+        ).build()
+    )
 }

@@ -49,18 +49,29 @@
         app:layout_constraintBottom_toBottomOf="@+id/author_name"
         app:layout_constraintEnd_toEndOf="@+id/book_title"
         app:layout_constraintTop_toTopOf="@+id/author_name"
-        tools:text="★ 4.4"/>
+        tools:text="★ 4.4" />
 
     <com.google.android.material.textview.MaterialTextView
-        android:text="Completed"
-        android:id="@+id/completed_text"
+        android:id="@+id/genre_text"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginTop="8dp"
         android:textAppearance="@style/TextAppearance.MyTheme.Body2"
-        android:textStyle="italic"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintStart_toStartOf="@+id/author_name"
-        app:layout_constraintTop_toBottomOf="@+id/author_name"/>
+        app:layout_constraintTop_toBottomOf="@+id/author_name"
+        tools:text="Horror &amp; Thriller" />
+
+    <com.google.android.material.textview.MaterialTextView
+        android:id="@+id/completed_text"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="8dp"
+        android:text="•  Completed"
+        android:textAppearance="@style/TextAppearance.MyTheme.Body2"
+        android:textStyle="italic"
+        app:layout_constraintBottom_toBottomOf="@id/genre_text"
+        app:layout_constraintStart_toEndOf="@id/genre_text"
+        app:layout_constraintTop_toTopOf="@id/genre_text" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

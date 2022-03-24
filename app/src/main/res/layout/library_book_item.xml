@@ -9,7 +9,8 @@
     <ImageView
         android:id="@+id/book_cover"
         android:layout_width="match_parent"
-        android:layout_height="220dp"
+        android:layout_height="0dp"
+        app:layout_constraintDimensionRatio="3:4"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"

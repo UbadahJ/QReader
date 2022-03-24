@@ -69,6 +69,7 @@ object BookViewHolderFactory {
             binding.bookTitle.text = item.name
             binding.authorName.text = item.author
             binding.ratingText.text = "★ ${item.rating}"
+            binding.genreText.text = item.category
             binding.completedText.visible = item.completed
         }
     }

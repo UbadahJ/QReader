@@ -4,27 +4,34 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".ui.main.BookFragment">
+    tools:context=".ui.fragments.BookFragment">
 
     <ScrollView
         android:layout_width="match_parent"
         android:layout_height="0dp"
         app:layout_constraintBottom_toTopOf="@+id/materialCardView"
         app:layout_constraintTop_toTopOf="parent"
-        tools:layout_editor_absoluteX="0dp">
+        app:layout_constraintVertical_bias="0.0"
+        tools:layout_editor_absoluteX="-40dp">
 
         <androidx.constraintlayout.widget.ConstraintLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content">
 
+            <include
+                android:id="@+id/toolbar"
+                layout="@layout/material_toolbar" />
+
             <ImageView
                 android:id="@+id/book_image"
-                android:layout_width="206.25dp"
-                android:layout_height="275dp"
-                android:layout_marginStart="12dp"
-                android:layout_marginTop="24dp"
+                android:layout_width="0dp"
+                android:layout_height="0dp"
+                android:layout_marginTop="8dp"
+                android:layout_marginEnd="16dp"
+                app:layout_constraintDimensionRatio="3:4"
+                app:layout_constraintEnd_toStartOf="@+id/v_guideline_60"
                 app:layout_constraintStart_toStartOf="@+id/v_guideline_10"
-                app:layout_constraintTop_toTopOf="parent" />
+                app:layout_constraintTop_toBottomOf="@+id/toolbar" />
 
             <com.google.android.material.textview.MaterialTextView
                 android:id="@+id/book_author"
@@ -55,6 +62,7 @@
                 style="@style/Widget.AppCompat.RatingBar.Small"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
+                android:layout_marginTop="8dp"
                 android:isIndicator="true"
                 android:stepSize="0.1"
                 app:layout_constraintStart_toStartOf="@+id/book_title"
@@ -68,7 +76,6 @@
                 android:layout_marginStart="8dp"
                 android:textAppearance="@style/TextAppearance.MyTheme.Subtitle2"
                 app:layout_constraintBottom_toBottomOf="@+id/book_rating_bar"
-                app:layout_constraintEnd_toStartOf="@+id/v_guideline_90"
                 app:layout_constraintStart_toEndOf="@+id/book_rating_bar"
                 app:layout_constraintTop_toTopOf="@+id/book_rating_bar"
                 tools:text="4.2" />
@@ -79,10 +86,10 @@
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="16dp"
-                android:paddingBottom="16dp"
                 android:lineSpacingMultiplier="1.25"
-                app:layout_constraintEnd_toEndOf="@+id/read_latest_button"
-                app:layout_constraintStart_toStartOf="@+id/read_latest_button"
+                android:paddingBottom="16dp"
+                app:layout_constraintEnd_toStartOf="@+id/v_guideline_90"
+                app:layout_constraintStart_toStartOf="@+id/v_guideline_10"
                 app:layout_constraintTop_toBottomOf="@+id/read_latest_button" />
 
             <com.google.android.material.button.MaterialButton
@@ -95,20 +102,19 @@
                 app:layout_constraintTop_toBottomOf="@+id/book_rating_bar"
                 tools:text="Read Chapter 102" />
 
-            <com.google.android.material.chip.Chip
+            <TextView
                 android:id="@+id/book_genre"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
-                android:layout_marginStart="16dp"
-                android:layout_marginTop="8dp"
+                android:layout_marginStart="8dp"
                 android:layout_marginEnd="16dp"
-                android:textAlignment="center"
                 android:textAppearance="@style/TextAppearance.MyTheme.Subtitle2"
                 android:visibility="gone"
+                app:layout_constraintBottom_toBottomOf="@+id/book_rating"
                 app:layout_constraintEnd_toStartOf="@+id/v_guideline_90"
-                app:layout_constraintStart_toEndOf="@+id/book_image"
-                app:layout_constraintTop_toBottomOf="@+id/menu_image_view"
-                tools:text="Fantasy"
+                app:layout_constraintStart_toEndOf="@+id/book_rating"
+                app:layout_constraintTop_toTopOf="@+id/book_rating"
+                tools:text="•  Fantasy"
                 tools:visibility="visible" />
 
             <androidx.constraintlayout.widget.Barrier
@@ -139,7 +145,7 @@
                 android:src="@drawable/download"
                 android:tooltipText="Download Chapters"
                 app:layout_constraintEnd_toStartOf="@+id/v_guideline_90"
-                app:layout_constraintStart_toEndOf="@+id/book_image"
+                app:layout_constraintStart_toStartOf="@+id/v_guideline_60"
                 app:layout_constraintTop_toBottomOf="@+id/library_label"
                 app:tint="?attr/colorPrimary" />
 
@@ -164,7 +170,7 @@
                 android:src="@drawable/menu_dots"
                 android:tooltipText="Download Chapters"
                 app:layout_constraintEnd_toStartOf="@+id/v_guideline_90"
-                app:layout_constraintStart_toEndOf="@+id/book_image"
+                app:layout_constraintStart_toStartOf="@+id/v_guideline_60"
                 app:layout_constraintTop_toBottomOf="@+id/download_label"
                 app:tint="?android:attr/textColorPrimary" />
 
@@ -186,11 +192,10 @@
                 android:id="@+id/library_button"
                 android:layout_width="32dp"
                 android:layout_height="32dp"
-                android:layout_marginTop="32dp"
                 android:src="@drawable/heart"
                 app:layout_constraintEnd_toStartOf="@+id/v_guideline_90"
-                app:layout_constraintStart_toEndOf="@+id/book_image"
-                app:layout_constraintTop_toTopOf="parent"
+                app:layout_constraintStart_toStartOf="@+id/v_guideline_60"
+                app:layout_constraintTop_toTopOf="@+id/book_image"
                 app:tint="?attr/colorPrimary" />
 
             <include
@@ -202,6 +207,13 @@
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toBottomOf="@+id/simple_barrier" />
+
+            <androidx.constraintlayout.widget.Guideline
+                android:id="@+id/v_guideline_60"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                app:layout_constraintGuide_percent=".6" />
 
         </androidx.constraintlayout.widget.ConstraintLayout>
     </ScrollView>

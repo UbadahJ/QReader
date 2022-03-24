@@ -1,4 +1,4 @@
-package com.ubadahj.qidianundergroud.ui.main
+package com.ubadahj.qidianundergroud.ui.fragments
 
 import android.os.Bundle
 import android.text.Editable
@@ -23,12 +23,12 @@ import com.ubadahj.qidianundergroud.services.IndexService
 import com.ubadahj.qidianundergroud.ui.adapters.BookAdapter
 import com.ubadahj.qidianundergroud.ui.dialog.InputBottomSheet
 import com.ubadahj.qidianundergroud.ui.dialog.InputBottomSheetConfig
+import com.ubadahj.qidianundergroud.ui.viewmodels.MainViewModel
 import com.ubadahj.qidianundergroud.utils.ui.onItemSelectedListener
 import com.ubadahj.qidianundergroud.utils.ui.snackBar
 import com.ubadahj.qidianundergroud.utils.ui.visible
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.cancel
-import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.launch
 
 @AndroidEntryPoint
@@ -58,11 +58,27 @@ class BrowseFragment : Fragment() {
         setHasOptionsMenu(true)
 
         binding?.apply {
-            (requireActivity() as AppCompatActivity).setSupportActionBar(toolbar.appbar)
+            (requireActivity() as AppCompatActivity).apply {
+                setSupportActionBar(toolbar.appbar)
+                supportActionBar?.setDisplayShowHomeEnabled(true)
+                supportActionBar?.setDisplayHomeAsUpEnabled(true)
+            }
             toolbar.appbar.title = resources.getText(R.string.browse)
 
-            bookListingView.layoutManager = LinearLayoutManager(requireContext())
-            bookListingView.adapter = adapter
+            bookListingView.setLayoutManager(LinearLayoutManager(requireContext()))
+            bookListingView.setAdapter(adapter)
+
+            swipeReload.setOnRefreshListener {
+                lifecycleScope.launch {
+                    viewModel
+                        .getBooks(refresh = true)
+                        .flowWithLifecycle(lifecycle)
+                        .collect {
+                            getBooks(it, true)
+                            swipeReload.isRefreshing = false
+                        }
+                }
+            }
 
             searchBar.searchEditText.addTextChangedListener { text: Editable? ->
                 adapter.filter.filter(text)
@@ -140,8 +156,10 @@ class BrowseFragment : Fragment() {
                 lifecycleScope.launch {
                     viewModel
                         .getBooks(refresh = true)
-                        .flowWithLifecycle(lifecycle)
-                        .collect { getBooks(it, true) }
+                        .collect {
+                            getBooks(it, true)
+                            if (it !is Resource.Loading) cancel()
+                        }
                 }
                 true
             }

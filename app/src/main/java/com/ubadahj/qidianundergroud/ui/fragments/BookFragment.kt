@@ -1,9 +1,10 @@
-package com.ubadahj.qidianundergroud.ui.main
+package com.ubadahj.qidianundergroud.ui.fragments
 
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.appcompat.app.AppCompatActivity
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import androidx.lifecycle.flowWithLifecycle
@@ -25,6 +26,7 @@ import com.ubadahj.qidianundergroud.services.DownloadService
 import com.ubadahj.qidianundergroud.ui.adapters.MenuAdapter
 import com.ubadahj.qidianundergroud.ui.dialog.MenuDialog
 import com.ubadahj.qidianundergroud.ui.models.MenuDialogItem
+import com.ubadahj.qidianundergroud.ui.viewmodels.MainViewModel
 import com.ubadahj.qidianundergroud.utils.collectNotNull
 import com.ubadahj.qidianundergroud.utils.models.isRead
 import com.ubadahj.qidianundergroud.utils.ui.openLink
@@ -33,7 +35,6 @@ import com.ubadahj.qidianundergroud.utils.ui.toDp
 import com.ubadahj.qidianundergroud.utils.ui.visible
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.Job
-import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
@@ -53,13 +54,23 @@ class BookFragment : Fragment() {
         container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View {
-        binding = BookFragmentBinding.inflate(inflater, container, false)
-        return binding!!.root
+        return BookFragmentBinding.inflate(inflater, container, false).also {
+            binding = it
+
+            handleNotificationIntent()
+        }.root
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         binding?.apply {
+            (requireActivity() as AppCompatActivity).apply {
+                setSupportActionBar(toolbar.appbar)
+                supportActionBar?.setDisplayShowHomeEnabled(true)
+                supportActionBar?.setDisplayHomeAsUpEnabled(true)
+            }
+            toolbar.appbar.title = ""
+
             readLatestButton.visible = false
             materialCardView.setOnClickListener {
                 findNavController().navigate(
@@ -141,11 +152,11 @@ class BookFragment : Fragment() {
                 transformations(RoundedCornersTransformation(4.toDp(requireContext()).toFloat()))
             }
         }
-        bookAuthor.text = book.author ?: "Unknown"
-        bookDesc.text = book.description ?: "No description"
+        bookAuthor.text = book.author?.trim() ?: "Unknown"
+        bookDesc.text = book.description?.trim() ?: "No description"
         bookRatingBar.rating = book.rating ?: 0.0f
         bookRating.text = book.rating?.toString() ?: "0.0"
-        bookGenre.text = book.category ?: "Unknown"
+        bookGenre.text = "•  ${book.category?.trim() ?: "Unknown"}"
         bookGenre.visible = true
         configureMenu(book)
     }
@@ -161,6 +172,11 @@ class BookFragment : Fragment() {
                 lifecycleScope.launch {
                     bookRepo.markAllRead(book)
                 }
+            },
+            MenuDialogItem("Show Reviews", R.drawable.comment) {
+                findNavController().navigate(
+                    BookFragmentDirections.actionBookFragmentToBookReviewFragment()
+                )
             }
         )
 
@@ -205,7 +221,7 @@ class BookFragment : Fragment() {
                             setOnClickListener {
                                 viewModel.setSelectedGroup(group)
                                 findNavController().navigate(
-                                    BookFragmentDirections.actionBookFragmentToChapterFragment()
+                                    BookFragmentDirections.actionBookFragmentToReaderContainerFragment()
                                 )
                             }
                         }
@@ -228,4 +244,9 @@ class BookFragment : Fragment() {
         binding = null
     }
 
+    private fun handleNotificationIntent() {
+        val bookId = requireArguments().getInt("bookId", -1)
+        if (bookId == -1) return
+        viewModel.setSelectedBook(bookId)
+    }
 }

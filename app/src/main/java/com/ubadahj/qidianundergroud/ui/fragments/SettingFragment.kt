@@ -1,4 +1,4 @@
-package com.ubadahj.qidianundergroud.ui.main
+package com.ubadahj.qidianundergroud.ui.fragments
 
 import android.os.Bundle
 import android.view.LayoutInflater

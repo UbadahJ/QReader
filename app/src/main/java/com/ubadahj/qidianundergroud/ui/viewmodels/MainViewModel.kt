@@ -1,20 +1,14 @@
-package com.ubadahj.qidianundergroud.ui.main
+package com.ubadahj.qidianundergroud.ui.viewmodels
 
-import android.annotation.SuppressLint
-import android.webkit.WebView
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.github.ajalt.timberkt.Timber.e
 import com.ubadahj.qidianundergroud.models.Book
-import com.ubadahj.qidianundergroud.models.Content
 import com.ubadahj.qidianundergroud.models.Group
 import com.ubadahj.qidianundergroud.models.Resource
 import com.ubadahj.qidianundergroud.repositories.BookRepository
-import com.ubadahj.qidianundergroud.repositories.ContentRepository
 import com.ubadahj.qidianundergroud.repositories.GroupRepository
-import com.ubadahj.qidianundergroud.repositories.MetadataRepository
+import com.ubadahj.qidianundergroud.utils.coroutines.asSourceFlow
 import dagger.hilt.android.lifecycle.HiltViewModel
-import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
 import javax.inject.Inject
@@ -22,19 +16,14 @@ import javax.inject.Inject
 @HiltViewModel
 class MainViewModel @Inject constructor(
     private val bookRepo: BookRepository,
-    private val groupRepo: GroupRepository,
-    private val contentRepo: ContentRepository,
-    private val metadataRepo: MetadataRepository
+    private val groupRepo: GroupRepository
 ) : ViewModel() {
 
-    private var selectedBookJob: Job? = null
-    private val _selectedBook: MutableStateFlow<Book?> = MutableStateFlow(null)
-    private val _selectedGroup: MutableStateFlow<Group?> = MutableStateFlow(null)
-    private val _selectedContent: MutableStateFlow<Content?> = MutableStateFlow(null)
+    private val _selectedBook = MutableStateFlow<Book?>(null).asSourceFlow()
+    private val _selectedGroup = MutableStateFlow<Group?>(null).asSourceFlow()
 
-    val selectedBook: StateFlow<Book?> = _selectedBook
-    val selectedGroup: StateFlow<Group?> = _selectedGroup
-    val selectedContent: StateFlow<Content?> = _selectedContent
+    val selectedBook = _selectedBook.asStateFlow()
+    val selectedGroup = _selectedGroup.asStateFlow()
 
     val libraryBooks = flow {
         emit(Resource.Loading)
@@ -92,25 +81,23 @@ class MainViewModel @Inject constructor(
         }
     }
 
-    @SuppressLint("SetJavaScriptEnabled")
-    fun getChapterContents(group: Group, refresh: Boolean) = flow {
+    fun getReviews(book: Book) = flow {
         emit(Resource.Loading)
         try {
-            emitAll(
-                contentRepo.getContents(
-                    { WebView(it).apply { settings.javaScriptEnabled = true } },
-                    group,
-                    refresh
-                )
+            emit(
+                bookRepo.getReviews(book)
                     .catch { Resource.Error(it) }
-                    .map {
-                        Resource.Success(it)
-                    }
+                    .map { Resource.Success(it) }
+                    .first()
             )
         } catch (e: Exception) {
-            e(e) { "Failed loading content" }
             emit(Resource.Error(e))
         }
+    }
+
+    fun clearState() {
+        _selectedBook.value = null
+        _selectedGroup.value = null
     }
 
     fun setSelectedBook(book: Book) {
@@ -118,17 +105,15 @@ class MainViewModel @Inject constructor(
     }
 
     fun setSelectedBook(id: Int) {
-        selectedBookJob?.cancel()
-        selectedBookJob = viewModelScope.launch { _selectedBook.emitAll(bookRepo.getBookById(id)) }
+        viewModelScope.launch { _selectedBook.emitAll(bookRepo.getBookById(id)) }
     }
 
     fun setSelectedGroup(group: Group?) {
-        _selectedGroup.value = group
-        _selectedContent.value = null
+        setSelectedGroup(group?.link ?: return)
     }
 
-    fun setSelectedContent(content: Content?) {
-        _selectedContent.value = content
+    fun setSelectedGroup(link: String) {
+        viewModelScope.launch { _selectedGroup.emitAll(groupRepo.getGroupByLink(link)) }
     }
 
 }

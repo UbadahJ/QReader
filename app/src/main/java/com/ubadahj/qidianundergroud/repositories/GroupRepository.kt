@@ -14,6 +14,8 @@ import com.ubadahj.qidianundergroud.models.BaseGroup
 import com.ubadahj.qidianundergroud.models.Book
 import com.ubadahj.qidianundergroud.models.Group
 import com.ubadahj.qidianundergroud.preferences.LibraryPreferences
+import com.ubadahj.qidianundergroud.repositories.models.RepoBook
+import com.ubadahj.qidianundergroud.repositories.models.asRepoBook
 import com.ubadahj.qidianundergroud.utils.models.source
 import com.ubadahj.qidianundergroud.utils.models.total
 import dagger.hilt.android.qualifiers.ApplicationContext
@@ -64,10 +66,10 @@ class GroupRepository @Inject constructor(
         refresh: Boolean = false
     ): Flow<List<Group>> {
         val dbGroups = database.bookQueries.chapters(book.id).executeAsList()
-        if (database.bookQueries.getUndergroundById(book.id).executeAsOneOrNull() == null)
-            fetchWebNovelGroups(book, refresh, dbGroups)
-        else
-            fetchUndergroundGroups(book, refresh, dbGroups)
+        when (book.asRepoBook(database)) {
+            is RepoBook.Underground -> fetchUndergroundGroups(book, refresh, dbGroups)
+            is RepoBook.WebNovel -> fetchWebNovelGroups(book, refresh, dbGroups)
+        }
 
         return database.bookQueries.chapters(book.id).asFlow().mapToList()
     }

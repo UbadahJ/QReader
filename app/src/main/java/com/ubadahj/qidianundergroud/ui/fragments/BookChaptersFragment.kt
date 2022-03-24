@@ -1,4 +1,4 @@
-package com.ubadahj.qidianundergroud.ui.dialog
+package com.ubadahj.qidianundergroud.ui.fragments
 
 import android.os.Bundle
 import android.view.LayoutInflater
@@ -13,7 +13,8 @@ import com.ubadahj.qidianundergroud.databinding.BookChaptersFragmentBinding
 import com.ubadahj.qidianundergroud.models.Group
 import com.ubadahj.qidianundergroud.models.Resource
 import com.ubadahj.qidianundergroud.ui.adapters.GroupAdapter
-import com.ubadahj.qidianundergroud.ui.main.MainViewModel
+import com.ubadahj.qidianundergroud.ui.dialog.GroupDetailsDialog
+import com.ubadahj.qidianundergroud.ui.viewmodels.MainViewModel
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.collect
@@ -29,7 +30,7 @@ class BookChaptersFragment : Fragment() {
     private val adapter: GroupAdapter = GroupAdapter(onClick = {
         viewModel.setSelectedGroup(it)
         findNavController().navigate(
-            BookChaptersFragmentDirections.actionBookChaptersFragmentToChapterFragment()
+            BookChaptersFragmentDirections.actionBookChaptersFragmentToReaderContainerFragment()
         )
     }) { GroupDetailsDialog(it).show(requireActivity().supportFragmentManager, null) }
 
@@ -79,7 +80,7 @@ class BookChaptersFragment : Fragment() {
             is Resource.Success -> {
                 adapter.submitList(resource.data)
             }
-            is Resource.Error -> {}
+            is Resource.Error -> findNavController().popBackStack()
         }
     }
 

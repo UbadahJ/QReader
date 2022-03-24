@@ -1,8 +1,8 @@
 package com.ubadahj.qidianundergroud.ui.adapters
 
 import android.view.ViewGroup
-import androidx.recyclerview.widget.DiffUtil
 import com.ubadahj.qidianundergroud.models.Book
+import com.ubadahj.qidianundergroud.ui.adapters.diff.BookDiffCallback
 import com.ubadahj.qidianundergroud.ui.adapters.factories.BookViewHolder
 import com.ubadahj.qidianundergroud.ui.adapters.factories.BookViewHolderFactory
 import com.ubadahj.qidianundergroud.ui.adapters.factories.BookViewHolderType
@@ -12,7 +12,7 @@ import com.ubadahj.qidianundergroud.utils.ui.getItemSafely
 class BookAdapter(
     books: List<Book>,
     private val onClick: (Book) -> Unit
-) : SortableListAdapter<Book, BookViewHolder>(DiffCallback()) {
+) : SortableListAdapter<Book, BookViewHolder>(BookDiffCallback) {
 
     override var sortedBy: (Book) -> Comparable<*>? = Book::name
     override val filterPredicate: (List<Book>, String) -> List<Book> =
@@ -40,18 +40,6 @@ class BookAdapter(
 
     override fun onBindViewHolder(holder: BookViewHolder, position: Int) {
         holder.bind(getItem(position))
-    }
-
-    class DiffCallback : DiffUtil.ItemCallback<Book>() {
-        override fun areItemsTheSame(
-            oldItem: Book,
-            newItem: Book
-        ): Boolean = oldItem.id == newItem.id
-
-        override fun areContentsTheSame(
-            oldItem: Book,
-            newItem: Book
-        ): Boolean = oldItem == newItem
     }
 
 }

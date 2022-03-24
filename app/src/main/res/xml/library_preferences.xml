@@ -6,11 +6,20 @@
     <PreferenceCategory android:title="General">
         <SeekBarPreference
             android:defaultValue="2"
-            android:key="@string/pref_column_count"
+            android:key="@string/pref_portrait_grid_columns"
             android:max="10"
-            android:summary="Set the number of columns for library"
-            android:title="Column count"
+            android:summary="Set the number of items to show per row in Portrait Mode"
+            android:title="Grid Size (Portrait)"
+            app:showSeekBarValue="true"
             app:min="1" />
+        <SeekBarPreference
+            android:defaultValue="2"
+            android:key="@string/pref_landscape_grid_columns"
+            android:max="10"
+            android:summary="Set the number of items to show per row in Landscape Mode"
+            android:title="Grid Size (Landscape)"
+            app:min="1"
+            app:showSeekBarValue="true" />
     </PreferenceCategory>
     <PreferenceCategory android:title="Updates">
         <SwitchPreference
