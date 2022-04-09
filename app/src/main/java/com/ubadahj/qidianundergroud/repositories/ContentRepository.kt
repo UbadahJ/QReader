@@ -40,7 +40,10 @@ class ContentRepository @Inject constructor(
     }
 
     private suspend fun fetchWebNovelChapters(group: Group) {
-        database.contentQueries.insert(webNovelApi.getChapterContents(group))
+        val bookId = database.bookQueries.getWebNovelById(group.bookId).executeAsOneOrNull()?.id
+            ?: database.bookQueries.getUndergroundById(group.bookId).executeAsOne().novelId!!
+
+        database.contentQueries.insert(webNovelApi.getChapterContents(bookId, group))
     }
 
     private suspend fun fetchDefaultChapters(
