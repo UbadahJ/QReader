@@ -1,5 +1,6 @@
 package com.ubadahj.qidianundergroud.api
 
+import android.text.Html
 import com.ubadahj.qidianundergroud.api.models.webnovel.WNBookRemote
 import com.ubadahj.qidianundergroud.api.models.webnovel.WNChapterRemote
 import com.ubadahj.qidianundergroud.api.models.webnovel.WNSearchResultRemote
@@ -62,20 +63,18 @@ class WebNovelApi @Inject constructor(
             }
     }
 
-    suspend fun getChapterContents(group: Group): Content {
-        val html = withContext(Dispatchers.IO) {
-            webNovelApi.getChapterContents(group.link).body()?.string()
-                ?: throw IllegalStateException("Unable to fetch page")
+    suspend fun getChapterContents(bookId: String, group: Group): Content {
+        val content = withContext(Dispatchers.IO) {
+            webNovelApi.getChapterContents(
+                csrfToken = getToken(),
+                bookId = bookId,
+                chapterId = group.link.split("_").last()
+            ).let { it.body() ?: throw IllegalStateException("Unable to fetch page") }
         }
 
-        val doc = Jsoup.parse(html)
-        doc.getElementsByClass("pirate").forEach { it.remove() }
-
-        val title = doc.select("h3.dib").text()
-        val contents = doc.getElementsByClass("cha-content").first()
-            ?.getElementsByTag("p")
-            ?.joinToString("\n\n") { it.text().trim() }
-            ?: throw IllegalStateException("Either chapter is premium or parsing failed")
+        val info = content.data.chapterInfo
+        val title = "Chapter ${info.chapterIndex}: ${info.chapterName}"
+        val contents = info.contents.joinToString("") { Html.fromHtml(it.content) }
 
         return Content(group.link.md5 + title.md5, group.link, title, contents)
     }

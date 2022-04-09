@@ -1,6 +1,7 @@
 package com.ubadahj.qidianundergroud.api.retrofit
 
 import com.ubadahj.qidianundergroud.api.models.webnovel.WNRawChapterLinksRemote
+import com.ubadahj.qidianundergroud.api.models.webnovel.content.WNChapterContentRemote
 import com.ubadahj.qidianundergroud.api.models.webnovel.reviews.WNReviewRemote
 import com.ubadahj.qidianundergroud.api.models.webnovel.reviews.replies.WNReviewReplyRemote
 import okhttp3.ResponseBody
@@ -8,7 +9,6 @@ import retrofit2.Response
 import retrofit2.http.GET
 import retrofit2.http.Path
 import retrofit2.http.Query
-import retrofit2.http.Url
 
 interface IWebNovelApi {
 
@@ -50,9 +50,13 @@ interface IWebNovelApi {
         @Query("pageSize") pageSize: Int = 9999,
     ): Response<WNReviewReplyRemote>
 
-    @GET
+    @GET("go/pcm/chapter/getContent")
     suspend fun getChapterContents(
-        @Url link: String
-    ): Response<ResponseBody>
+        @Query("_csrfToken") csrfToken: String,
+        @Query("bookId") bookId: String,
+        @Query("chapterId") chapterId: String,
+        @Query("encryptType") encryptType: Int = 3,
+        @Query("font") font: String = "Merriweather"
+    ): Response<WNChapterContentRemote>
 
 }
