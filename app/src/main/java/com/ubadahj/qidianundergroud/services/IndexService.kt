@@ -34,6 +34,7 @@ class IndexService @AssistedInject constructor(
     private val notificationId = 86420
 
     override suspend fun doWork(): Result {
+        val clear = inputData.getBoolean("clear", false)
         val books = bookRepo.getUndergroundBooks().first()
         createChannel(
             applicationContext, Channel(
@@ -48,6 +49,10 @@ class IndexService @AssistedInject constructor(
             setSmallIcon(R.drawable.download)
             setOnlyAlertOnce(true)
             priority = NotificationCompat.PRIORITY_LOW
+        }
+
+        if (clear) {
+            metaRepo.clear()
         }
 
         NotificationManagerCompat.from(applicationContext).apply {

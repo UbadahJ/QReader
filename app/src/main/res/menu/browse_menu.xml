@@ -30,6 +30,11 @@
                 android:icon="@drawable/download"
                 android:title="Download Books Index"
                 app:iconTint="?android:attr/textColorPrimary" />
+            <item
+                android:id="@+id/menu_generate_index_force"
+                android:icon="@drawable/download"
+                android:title="Download Books Index (Force)"
+                app:iconTint="?android:attr/textColorPrimary" />
         </menu>
     </item>
 </menu>

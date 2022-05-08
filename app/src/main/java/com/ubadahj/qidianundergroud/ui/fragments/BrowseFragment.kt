@@ -14,6 +14,7 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.work.ExistingWorkPolicy
 import androidx.work.OneTimeWorkRequestBuilder
 import androidx.work.WorkManager
+import androidx.work.workDataOf
 import com.github.ajalt.timberkt.e
 import com.ubadahj.qidianundergroud.R
 import com.ubadahj.qidianundergroud.databinding.BookListFragmentBinding
@@ -164,10 +165,11 @@ class BrowseFragment : Fragment() {
                 true
             }
             R.id.menu_generate_index -> {
-                val work = OneTimeWorkRequestBuilder<IndexService>().build()
-                WorkManager.getInstance(requireContext()).enqueueUniqueWork(
-                    "index-service", ExistingWorkPolicy.KEEP, work
-                )
+                generateIndex()
+                true
+            }
+            R.id.menu_generate_index_force -> {
+                generateIndex(clear = true)
                 true
             }
             R.id.add -> {
@@ -184,6 +186,20 @@ class BrowseFragment : Fragment() {
             }
             else -> super.onOptionsItemSelected(item)
         }
+    }
+
+    private fun generateIndex(clear: Boolean = false) {
+        val work = OneTimeWorkRequestBuilder<IndexService>()
+            .setInputData(
+                workDataOf(
+                    "clear" to clear,
+                )
+            )
+            .build()
+
+        WorkManager.getInstance(requireContext()).enqueueUniqueWork(
+            "index-service", ExistingWorkPolicy.KEEP, work
+        )
     }
 
     private fun openBookFromLink(link: String) {
