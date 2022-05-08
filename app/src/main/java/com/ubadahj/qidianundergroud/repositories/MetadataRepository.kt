@@ -64,4 +64,12 @@ class MetadataRepository @Inject constructor(
             enableNotification = true
         )
 
+    suspend fun clear() = withContext(Dispatchers.IO) {
+        database.metadataQueries.transaction {
+            database.bookQueries.getAllUndergroundBooks().executeAsList().forEach {
+                database.metadataQueries.delete(it.undergroundId)
+            }
+        }
+    }
+
 }

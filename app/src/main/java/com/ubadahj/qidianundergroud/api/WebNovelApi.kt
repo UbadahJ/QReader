@@ -165,13 +165,13 @@ class WebNovelApi @Inject constructor(
         val document = Jsoup.parse(string())
         val infoElement = document.getElementsByClass("det-info").first()
 
-        val title = infoElement?.selectFirst("h2")
+        val title = infoElement?.selectFirst("h1")
             ?.also { it.selectFirst("small")?.remove() }
             ?.text()
 
         val rating = infoElement?.selectFirst("._score strong")?.text()?.toFloatOrNull() ?: 0.0f
 
-        val author = infoElement?.selectFirst("address > p")
+        val author = infoElement?.selectFirst("address h2")
             ?.children()
             ?.firstOrNull { it.text().contains("author", true) }
             ?.nextElementSibling()
@@ -179,7 +179,7 @@ class WebNovelApi @Inject constructor(
             ?: ""
 
         val coverLink = infoElement?.getElementsByTag("img")
-            ?.lastOrNull { title.toString() in it.attr("alt") }
+            ?.last()
             ?.attr("src")
             ?.let { "https:$it" }
             ?: ""
